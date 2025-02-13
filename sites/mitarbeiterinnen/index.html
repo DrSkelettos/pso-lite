@@ -1,0 +1,43 @@
+---
+layout: layout.html
+title: Mitarbeiter:innen
+active_mitarbeiterinnen: active
+---
+
+<script src="/src/employees.js"></script>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Mitarbeiter:innen</h5>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                        <i class="bi bi-plus-lg me-1"></i>Mitarbeiter:in hinzufügen
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th width=100>Name</th>
+                                <th width="100">Patient:innen</th>
+                                <th>Abwesenheiten</th>
+                                <th width="100"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% include "mitarbeiterinnen/addEmployee.html" %}
+{% include "mitarbeiterinnen/editEmployee.html" %}
+
+<script>
+    fillEmployeesTable();
+</script>

@@ -1,0 +1,27 @@
+<!-- Add Employee Modal -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mitarbeiter:in hinzufügen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addEmployeeForm">
+                    <div class="mb-3">
+                        <label for="employeeName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="employeeName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="employeePatients" class="form-label">Einzelpat.</label>
+                        <input type="number" class="form-control" id="employeePatients" min="0" value="0" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="addEmployee()">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>

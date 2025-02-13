@@ -1,12 +1,20 @@
 let original = {};
 
 function setOriginalData() {
+    original.employees = JSON.stringify(employees);
     original.patients = JSON.stringify(patients);
 }
 setOriginalData();
 
 function checkData() {
-    if (original.patients != JSON.stringify(patients))
+    let changed = false;
+    for (const key in original) {
+        if (original[key] != JSON.stringify(window[key])) {
+            changed = true;
+            break;
+        }
+    }
+    if (changed)
         document.getElementById("data-changed").classList.remove("d-none");
     else
         document.getElementById("data-changed").classList.add("d-none");

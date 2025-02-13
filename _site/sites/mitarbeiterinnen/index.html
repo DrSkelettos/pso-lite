@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PSO - Mitarbeiter:innen</title>
+
+    <style>
+        .nav-scroller {
+            position: relative;
+            z-index: 2;
+            height: 2.75rem;
+            overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+            display: flex;
+            flex-wrap: nowrap;
+            padding-bottom: 1rem;
+            margin-top: -1px;
+            overflow-x: auto;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+
+        .form-label {
+            font-weight: bold;
+        }
+
+        .font-12 {
+            font-size: 12px;
+        }
+    </style>
+
+    <link href="/src/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="/src/bootstrap/bootstrap.min.js"></script>
+    <link href="/src/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+
+    <script src="/_DATA/Zimmer.js"></script>
+    <script src="/_DATA/Mitarbeiter_innen.js"></script>
+    <script src="/_DATA/Belegung.js"></script>
+
+    <script src="/src/patients.js"></script>
+    <script src="/src/data-manager.js"></script>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">PSO</a>
+
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item me-2">
+                    <a class="nav-link " href="/index.html">
+                        <i class="bi bi-house me-1"></i>
+                        Startseite
+                    </a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="nav-link active" href="/sites/mitarbeiterinnen/index.html">
+                        <i class="bi bi-people me-1"></i>
+                        Mitarbeiter:innen
+                    </a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="nav-link " href="/sites/belegung/index.html">
+                        <i class="bi bi-calendar-date me-1"></i>
+                        Belegung
+                    </a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="nav-link " href="/sites/therapiezuordnung/index.html">
+                        <i class="bi bi-list-columns me-1"></i>
+                        Therapiezuordnung
+                    </a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="nav-link " href="/sites/chefaerztinvisite/index.html">
+                        <i class="bi bi-eye me-1"></i>
+                        Chefärztinvisite
+                    </a>
+                </li>
+            </ul>
+            <div id="data-changed" class="d-none text-warning fw-bold cursor-pointer" data-bs-toggle="modal" data-bs-target="#saveDataModal">
+                <div class="d-inline-block pb-1">Speichern notwendig!</div>
+                <i class="ms-2 bi bi-floppy-fill fs-4"></i>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        
+<script src="/src/employees.js"></script>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Mitarbeiter:innen</h5>
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                        <i class="bi bi-plus-lg me-1"></i>Mitarbeiter:in hinzufügen
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th width=100>Name</th>
+                                <th width="100">Patient:innen</th>
+                                <th>Abwesenheiten</th>
+                                <th width="100"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeesTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Employee Modal -->
+<div class="modal fade" id="addEmployeeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mitarbeiter:in hinzufügen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addEmployeeForm">
+                    <div class="mb-3">
+                        <label for="employeeName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="employeeName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="employeePatients" class="form-label">Einzelpat.</label>
+                        <input type="number" class="form-control" id="employeePatients" min="0" value="0" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="addEmployee()">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Employee Modal -->
+<div class="modal fade" id="editEmployeeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Mitarbeiter:in bearbeiten</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEmployeeForm">
+                    <input type="hidden" id="editEmployeeId">
+                    <div class="mb-3">
+                        <label for="editEmployeePatients" class="form-label">Einzelpat.</label>
+                        <input type="number" class="form-control" id="editEmployeePatients" min="0" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Abwesenheiten</label>
+                        <div id="absencesList" class="mb-2">
+                            <!-- Absences will be added here dynamically -->
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addAbsenceEntry()">
+                            <i class="bi bi-plus-lg me-1"></i>Abwesenheit hinzufügen
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger me-auto" onclick="deleteEmployee()">
+                    <i class="bi bi-trash me-1"></i>Löschen
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="saveEmployeeEdit()">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    fillEmployeesTable();
+</script>
+    </div>
+
+</body>
+
+</html>
