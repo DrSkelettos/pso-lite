@@ -108,7 +108,22 @@ function fillPatientData(row, patient) {
 
     cells.group.textContent = patient.group || '';
     cells.admission.textContent = patient.admission || '';
-    cells.discharge.textContent = patient.discharge || '';
+    
+    // Make discharge date clickable if present
+    if (patient.discharge) {
+        const dischargeLink = document.createElement('a');
+        dischargeLink.href = '#';
+        dischargeLink.textContent = patient.discharge;
+        dischargeLink.classList.add('text-decoration-none');
+        dischargeLink.onclick = (e) => {
+            e.preventDefault();
+            preFillAddPatientModal(patient);
+        };
+        cells.discharge.innerHTML = '';
+        cells.discharge.appendChild(dischargeLink);
+    } else {
+        cells.discharge.textContent = '';
+    }
 
     // Calculate and display week number
     if (patient.admission) {
@@ -375,4 +390,31 @@ function calculateWeek(admissionDate) {
     const totalWeeks = weeksSinceMonday + 1; // Add 1 for the first week
 
     return totalWeeks.toString();
+}
+
+function preFillAddPatientModal(patientData) {
+    // Set name to "X"
+    document.getElementById('patientName').value = 'X';
+
+    // Set employee from original patient
+    if (patientData.employees && patientData.employees.length > 0) {
+        document.getElementById('patientEmployee').value = patientData.employees[0].employee;
+    }
+
+    // Set room from original patient
+    if (patientData.rooms && patientData.rooms.length > 0) {
+        const currentRoom = patientData.rooms[patientData.rooms.length - 1];
+        document.getElementById('patientRoom').value = currentRoom.room;
+    }
+
+    // Set admission date to original patient's discharge date
+    if (patientData.discharge) {
+        // Convert from German date format to ISO for input field
+        const [day, month, year] = patientData.discharge.split('.');
+        document.getElementById('patientAdmission').value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    // Show the modal
+    const modal = new bootstrap.Modal(document.getElementById('addPatientModal'));
+    modal.show();
 }

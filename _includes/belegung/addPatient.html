@@ -55,40 +55,95 @@
 </div>
 
 <script>
-    // Populate room dropdown
-    function populateRoomDropdown() {
-        const select = document.getElementById('patientRoom');
-        for (let roomKey in rooms) {
-            for (let spaceKey of ['F', 'T']) {
-                if (spaceKey in rooms[roomKey]) {
-                    const option = document.createElement('option');
-                    option.value = `${roomKey}-${spaceKey}`;
-                    option.textContent = `${roomKey} ${spaceKey}`;
-                    select.appendChild(option);
+    // Reset form when modal is hidden
+    document.getElementById('addPatientModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('addPatientForm').reset();
+        // Clear employee and room selects to trigger proper reinitialization
+        document.getElementById('patientEmployee').innerHTML = '';
+        document.getElementById('patientRoom').innerHTML = '';
+        initializeAddPatientForm();
+    });
+
+    // Initialize form when modal is shown
+    document.getElementById('addPatientModal').addEventListener('show.bs.modal', function () {
+        initializeAddPatientForm();
+    });
+
+    function initializeAddPatientForm() {
+        // Initialize employee select
+        const employeeSelect = document.getElementById('patientEmployee');
+        if (employeeSelect.options.length === 0) {
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = 'Bitte wählen...';
+            employeeSelect.appendChild(emptyOption);
+
+            for (let empKey in employees) {
+                const option = document.createElement('option');
+                option.value = empKey;
+                option.textContent = empKey;
+                employeeSelect.appendChild(option);
+            }
+        }
+
+        // Initialize room select
+        const roomSelect = document.getElementById('patientRoom');
+        if (roomSelect.options.length === 0) {
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = 'Bitte wählen...';
+            roomSelect.appendChild(emptyOption);
+
+            for (let roomKey in rooms) {
+                for (let space of ['F', 'T']) {
+                    if (space in rooms[roomKey]) {
+                        const option = document.createElement('option');
+                        option.value = `${roomKey}-${space}`;
+                        option.textContent = `${roomKey}-${space}`;
+                        roomSelect.appendChild(option);
+                    }
                 }
             }
         }
     }
 
-    // Populate employee dropdown
-    function populateEmployeeDropdown() {
-        const select = document.getElementById('patientEmployee');
-        for (let empKey in employees) {
-            const option = document.createElement('option');
-            option.value = empKey;
-            option.textContent = empKey;
-            select.appendChild(option);
+    function addPatient() {
+        const form = document.getElementById('addPatientForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
         }
-    }
 
-    // Initialize dropdowns when document is ready
-    document.addEventListener('DOMContentLoaded', () => {
-        populateRoomDropdown();
-        populateEmployeeDropdown();
-    });
+        const name = document.getElementById('patientName').value;
+        const group = document.getElementById('patientGroup').value;
+        const employee = document.getElementById('patientEmployee').value;
+        const room = document.getElementById('patientRoom').value;
+        const admission = document.getElementById('patientAdmission').value;
+        const misc = document.getElementById('patientMisc').value;
 
-    // Format date as DD.MM.YYYY
-    function formatDate(date) {
-        return date.split('-').reverse().join('.');
+        // Convert ISO date to German format
+        const [year, month, day] = admission.split('-');
+        const admissionDate = `${day}.${month}.${year}`;
+
+        // Find next available patient ID
+        const nextId = Math.max(...Object.keys(patients).map(Number)) + 1;
+
+        // Create new patient object
+        patients[nextId] = {
+            name: name,
+            group: group,
+            admission: admissionDate,
+            employees: employee ? [{ employee: employee, start: admissionDate }] : [],
+            rooms: room ? [{ room: room, start: admissionDate }] : [],
+            misc: misc
+        };
+
+        // Hide modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('addPatientModal'));
+        modal.hide();
+
+        // Update table
+        fillPatientsTable();
+        checkData();
     }
 </script>
