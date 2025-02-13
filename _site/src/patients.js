@@ -86,12 +86,11 @@ function fillPatientData(row, patient) {
 
     // Check for future room assignments
     if (patient.rooms && patient.rooms.length > 1) {
-        const today = new Date('2025-02-13'); // Using the current time from metadata
         const futureRooms = patient.rooms.filter(room => {
             if (!room.start) return false;
             const [day, month, year] = room.start.split('.');
             const startDate = new Date(year, month - 1, day);
-            return startDate > today;
+            return startDate > currentTableDate;
         });
 
         if (futureRooms.length > 0) {
@@ -113,8 +112,7 @@ function fillPatientData(row, patient) {
 
     // Calculate and display week number
     if (patient.admission) {
-        const weekNumber = calculateWeek(patient.admission);
-        cells.week.textContent = weekNumber;
+        cells.week.textContent = calculateWeek(patient.admission);
     }
 
     // Fill in employee data
@@ -250,103 +248,106 @@ function fillPatientsTable() {
     }
 }
 
-function filterPatients(date = null) {
-    const compareDate = date || new Date().toLocaleDateString('de-DE');
-    const result = {
-        current: {},
-        dismissed: {},
-        planned: {}
-    };
+function filterPatients() {
+    const current = {};
+    const dismissed = {};
+    const planned = {};
 
-    for (let key in patients) {
-        const patient = patients[key];
+    for (let id in patients) {
+        const patient = patients[id];
+        
+        // Convert dates to Date objects for comparison
         const admissionDate = parseGermanDate(patient.admission);
         const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;
-        const currentDate = parseGermanDate(compareDate);
 
-        if (admissionDate > currentDate) {
-            // Future admission date = planned
-            result.planned[key] = patient;
-        } else if (dischargeDate && dischargeDate < currentDate) {
-            // Past discharge date = dismissed (only if discharge date exists)
-            result.dismissed[key] = patient;
+        if (admissionDate > currentTableDate) {
+            // Future admission = planned
+            planned[id] = patient;
+        } else if (dischargeDate && dischargeDate < currentTableDate) {
+            // Past discharge = dismissed
+            dismissed[id] = patient;
         } else {
-            // Current patient (admission date passed, and either no discharge date or discharge date not yet passed)
-            result.current[key] = patient;
+            // Current patient
+            current[id] = patient;
         }
     }
 
-    return result;
+    return { current, dismissed, planned };
 }
 
 function parseGermanDate(dateStr) {
+    if (!dateStr) return null;
     const [day, month, year] = dateStr.split('.');
-    return new Date(year, month - 1, day); // month is 0-based in JS Date
+    return new Date(year, month - 1, day);
 }
 
-function getPatientsByRooms(date = null) {
-    const patientsByRooms = {};
-    const { current, dismissed, planned } = filterPatients(date);
+function getActiveRoom(patient, date = null) {
+    if (!patient.rooms || patient.rooms.length === 0) return null;
 
-    // Initialize result with empty arrays for each room-space combination
-    for (let roomKey in rooms) {
-        for (let spaceKey of ['F', 'T']) {
-            if (spaceKey in rooms[roomKey]) {
-                const roomId = `${roomKey}-${spaceKey}`;
-                patientsByRooms[roomId] = {
-                    current: null,
-                    planned: null
-                };
-            }
+    const targetDate = date ? parseGermanDate(date) : currentTableDate;
+    let activeRoom = null;
+
+    // Sort rooms by start date
+    const sortedRooms = [...patient.rooms].sort((a, b) => {
+        const dateA = parseGermanDate(a.start);
+        const dateB = parseGermanDate(b.start);
+        return dateA - dateB;
+    });
+
+    // Find the active room for the target date
+    for (let room of sortedRooms) {
+        const startDate = parseGermanDate(room.start);
+        const endDate = room.end ? parseGermanDate(room.end) : null;
+
+        if (startDate <= targetDate && (!endDate || targetDate <= endDate)) {
+            activeRoom = room.room;
         }
     }
 
-    // Helper function to get the active room for a patient at the given date
-    function getActiveRoom(patient, compareDate) {
-        const currentDate = parseGermanDate(compareDate);
-        let activeRoom = null;
+    return activeRoom;
+}
 
-        if (patient.rooms && patient.rooms.length > 0) {
-            // Sort rooms by start date, newest first
-            const sortedRooms = [...patient.rooms].sort((a, b) =>
-                parseGermanDate(b.start) - parseGermanDate(a.start)
-            );
+function getPatientsByRooms() {
+    const patientsByRooms = {};
+    const { current, dismissed, planned } = filterPatients();
 
-            // Find the most recent room assignment that started before or on the compare date
-            activeRoom = sortedRooms.find(room =>
-                parseGermanDate(room.start) <= currentDate &&
-                (!room.end || parseGermanDate(room.end) >= currentDate)
-            );
+    // Initialize result with empty arrays for each room-space combination
+    for (let roomKey in rooms) {
+        for (let spaceKey in rooms[roomKey]) {
+            const roomId = `${roomKey}-${spaceKey}`;
+            patientsByRooms[roomId] = {
+                current: null,
+                planned: null
+            };
         }
-
-        return activeRoom ? activeRoom.room : null;
     }
 
     // Process current patients
     for (let patientId in current) {
         const patient = current[patientId];
-        const activeRoom = getActiveRoom(patient, date || new Date().toLocaleDateString('de-DE'));
+        const activeRoom = getActiveRoom(patient);
         if (activeRoom && activeRoom in patientsByRooms) {
-            patientsByRooms[activeRoom].current = {
-                id: patientId,
-                ...patient
-            };
+            patientsByRooms[activeRoom].current = { ...patient, id: patientId };
         }
     }
 
     // Process planned patients
     for (let patientId in planned) {
         const patient = planned[patientId];
-        const activeRoom = getActiveRoom(patient, patient.admission); // Use admission date for planned patients
+        const activeRoom = getActiveRoom(patient, patient.admission);
         if (activeRoom && activeRoom in patientsByRooms) {
-            patientsByRooms[activeRoom].planned = {
-                id: patientId,
-                ...patient
-            };
+            patientsByRooms[activeRoom].planned = { ...patient, id: patientId };
         }
     }
 
     return patientsByRooms;
+}
+
+let currentTableDate = new Date();
+
+function updateTableDate(dateString) {
+    currentTableDate = new Date(dateString);
+    fillPatientsTable();
 }
 
 function calculateWeek(admissionDate) {
@@ -355,10 +356,9 @@ function calculateWeek(admissionDate) {
     // Parse the German date format DD.MM.YYYY
     const [day, month, year] = admissionDate.split('.');
     const admission = new Date(year, month - 1, day);
-    const today = new Date('2025-02-13'); // Using the current time from metadata
 
     // If admission is in the future, return empty
-    if (admission > today)
+    if (admission > currentTableDate)
         return '';
 
     // Find the first Monday after admission
@@ -367,11 +367,11 @@ function calculateWeek(admissionDate) {
     firstMonday.setDate(admission.getDate() + daysUntilMonday);
 
     // If we haven't reached the first Monday yet, return week 1
-    if (today < firstMonday)
+    if (currentTableDate < firstMonday)
         return '1';
 
     // Calculate weeks since first Monday
-    const weeksSinceMonday = Math.floor((today - firstMonday) / (7 * 24 * 60 * 60 * 1000));
+    const weeksSinceMonday = Math.floor((currentTableDate - firstMonday) / (7 * 24 * 60 * 60 * 1000));
     const totalWeeks = weeksSinceMonday + 1; // Add 1 for the first week
 
     return totalWeeks.toString();
