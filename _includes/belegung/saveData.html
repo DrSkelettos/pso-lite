@@ -13,6 +13,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
                 <button type="button" class="btn btn-primary" onclick="copyToClipboard()">In Zwischenablage kopieren</button>
+                <button type="button" class="btn btn-success" onclick="confirmSave()">Bestätigen</button>
             </div>
         </div>
     </div>
@@ -103,6 +104,13 @@
                 copyBtn.textContent = originalText;
             }, 2000);
         });
+    }
+
+    function confirmSave() {
+        setOriginalData();
+        checkData();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('saveDataModal'));
+        modal.hide();
     }
 
     // Update and select content when modal is shown

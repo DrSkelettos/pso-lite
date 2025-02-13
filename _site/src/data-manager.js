@@ -1,7 +1,9 @@
 let original = {};
 
-original.patients = JSON.stringify(patients);
-
+function setOriginalData() {
+    original.patients = JSON.stringify(patients);
+}
+setOriginalData();
 
 function checkData() {
     if (original.patients != JSON.stringify(patients))
