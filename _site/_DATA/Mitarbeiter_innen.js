@@ -1,23 +1,23 @@
 const employees = {
     "CP" : {
-        "name" : "Fr. Dr. Pfeiffer",        
+        "patients" : 0,
     },
     "LS" : {
-        "name" : "Hr. Schäfer",
+        "patients" : 2,
     },
     "Em" : {
-        "name" : "Fr. Emde",
+        "patients" : 3,
     },
     "Sa" : {
-        "name" : "Fr. Sabanci",
-    },
+        "patients" : 3,
+    },  
     "Rad" : {
-        "name" : "Fr. Radeva",
+        "patients" : 4,
     },
     "Kaz" : {
-        "name" : "Fr. Kazianis",
+        "patients" : 6,
     },
     "Ulu" : {
-        "name" : "Fr. Ulusan",
+        "patients" : 5,
     },
 }
