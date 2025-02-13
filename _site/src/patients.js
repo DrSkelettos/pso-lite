@@ -65,6 +65,7 @@ function fillPatientData(row, patient) {
         employee1: row.querySelector('.data-employee1'),
         misc: row.querySelector('.data-misc'),
         admission: row.querySelector('.data-admission'),
+        week: row.querySelector('.data-week'),
         discharge: row.querySelector('.data-discharge'),
         discharge_mode: row.querySelector('.data-discharge_mode')
     };
@@ -85,7 +86,7 @@ function fillPatientData(row, patient) {
 
     // Check for future room assignments
     if (patient.rooms && patient.rooms.length > 1) {
-        const today = new Date();
+        const today = new Date('2025-02-13'); // Using the current time from metadata
         const futureRooms = patient.rooms.filter(room => {
             if (!room.start) return false;
             const [day, month, year] = room.start.split('.');
@@ -110,6 +111,12 @@ function fillPatientData(row, patient) {
     cells.admission.textContent = patient.admission || '';
     cells.discharge.textContent = patient.discharge || '';
 
+    // Calculate and display week number
+    if (patient.admission) {
+        const weekNumber = calculateWeek(patient.admission);
+        cells.week.textContent = weekNumber;
+    }
+
     // Fill in employee data
     if (patient.employees && patient.employees.length > 0) {
         cells.employee1.textContent = patient.employees[0].employee;
@@ -119,9 +126,7 @@ function fillPatientData(row, patient) {
         
         // Add additional employees
         if (patient.employees.length > 1) {
-            const additionalEmployees = patient.employees.slice(1).map(emp => 
-                emp.employee
-            );
+            const additionalEmployees = patient.employees.slice(1).map(emp => emp.employee);
             miscContent.push(additionalEmployees.join(', '));
         }
         
@@ -342,4 +347,32 @@ function getPatientsByRooms(date = null) {
     }
 
     return patientsByRooms;
+}
+
+function calculateWeek(admissionDate) {
+    if (!admissionDate) return '';
+
+    // Parse the German date format DD.MM.YYYY
+    const [day, month, year] = admissionDate.split('.');
+    const admission = new Date(year, month - 1, day);
+    const today = new Date('2025-02-13'); // Using the current time from metadata
+
+    // If admission is in the future, return empty
+    if (admission > today)
+        return '';
+
+    // Find the first Monday after admission
+    const firstMonday = new Date(admission);
+    const daysUntilMonday = (8 - admission.getDay()) % 7;
+    firstMonday.setDate(admission.getDate() + daysUntilMonday);
+
+    // If we haven't reached the first Monday yet, return week 1
+    if (today < firstMonday)
+        return '1';
+
+    // Calculate weeks since first Monday
+    const weeksSinceMonday = Math.floor((today - firstMonday) / (7 * 24 * 60 * 60 * 1000));
+    const totalWeeks = weeksSinceMonday + 1; // Add 1 for the first week
+
+    return totalWeeks.toString();
 }
