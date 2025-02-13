@@ -193,27 +193,14 @@
         const patient = patients[patientId];
         if (!patient) return;
 
-        // Store patient ID for saving
+        // Set basic info
         document.getElementById('editPatientId').value = patientId;
-
-        // Fill in basic info
-        document.getElementById('editPatientName').value = patient.name || '';
-        document.getElementById('editPatientGroup').value = patient.group || '';
+        document.getElementById('editPatientName').value = patient.name;
+        document.getElementById('editPatientGroup').value = patient.group;
+        document.getElementById('editPatientAdmission').value = formatDateForInput(patient.admission);
         document.getElementById('editPatientMisc').value = patient.misc || '';
-
-        // Convert German dates to ISO format for date inputs
-        if (patient.admission) {
-            const [day, month, year] = patient.admission.split('.');
-            document.getElementById('editPatientAdmission').value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        } else {
-            document.getElementById('editPatientAdmission').value = '';
-        }
-
         if (patient.discharge) {
-            const [day, month, year] = patient.discharge.split('.');
-            document.getElementById('editPatientDischarge').value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        } else {
-            document.getElementById('editPatientDischarge').value = '';
+            document.getElementById('editPatientDischarge').value = formatDateForInput(patient.discharge);
         }
 
         // Clear existing entries

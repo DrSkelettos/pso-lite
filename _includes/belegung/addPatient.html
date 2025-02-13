@@ -58,10 +58,6 @@
     // Reset form when modal is hidden
     document.getElementById('addPatientModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('addPatientForm').reset();
-        // Clear employee and room selects to trigger proper reinitialization
-        document.getElementById('patientEmployee').innerHTML = '';
-        document.getElementById('patientRoom').innerHTML = '';
-        initializeAddPatientForm();
     });
 
     // Initialize form when modal is shown
@@ -72,36 +68,40 @@
     function initializeAddPatientForm() {
         // Initialize employee select
         const employeeSelect = document.getElementById('patientEmployee');
-        if (employeeSelect.options.length === 0) {
-            const emptyOption = document.createElement('option');
-            emptyOption.value = '';
-            emptyOption.textContent = 'Bitte wählen...';
-            employeeSelect.appendChild(emptyOption);
+        employeeSelect.innerHTML = ''; // Clear existing options
+        
+        // Add empty option
+        const emptyEmployeeOption = document.createElement('option');
+        emptyEmployeeOption.value = '';
+        emptyEmployeeOption.textContent = 'Bitte wählen...';
+        employeeSelect.appendChild(emptyEmployeeOption);
 
-            for (let empKey in employees) {
-                const option = document.createElement('option');
-                option.value = empKey;
-                option.textContent = empKey;
-                employeeSelect.appendChild(option);
-            }
+        // Add employee options
+        for (let empKey in employees) {
+            const option = document.createElement('option');
+            option.value = empKey;
+            option.textContent = empKey;
+            employeeSelect.appendChild(option);
         }
 
         // Initialize room select
         const roomSelect = document.getElementById('patientRoom');
-        if (roomSelect.options.length === 0) {
-            const emptyOption = document.createElement('option');
-            emptyOption.value = '';
-            emptyOption.textContent = 'Bitte wählen...';
-            roomSelect.appendChild(emptyOption);
+        roomSelect.innerHTML = ''; // Clear existing options
+        
+        // Add empty option
+        const emptyRoomOption = document.createElement('option');
+        emptyRoomOption.value = '';
+        emptyRoomOption.textContent = 'Bitte wählen...';
+        roomSelect.appendChild(emptyRoomOption);
 
-            for (let roomKey in rooms) {
-                for (let space of ['F', 'T']) {
-                    if (space in rooms[roomKey]) {
-                        const option = document.createElement('option');
-                        option.value = `${roomKey}-${space}`;
-                        option.textContent = `${roomKey}-${space}`;
-                        roomSelect.appendChild(option);
-                    }
+        // Add room options
+        for (let roomKey in rooms) {
+            for (let space of ['F', 'T']) {
+                if (space in rooms[roomKey]) {
+                    const option = document.createElement('option');
+                    option.value = `${roomKey}-${space}`;
+                    option.textContent = `${roomKey}-${space}`;
+                    roomSelect.appendChild(option);
                 }
             }
         }

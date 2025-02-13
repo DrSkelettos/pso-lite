@@ -393,28 +393,34 @@ function calculateWeek(admissionDate) {
 }
 
 function preFillAddPatientModal(patientData) {
-    // Set name to "X"
-    document.getElementById('patientName').value = 'X';
-
-    // Set employee from original patient
-    if (patientData.employees && patientData.employees.length > 0) {
-        document.getElementById('patientEmployee').value = patientData.employees[0].employee;
-    }
-
-    // Set room from original patient
-    if (patientData.rooms && patientData.rooms.length > 0) {
-        const currentRoom = patientData.rooms[patientData.rooms.length - 1];
-        document.getElementById('patientRoom').value = currentRoom.room;
-    }
-
-    // Set admission date to original patient's discharge date
-    if (patientData.discharge) {
-        // Convert from German date format to ISO for input field
-        const [day, month, year] = patientData.discharge.split('.');
-        document.getElementById('patientAdmission').value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-    }
-
-    // Show the modal
+    // Show the modal first, which will trigger initialization
     const modal = new bootstrap.Modal(document.getElementById('addPatientModal'));
     modal.show();
+
+    // Wait for modal to be shown and dropdowns initialized
+    setTimeout(() => {
+
+        // Set name to "X"
+        document.getElementById('patientName').value = 'X';
+
+        // Set employee from original patient
+        if (patientData.employees && patientData.employees.length > 0) {
+            const employee = patientData.employees[0].employee;
+            document.getElementById('patientEmployee').value = employee;
+        }
+
+        // Set room from original patient
+        if (patientData.rooms && patientData.rooms.length > 0) {
+            const currentRoom = patientData.rooms[patientData.rooms.length - 1].room;
+            document.getElementById('patientRoom').value = currentRoom;
+        }
+
+        // Set admission date to original patient's discharge date
+        if (patientData.discharge) {
+            // Convert from German date format to ISO for input field
+            const [day, month, year] = patientData.discharge.split('.');
+            const isoDate = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            document.getElementById('patientAdmission').value = isoDate;
+        }
+    }, 100); // Small delay to ensure modal is shown and dropdowns are initialized
 }

@@ -81,8 +81,7 @@
                     </a>
                 </li>
             </ul>
-            <div id="data-changed" class="d-none text-warning fw-bold cursor-pointer"
-                onclick="window.open('/sites/hilfe/speichern/index.html', '_blank')">
+            <div id="data-changed" class="d-none text-warning fw-bold cursor-pointer" data-bs-toggle="modal" data-bs-target="#saveDataModal">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4"></i>
             </div>
@@ -217,10 +216,6 @@
     // Reset form when modal is hidden
     document.getElementById('addPatientModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('addPatientForm').reset();
-        // Clear employee and room selects to trigger proper reinitialization
-        document.getElementById('patientEmployee').innerHTML = '';
-        document.getElementById('patientRoom').innerHTML = '';
-        initializeAddPatientForm();
     });
 
     // Initialize form when modal is shown
@@ -231,36 +226,40 @@
     function initializeAddPatientForm() {
         // Initialize employee select
         const employeeSelect = document.getElementById('patientEmployee');
-        if (employeeSelect.options.length === 0) {
-            const emptyOption = document.createElement('option');
-            emptyOption.value = '';
-            emptyOption.textContent = 'Bitte wählen...';
-            employeeSelect.appendChild(emptyOption);
+        employeeSelect.innerHTML = ''; // Clear existing options
+        
+        // Add empty option
+        const emptyEmployeeOption = document.createElement('option');
+        emptyEmployeeOption.value = '';
+        emptyEmployeeOption.textContent = 'Bitte wählen...';
+        employeeSelect.appendChild(emptyEmployeeOption);
 
-            for (let empKey in employees) {
-                const option = document.createElement('option');
-                option.value = empKey;
-                option.textContent = empKey;
-                employeeSelect.appendChild(option);
-            }
+        // Add employee options
+        for (let empKey in employees) {
+            const option = document.createElement('option');
+            option.value = empKey;
+            option.textContent = empKey;
+            employeeSelect.appendChild(option);
         }
 
         // Initialize room select
         const roomSelect = document.getElementById('patientRoom');
-        if (roomSelect.options.length === 0) {
-            const emptyOption = document.createElement('option');
-            emptyOption.value = '';
-            emptyOption.textContent = 'Bitte wählen...';
-            roomSelect.appendChild(emptyOption);
+        roomSelect.innerHTML = ''; // Clear existing options
+        
+        // Add empty option
+        const emptyRoomOption = document.createElement('option');
+        emptyRoomOption.value = '';
+        emptyRoomOption.textContent = 'Bitte wählen...';
+        roomSelect.appendChild(emptyRoomOption);
 
-            for (let roomKey in rooms) {
-                for (let space of ['F', 'T']) {
-                    if (space in rooms[roomKey]) {
-                        const option = document.createElement('option');
-                        option.value = `${roomKey}-${space}`;
-                        option.textContent = `${roomKey}-${space}`;
-                        roomSelect.appendChild(option);
-                    }
+        // Add room options
+        for (let roomKey in rooms) {
+            for (let space of ['F', 'T']) {
+                if (space in rooms[roomKey]) {
+                    const option = document.createElement('option');
+                    option.value = `${roomKey}-${space}`;
+                    option.textContent = `${roomKey}-${space}`;
+                    roomSelect.appendChild(option);
                 }
             }
         }
@@ -622,27 +621,14 @@
         const patient = patients[patientId];
         if (!patient) return;
 
-        // Store patient ID for saving
+        // Set basic info
         document.getElementById('editPatientId').value = patientId;
-
-        // Fill in basic info
-        document.getElementById('editPatientName').value = patient.name || '';
-        document.getElementById('editPatientGroup').value = patient.group || '';
+        document.getElementById('editPatientName').value = patient.name;
+        document.getElementById('editPatientGroup').value = patient.group;
+        document.getElementById('editPatientAdmission').value = formatDateForInput(patient.admission);
         document.getElementById('editPatientMisc').value = patient.misc || '';
-
-        // Convert German dates to ISO format for date inputs
-        if (patient.admission) {
-            const [day, month, year] = patient.admission.split('.');
-            document.getElementById('editPatientAdmission').value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        } else {
-            document.getElementById('editPatientAdmission').value = '';
-        }
-
         if (patient.discharge) {
-            const [day, month, year] = patient.discharge.split('.');
-            document.getElementById('editPatientDischarge').value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        } else {
-            document.getElementById('editPatientDischarge').value = '';
+            document.getElementById('editPatientDischarge').value = formatDateForInput(patient.discharge);
         }
 
         // Clear existing entries
@@ -755,6 +741,9 @@
     // Set default date to today
     const today = new Date();
     document.getElementById('tableDate').value = today.toISOString().split('T')[0];
+    
+    // Initialize form dropdowns and table
+    initializeAddPatientForm();
     fillPatientsTable();
 </script>
     </div>

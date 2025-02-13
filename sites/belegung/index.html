@@ -78,5 +78,8 @@ title: Belegung
     // Set default date to today
     const today = new Date();
     document.getElementById('tableDate').value = today.toISOString().split('T')[0];
+    
+    // Initialize form dropdowns and table
+    initializeAddPatientForm();
     fillPatientsTable();
 </script>
