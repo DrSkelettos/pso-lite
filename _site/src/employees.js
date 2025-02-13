@@ -1,18 +1,28 @@
 function formatAbsenceDates(start, end) {
     const [startDay, startMonth, startYear] = start.split('.');
     const [endDay, endMonth, endYear] = end.split('.');
-    const currentYear = new Date().getFullYear().toString();
 
-    // If either year is not current year, show full dates
-    if (startYear !== currentYear || endYear !== currentYear) {
-        return `${start}-${end}`;
+    // Pad day and month with leading zeros
+    const startDayPadded = startDay.padStart(2, '0');
+    const startMonthPadded = startMonth.padStart(2, '0');
+    const endDayPadded = endDay.padStart(2, '0');
+    const endMonthPadded = endMonth.padStart(2, '0');
+
+    // If start and end are the same day
+    if (startDay === endDay && startMonth === endMonth && startYear === endYear) {
+        return `${startDayPadded}.${startMonthPadded}.${startYear}`;
     }
 
-    // Both dates are in current year, hide year
-    if (startMonth === endMonth) {
-        return `${startDay}.-${endDay}.${startMonth}.`;
+    // If years are equal
+    if (startYear === endYear) {
+        // If months are equal
+        if (startMonth === endMonth) {
+            return `${startDayPadded}.-${endDayPadded}.${startMonthPadded}.${startYear}`;
+        }
+        return `${startDayPadded}.${startMonthPadded}.-${endDayPadded}.${endMonthPadded}.${startYear}`;
     }
-    return `${startDay}.${startMonth}.-${endDay}.${endMonth}.`;
+    // Different years, show full dates
+    return `${startDayPadded}.${startMonthPadded}.${startYear}-${endDayPadded}.${endMonthPadded}.${endYear}`;
 }
 
 function addEmployee() {
@@ -60,7 +70,11 @@ function editEmployee(empKey) {
     absencesList.innerHTML = '';
     
     if (employee.absences) {
-        addAbsenceEntry(employee.absences.start, employee.absences.end);
+        // Convert single absence to array if needed
+        const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
+        absencesArray.forEach(absence => {
+            addAbsenceEntry(absence.start, absence.end);
+        });
     }
 
     // Show modal
@@ -109,15 +123,21 @@ function saveEmployeeEdit() {
     // Get absences
     const absenceEntries = document.querySelectorAll('.absence-entry');
     if (absenceEntries.length > 0) {
-        const firstEntry = absenceEntries[0];
-        const start = firstEntry.querySelector('.absence-start').value;
-        const end = firstEntry.querySelector('.absence-end').value;
+        const absences = [];
+        absenceEntries.forEach(entry => {
+            const start = entry.querySelector('.absence-start').value;
+            const end = entry.querySelector('.absence-end').value;
+            
+            if (start && end) {
+                absences.push({
+                    start: formatISOToGermanDate(start),
+                    end: formatISOToGermanDate(end)
+                });
+            }
+        });
         
-        if (start && end) {
-            employees[empKey].absences = {
-                start: formatISOToGermanDate(start),
-                end: formatISOToGermanDate(end)
-            };
+        if (absences.length > 0) {
+            employees[empKey].absences = absences;
         } else {
             delete employees[empKey].absences;
         }
@@ -173,19 +193,15 @@ function fillEmployeesTable() {
         // Absences cell
         const absencesCell = document.createElement('td');
         if (employee.absences) {
-            const now = new Date();
-            const [absStartDay, absStartMonth, absStartYear] = employee.absences.start.split('.');
-            const absStart = new Date(absStartYear, absStartMonth - 1, absStartDay);
+            // Convert single absence to array if needed
+            const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
             
-            const [absEndDay, absEndMonth, absEndYear] = employee.absences.end.split('.');
-            const absEnd = new Date(absEndYear, absEndMonth - 1, absEndDay);
-
-            if (absEnd >= now) {
+            absencesArray.forEach(absence => {
                 const badge = document.createElement('span');
-                badge.className = 'badge bg-warning text-dark';
-                badge.textContent = formatAbsenceDates(employee.absences.start, employee.absences.end);
+                badge.className = 'badge bg-warning text-dark me-1';
+                badge.textContent = formatAbsenceDates(absence.start, absence.end);
                 absencesCell.appendChild(badge);
-            }
+            });
         }
         row.appendChild(absencesCell);
 
