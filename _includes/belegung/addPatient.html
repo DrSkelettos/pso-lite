@@ -1,0 +1,94 @@
+<!-- Add Patient Modal -->
+<div class="modal fade" id="addPatientModal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPatientModalLabel">Neue:n Patient:in hinzufügen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPatientForm">
+                    <div class="mb-3">
+                        <label for="patientName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="patientName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="patientRoom" class="form-label">Zimmer</label>
+                        <select class="form-select" id="patientRoom" required>
+                            <option value="">Bitte wählen...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="patientEmployee" class="form-label">Therapeut:in</label>
+                        <select class="form-select" id="patientEmployee" required>
+                            <option value="">Bitte wählen...</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="patientGroup" class="form-label">Gruppe</label>
+                        <select class="form-select" id="patientGroup" required>
+                            <option value="">Bitte wählen...</option>
+                            <option value="1-A">1-A</option>
+                            <option value="1-B">1-B</option>
+                            <option value="2-A">2-A</option>
+                            <option value="2-B">2-B</option>
+                            <option value="3-A">3-A</option>
+                            <option value="3-B">3-B</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="patientAdmission" class="form-label">Aufnahmedatum</label>
+                        <input type="date" class="form-control" id="patientAdmission" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="patientMisc" class="form-label">Bemerkung</label>
+                        <input type="text" class="form-control" id="patientMisc">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="addPatient()">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Populate room dropdown
+    function populateRoomDropdown() {
+        const select = document.getElementById('patientRoom');
+        for (let roomKey in rooms) {
+            for (let spaceKey of ['F', 'T']) {
+                if (spaceKey in rooms[roomKey]) {
+                    const option = document.createElement('option');
+                    option.value = `${roomKey}-${spaceKey}`;
+                    option.textContent = `${roomKey} ${spaceKey}`;
+                    select.appendChild(option);
+                }
+            }
+        }
+    }
+
+    // Populate employee dropdown
+    function populateEmployeeDropdown() {
+        const select = document.getElementById('patientEmployee');
+        for (let empKey in employees) {
+            const option = document.createElement('option');
+            option.value = empKey;
+            option.textContent = `${employees[empKey].name} (${empKey})`;
+            select.appendChild(option);
+        }
+    }
+
+    // Initialize dropdowns when document is ready
+    document.addEventListener('DOMContentLoaded', () => {
+        populateRoomDropdown();
+        populateEmployeeDropdown();
+    });
+
+    // Format date as DD.MM.YYYY
+    function formatDate(date) {
+        return date.split('-').reverse().join('.');
+    }
+</script>

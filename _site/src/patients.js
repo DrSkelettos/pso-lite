@@ -1,7 +1,59 @@
-function addPatient(data) {
-    let lastKey = Object.keys(patients).length === 0 ? 0 : Math.max(...Object.keys(patients));
-    patients[lastKey + 1] = data;
+function addPatient() {
+
+    const form = document.getElementById('addPatientForm');
+    if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+    }
+
+    const name = document.getElementById('patientName').value;
+    const group = document.getElementById('patientGroup').value;
+    const room = document.getElementById('patientRoom').value;
+    const employee = document.getElementById('patientEmployee').value;
+    const admission = formatDate(document.getElementById('patientAdmission').value);
+    const misc = document.getElementById('patientMisc').value;
+
+    // Create new patient object in correct format
+    const newPatient = {
+        name: name,
+        group: group,
+        admission: admission,
+        employees: [
+            { employee: employee, start: admission }
+        ],
+        rooms: [
+            { room: room, start: admission }
+        ]
+    };
+
+    // Add misc if it's not empty
+    if (misc) {
+        newPatient.misc = misc;
+    }
+
+    // Add to patients object with new key
+    let lastKey = Object.keys(patients).length === 0 ? 0 : Math.max(...Object.keys(patients).map(Number));
+    patients[lastKey + 1] = newPatient;
+
+    // Update data and table
     checkData();
+    fillPatientsTable();
+
+    // Close modal and reset form
+    const modal = bootstrap.Modal.getInstance(document.getElementById('addPatientModal'));
+    modal.hide();
+    form.reset();
+}
+
+function getActiveEmployees(patient, date) {
+    if (!patient.employees || patient.employees.length === 0) return [];
+
+    const compareDate = parseGermanDate(date);
+    return patient.employees.filter(emp => {
+        const startDate = parseGermanDate(emp.start);
+        const endDate = emp.end ? parseGermanDate(emp.end) : null;
+        return startDate <= compareDate && (!endDate || endDate >= compareDate);
+    }).map(emp => emp.employee);
 }
 
 function fillPatientData(row, patient) {
@@ -24,15 +76,14 @@ function fillPatientData(row, patient) {
     cells.admission.textContent = patient.admission || '';
     cells.discharge.textContent = patient.discharge || '';
 
-    // Handle employee assignments
+    // Handle employee assignments - first entry always goes to employee1
     if (patient.employees && patient.employees.length > 0) {
-        const currentEmployees = patient.employees
-            .filter(e => !e.end)
-            .map(e => e.employee);
-        
-        if (currentEmployees.length > 0) {
-            cells.employee1.textContent = currentEmployees[0] || '';
-            cells.employee2.textContent = currentEmployees[1] || '';
+        cells.employee1.textContent = patient.employees[0].employee || '';
+        if (patient.employees.length > 1) {
+            cells.employee2.textContent = patient.employees
+                .slice(1)
+                .map(e => e.employee)
+                .join(', ');
         }
     }
 }
@@ -54,16 +105,22 @@ function fillPlannedPatientData(row, patient) {
     cells.group.textContent = patient.group || '';
     cells.admission.textContent = patient.admission || '';
 
-    // Handle employee assignments
+    // Handle employee assignments - first entry always goes to employee1
     if (patient.employees && patient.employees.length > 0) {
         cells.employee1.textContent = patient.employees[0].employee || '';
+        if (patient.employees.length > 1) {
+            cells.misc.textContent = patient.employees
+                .slice(1)
+                .map(e => e.employee)
+                .join(', ');
+        }
     }
 }
 
 function fillPatientsTable() {
     let table = document.getElementById("patients-table");
     let template = document.getElementById("patient-row");
-    
+
     // Clear existing rows except template
     Array.from(table.children).forEach(child => {
         if (child !== template) {
@@ -80,11 +137,11 @@ function fillPatientsTable() {
             // Create new row from template
             let row = template.cloneNode(true);
             let rowId = `${roomKey}-${spaceKey}`;
-            
+
             // Set row properties
             row.id = rowId;
             row.classList.remove('d-none');
-            
+
             // Set room number
             let roomCell = row.querySelector('.data-room');
             roomCell.textContent = roomKey;
@@ -174,20 +231,20 @@ function getPatientsByRooms(date = null) {
     function getActiveRoom(patient, compareDate) {
         const currentDate = parseGermanDate(compareDate);
         let activeRoom = null;
-        
+
         if (patient.rooms && patient.rooms.length > 0) {
             // Sort rooms by start date, newest first
-            const sortedRooms = [...patient.rooms].sort((a, b) => 
+            const sortedRooms = [...patient.rooms].sort((a, b) =>
                 parseGermanDate(b.start) - parseGermanDate(a.start)
             );
 
             // Find the most recent room assignment that started before or on the compare date
-            activeRoom = sortedRooms.find(room => 
+            activeRoom = sortedRooms.find(room =>
                 parseGermanDate(room.start) <= currentDate &&
                 (!room.end || parseGermanDate(room.end) >= currentDate)
             );
         }
-        
+
         return activeRoom ? activeRoom.room : null;
     }
 

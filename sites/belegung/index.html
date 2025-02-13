@@ -52,6 +52,26 @@ title: Belegung
     </tbody>
 </table>
 
+<div class="row mt-4">
+    <!-- Save Data -->
+    <div class="col text-start">
+        <button type="button" class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#saveDataModal">
+            <i class="bi bi-floppy me-2"></i> Daten speichern
+        </button>
+    </div>
+    <!-- Add Patient -->
+    <div class="col text-end">
+        <button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addPatientModal">
+            <i class="bi bi-plus-circle me-2"></i> Patient:in hinzufügen
+        </button>
+    </div>
+</div>
+
+
+
+{% include "belegung/addPatient.html" %}
+{% include "belegung/saveData.html" %}
+
 <script>
     fillPatientsTable();
 </script>
