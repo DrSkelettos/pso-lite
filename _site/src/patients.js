@@ -70,6 +70,9 @@ function fillPatientData(row, patient) {
     };
 
     // Fill in basic data
+    const nameContainer = document.createElement('div');
+    
+    // Add name as clickable link
     const nameLink = document.createElement('a');
     nameLink.href = '#';
     nameLink.textContent = patient.name || '';
@@ -78,8 +81,30 @@ function fillPatientData(row, patient) {
         e.preventDefault();
         editPatient(patient.id);
     };
+    nameContainer.appendChild(nameLink);
+
+    // Check for future room assignments
+    if (patient.rooms && patient.rooms.length > 1) {
+        const today = new Date();
+        const futureRooms = patient.rooms.filter(room => {
+            if (!room.start) return false;
+            const [day, month, year] = room.start.split('.');
+            const startDate = new Date(year, month - 1, day);
+            return startDate > today;
+        });
+
+        if (futureRooms.length > 0) {
+            // Add future room info
+            const nextRoom = futureRooms[0];
+            const futureInfo = document.createElement('small');
+            futureInfo.classList.add('text-muted', 'ms-2', 'font-12');
+            futureInfo.textContent = `>${nextRoom.room} am ${nextRoom.start}`;
+            nameContainer.appendChild(futureInfo);
+        }
+    }
+
     cells.name.innerHTML = '';
-    cells.name.appendChild(nameLink);
+    cells.name.appendChild(nameContainer);
 
     cells.group.textContent = patient.group || '';
     cells.admission.textContent = patient.admission || '';
@@ -87,10 +112,8 @@ function fillPatientData(row, patient) {
 
     // Fill in employee data
     if (patient.employees && patient.employees.length > 0) {
-        // First employee
-        const firstEmployee = patient.employees[0].employee;
-        cells.employee1.textContent = firstEmployee;
-
+        cells.employee1.textContent = patient.employees[0].employee;
+        
         // Combine additional employees and misc info
         let miscContent = [];
         
