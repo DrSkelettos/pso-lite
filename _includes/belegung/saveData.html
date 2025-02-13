@@ -34,6 +34,10 @@
                 output += `,\n${indent}${indent}discharge: "${patient.discharge}"`;
             }
 
+            if (patient.misc) {
+                output += `,\n${indent}${indent}misc: "${patient.misc}"`;
+            }
+
             if (patient.employees && patient.employees.length > 0) {
                 output += `,\n${indent}${indent}employees: [\n`;
                 patient.employees.forEach((emp, index) => {

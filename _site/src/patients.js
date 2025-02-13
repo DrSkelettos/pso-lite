@@ -59,32 +59,45 @@ function getActiveEmployees(patient, date) {
 function fillPatientData(row, patient) {
     if (!patient) return;
 
-    // Get all data cells
     const cells = {
         name: row.querySelector('.data-name'),
         group: row.querySelector('.data-group'),
         employee1: row.querySelector('.data-employee1'),
-        employee2: row.querySelector('.data-employee2'),
+        misc: row.querySelector('.data-misc'),
         admission: row.querySelector('.data-admission'),
         discharge: row.querySelector('.data-discharge'),
         discharge_mode: row.querySelector('.data-discharge_mode')
     };
 
-    // Fill in the data
+    // Fill in basic data
     cells.name.textContent = patient.name || '';
     cells.group.textContent = patient.group || '';
     cells.admission.textContent = patient.admission || '';
     cells.discharge.textContent = patient.discharge || '';
 
-    // Handle employee assignments - first entry always goes to employee1
+    // Fill in employee data
     if (patient.employees && patient.employees.length > 0) {
-        cells.employee1.textContent = patient.employees[0].employee || '';
+        // First employee
+        const firstEmployee = patient.employees[0].employee;
+        cells.employee1.textContent = firstEmployee;
+
+        // Combine additional employees and misc info
+        let miscContent = [];
+        
+        // Add additional employees
         if (patient.employees.length > 1) {
-            cells.employee2.textContent = patient.employees
-                .slice(1)
-                .map(e => e.employee)
-                .join(', ');
+            const additionalEmployees = patient.employees.slice(1).map(emp => 
+                emp.employee
+            );
+            miscContent.push(additionalEmployees.join(', '));
         }
+        
+        // Add misc text if present
+        if (patient.misc) {
+            miscContent.push(patient.misc);
+        }
+        
+        cells.misc.textContent = miscContent.join(' | ');
     }
 }
 
@@ -105,15 +118,28 @@ function fillPlannedPatientData(row, patient) {
     cells.group.textContent = patient.group || '';
     cells.admission.textContent = patient.admission || '';
 
-    // Handle employee assignments - first entry always goes to employee1
+    // Handle employee assignments and misc
     if (patient.employees && patient.employees.length > 0) {
-        cells.employee1.textContent = patient.employees[0].employee || '';
+        cells.employee1.textContent = patient.employees[0].employee;
+        
+        // Combine additional employees and misc info
+        let miscContent = [];
+        
+        // Add additional employees
         if (patient.employees.length > 1) {
-            cells.misc.textContent = patient.employees
-                .slice(1)
-                .map(e => e.employee)
-                .join(', ');
+            const additionalEmployees = patient.employees.slice(1).map(emp => emp.employee);
+            miscContent.push(additionalEmployees.join(', '));
         }
+        
+        // Add misc text if present
+        if (patient.misc) {
+            miscContent.push(patient.misc);
+        }
+        
+        cells.misc.textContent = miscContent.join(' | ');
+    } else if (patient.misc) {
+        // If there are no employees but misc is present
+        cells.misc.textContent = patient.misc;
     }
 }
 

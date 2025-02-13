@@ -1,4 +1,4 @@
-let patients = {
+const patients = {
     1: {
         name: "Fr. Müller",
         group: "1-A",
@@ -18,7 +18,7 @@ let patients = {
         admission: "01.02.2025",
         discharge: "01.05.2025",
         employees: [
-            { employee: "Sa", start: "01.02.2025" },
+            { employee: "Sa", start: "01.02.2025" }
         ],
         rooms: [
             { room: "103-F", start: "01.02.2025" }
@@ -29,10 +29,22 @@ let patients = {
         group: "2-A",
         admission: "01.05.2025",
         employees: [
-            { employee: "Em", start: "01.05.2025" },
+            { employee: "Em", start: "01.05.2025" }
         ],
         rooms: [
             { room: "103-T", start: "01.05.2025" }
+        ]
+    },
+    4: {
+        name: "Hr. Westernhagen",
+        group: "1-A",
+        admission: "16.02.2025",
+        misc: "XXL",
+        employees: [
+            { employee: "LS", start: "16.02.2025" }
+        ],
+        rooms: [
+            { room: "116-T", start: "16.02.2025" }
         ]
     }
 }
