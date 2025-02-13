@@ -1,0 +1,38 @@
+let patients = {
+    1: {
+        name: "Fr. Müller",
+        group: "1-A",
+        admission: "01.01.2025",
+        discharge: "01.05.2025",
+        employees: [
+            { employee: "LS", start: "01.01.2025" },
+            { employee: "CP", start: "01.03.2025", end: "14.03.2025" }
+        ],
+        rooms: [
+            { room: "103-T", start: "01.01.2025" }
+        ]
+    },
+    2: {
+        name: "Fr. Schmidt",
+        group: "1-B",
+        admission: "01.02.2025",
+        discharge: "01.05.2025",
+        employees: [
+            { employee: "Sa", start: "01.02.2025" },
+        ],
+        rooms: [
+            { room: "103-F", start: "01.02.2025" }
+        ]
+    },
+    3: {
+        name: "Hr. Meier",
+        group: "2-A",
+        admission: "01.05.2025",
+        employees: [
+            { employee: "Em", start: "01.05.2025" },
+        ],
+        rooms: [
+            { room: "103-T", start: "01.05.2025" }
+        ]
+    }
+}

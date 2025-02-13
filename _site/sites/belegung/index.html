@@ -33,6 +33,13 @@
     <link href="/src/bootstrap/bootstrap.min.css" rel="stylesheet">
     <script src="/src/bootstrap/bootstrap.min.js"></script>
     <link href="/src/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+
+    <script src="/_DATA/Zimmer.js"></script>
+    <script src="/_DATA/Mitarbeiter_innen.js"></script>
+    <script src="/_DATA/Belegung.js"></script>
+
+    <script src="/src/patients.js"></script>
+    <script src="/src/data-manager.js"></script>
 </head>
 
 <body>
@@ -66,12 +73,66 @@
                     </a>
                 </li>
             </ul>
+            <div id="data-changed" class="d-none text-warning fw-bold cursor-pointer" onclick="window.open('/sites/hilfe/speichern/index.html', '_blank')">
+                <div class="d-inline-block pb-1">Speichern notwendig!</div>
+                <i class="ms-2 bi bi-floppy-fill fs-4"></i>
+            </div>
         </div>
     </nav>
 
     <div class="container-fluid">
         
-<h1>Belegung</h1>
+<style>
+    .table-bordered > tbody > tr.border-bottom-3 {
+        border-bottom-width: 3px !important;
+    }
+
+    .table-bordered td.border-end-3,
+    .table-bordered th.border-end-3 {
+        border-right: 3px solid #dee2e6 !important;
+    }
+</style>
+
+<table class="table table-sm table-bordered table-hover">
+    <thead class="table-light">
+        <tr class="text-center">
+            <th width="50">Zimmer</th>
+            <th class="text-start">Patient:in</th>
+            <th width="75">Gruppe</th>
+            <th width="75">Therap.</th>
+            <th width="75">Vertr.</th>
+            <th width="95">Aufnahme</th>
+            <th width="95">Entlassung</th>
+            <th class="border-end-3">E-Modus</th>
+            <th>Geplant</th>
+            <th width="75">Gruppe</th>
+            <th width="75">Therap.</th>
+            <th width="75">Bemerkung</th>
+            <th width="95">Aufnahme</th>
+        </tr>
+    </thead>
+    <tbody id="patients-table">
+        <tr id="patient-row" class="text-center d-none">
+            <td class="data-room"></td>
+            <td class="data-name text-start"></td>
+            <td class="data-group"></td>
+            <td class="data-employee1"></td>
+            <td class="data-employee2"></td>
+            <td class="data-admission"></td>
+            <td class="data-discharge"></td>
+            <td class="data-discharge_mode border-end-3"></td>
+            <td class="data-name-planned text-start"></td>
+            <td class="data-group-planned"></td>
+            <td class="data-employee1-planned"></td>
+            <td class="data-misc-planned"></td>
+            <td class="data-admission-planned"></td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    fillPatientsTable();
+</script>
     </div>
 
 </body>
