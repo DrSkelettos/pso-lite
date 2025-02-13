@@ -493,6 +493,9 @@
                 </form>
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger me-auto" onclick="deletePatient()">
+                    <i class="bi bi-trash me-1"></i>Löschen
+                </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
                 <button type="button" class="btn btn-primary" onclick="saveEditPatient()">Speichern</button>
             </div>
@@ -619,14 +622,27 @@
         const patient = patients[patientId];
         if (!patient) return;
 
-        // Set basic info
+        // Store patient ID for saving
         document.getElementById('editPatientId').value = patientId;
-        document.getElementById('editPatientName').value = patient.name;
-        document.getElementById('editPatientGroup').value = patient.group;
-        document.getElementById('editPatientAdmission').value = formatDateForInput(patient.admission);
+
+        // Fill in basic info
+        document.getElementById('editPatientName').value = patient.name || '';
+        document.getElementById('editPatientGroup').value = patient.group || '';
         document.getElementById('editPatientMisc').value = patient.misc || '';
+
+        // Convert German dates to ISO format for date inputs
+        if (patient.admission) {
+            const [day, month, year] = patient.admission.split('.');
+            document.getElementById('editPatientAdmission').value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        } else {
+            document.getElementById('editPatientAdmission').value = '';
+        }
+
         if (patient.discharge) {
-            document.getElementById('editPatientDischarge').value = formatDateForInput(patient.discharge);
+            const [day, month, year] = patient.discharge.split('.');
+            document.getElementById('editPatientDischarge').value = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+        } else {
+            document.getElementById('editPatientDischarge').value = '';
         }
 
         // Clear existing entries
@@ -646,6 +662,24 @@
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('editPatientModal'));
         modal.show();
+    }
+
+    function deletePatient() {
+        const patientId = document.getElementById('editPatientId').value;
+        if (!patientId) return;
+
+        if (confirm('Möchten Sie diese:n Patient:in wirklich löschen?')) {
+            // Delete the patient
+            delete patients[patientId];
+
+            // Hide modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
+            modal.hide();
+
+            // Update table and mark changes
+            fillPatientsTable();
+            checkData();
+        }
     }
 
     function saveEditPatient() {
