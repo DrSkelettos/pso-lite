@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PSO - Startseite</title>
+
+    <style>
+        .nav-scroller {
+            position: relative;
+            z-index: 2;
+            height: 2.75rem;
+            overflow-y: hidden;
+        }
+
+        .nav-scroller .nav {
+            display: flex;
+            flex-wrap: nowrap;
+            padding-bottom: 1rem;
+            margin-top: -1px;
+            overflow-x: auto;
+            text-align: center;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+    </style>
+
+    <link href="/src/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="/src/bootstrap/bootstrap.min.js"></script>
+    <link href="/src/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">PSO</a>
+
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item me-2">
+                    <a class="nav-link active" href="/index.html">
+                        <i class="bi bi-house me-1"></i>
+                        Startseite
+                    </a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="nav-link " href="/sites/belegung/index.html">
+                        <i class="bi bi-calendar-date me-1"></i>
+                        Belegung
+                    </a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="nav-link " href="/sites/therapiezuordnung/index.html">
+                        <i class="bi bi-list-columns me-1"></i>
+                        Therapiezuordnung
+                    </a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="nav-link " href="/sites/chefaerztinvisite/index.html">
+                        <i class="bi bi-people me-1"></i>
+                        Chefärztinvisite
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        
+<div class="container my-5">
+
+    <div class="row">
+
+        <!-- Belegung -->
+        <div class="col">
+            <div class="card text-center cursor-pointer" onclick="window.location.href='/sites/belegung/index.html';">
+                <div class="card-header">
+                    <i class="bi bi-calendar-date" style="font-size: 5rem;"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Belegung</h5>
+                    <p class="card-text">Aufnahme- und Entlassplanung</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Therapiezuordnung -->
+        <div class="col">
+            <div class="card text-center cursor-pointer" onclick="window.location.href='/sites/therapiezuordnung/index.html';">
+                <div class="card-header">
+                    <i class="bi bi-list-columns" style="font-size: 5rem;"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Therapiezuordnung</h5>
+                    <p class="card-text">Zuordnung zu festen und indikativen Therapien</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chefärztinvisite -->
+        <div class="col">
+            <div class="card text-center cursor-pointer" onclick="window.location.href='/sites/chefaerztinvisite/index.html';">
+                <div class="card-header">
+                    <i class="bi bi-people" style="font-size: 5rem;"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Chefärztinvisite</h5>
+                    <p class="card-text">Planung für die Chefärztinvisite</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+    </div>
+
+</body>
+
+</html>
