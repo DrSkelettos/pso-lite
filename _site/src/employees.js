@@ -86,14 +86,39 @@ function addAbsenceEntry(start = '', end = '') {
     const absencesList = document.getElementById('absencesList');
     const absenceDiv = document.createElement('div');
     absenceDiv.className = 'absence-entry d-flex gap-2 align-items-center mb-2';
-    absenceDiv.innerHTML = `
-        <input type="date" class="form-control absence-start" value="${start ? formatGermanToISODate(start) : ''}" required>
-        <span>-</span>
-        <input type="date" class="form-control absence-end" value="${end ? formatGermanToISODate(end) : ''}" required>
-        <button type="button" class="btn btn-outline-danger btn-sm" onclick="this.parentElement.remove()">
-            <i class="bi bi-trash"></i>
-        </button>
-    `;
+    
+    // Create the elements first so we can add event listeners
+    const startInput = document.createElement('input');
+    startInput.type = 'date';
+    startInput.className = 'form-control absence-start';
+    startInput.value = start ? formatGermanToISODate(start) : '';
+    startInput.required = true;
+
+    const endInput = document.createElement('input');
+    endInput.type = 'date';
+    endInput.className = 'form-control absence-end';
+    endInput.value = end ? formatGermanToISODate(end) : '';
+    endInput.required = true;
+
+    // Add event listener to start date
+    startInput.addEventListener('change', function() {
+        if (!endInput.value) {
+            endInput.value = this.value;
+        }
+    });
+
+    // Assemble the div
+    absenceDiv.appendChild(startInput);
+    absenceDiv.appendChild(document.createTextNode('-'));
+    absenceDiv.appendChild(endInput);
+    
+    const deleteButton = document.createElement('button');
+    deleteButton.type = 'button';
+    deleteButton.className = 'btn btn-outline-danger btn-sm';
+    deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
+    deleteButton.onclick = function() { this.parentElement.remove(); };
+    absenceDiv.appendChild(deleteButton);
+
     absencesList.appendChild(absenceDiv);
 }
 

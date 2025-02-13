@@ -1,27 +1,33 @@
 const employees = {
-    "CP": {
-        patients: 0,
+    CP: {
+        patients: 0
     },
-    "LS": {
+    LS: {
         patients: 2,
-        absences: {
-            start: "01.03.2025",
-            end: "13.03.2025",
-        }
+        absences: [
+            {
+                "start": "1.3.2025",
+                "end": "13.3.2025"
+            },
+            {
+                "start": "28.2.2025",
+                "end": "28.2.2025"
+            }
+        ]
     },
-    "Em": {
-        patients: 3,
+    Em: {
+        patients: 3
     },
-    "Sa": {
-        patients: 3,
+    Sa: {
+        patients: 3
     },
-    "Rad": {
-        patients: 4,
+    Rad: {
+        patients: 4
     },
-    "Kaz": {
-        patients: 6,
+    Kaz: {
+        patients: 6
     },
-    "Ulu": {
-        patients: 5,
+    Ulu: {
+        patients: 5
     },
-}
+};

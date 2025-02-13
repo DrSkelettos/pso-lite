@@ -1,0 +1,81 @@
+<!-- Save Data -->
+<div class="modal fade" id="saveDataModal" tabindex="-1" aria-labelledby="saveDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveDataModalLabel">Daten speichern</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Speichern Sie den folgenden Code als <code>_DATA/Mitarbeiter_innen.js</code>:</p>
+                <pre class="bg-light p-3 cursor-pointer" onclick="selectCodeContent()"><code id="saveDataContent"></code></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                <button type="button" class="btn btn-primary" onclick="copyToClipboard()">In Zwischenablage kopieren</button>
+                <button type="button" class="btn btn-success" onclick="confirmSave()">Bestätigen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function formatEmployeeData() {
+        const indent = '    ';
+        let output = 'const employees = {\n';
+
+        for (let key in employees) {
+            let employee = employees[key];
+            output += `${indent}${key}: {\n`;
+            output += `${indent}${indent}patients: ${employee.patients}`;
+            
+            if (employee.absences) {
+                const absences = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
+                if (absences.length > 0) {
+                    output += ',\n';
+                    output += `${indent}${indent}absences: ${JSON.stringify(absences, null, 4).replace(/\n/g, '\n' + indent + indent)}`;
+                }
+            }
+            
+            output += '\n';
+            output += `${indent}},\n`;
+        }
+
+        output += '};\n';
+        return output;
+    }
+
+    function selectCodeContent() {
+        const codeElement = document.getElementById('saveDataContent');
+        const range = document.createRange();
+        range.selectNodeContents(codeElement);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    function updateSaveDataContent() {
+        const formattedData = formatEmployeeData();
+        document.getElementById('saveDataContent').textContent = formattedData;
+        selectCodeContent();
+    }
+
+    function copyToClipboard() {
+        selectCodeContent();
+        try {
+            document.execCommand('copy');
+            alert('Code wurde in die Zwischenablage kopiert!');
+        } catch (err) {
+            alert('Fehler beim Kopieren in die Zwischenablage: ' + err);
+        }
+    }
+
+    function confirmSave() {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('saveDataModal'));
+        modal.hide();
+        document.getElementById('data-changed').classList.add('d-none');
+    }
+
+    // Update and select content when modal is shown
+    document.getElementById('saveDataModal').addEventListener('show.bs.modal', updateSaveDataContent);
+</script>
