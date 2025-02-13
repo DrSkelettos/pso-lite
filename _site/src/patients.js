@@ -70,7 +70,17 @@ function fillPatientData(row, patient) {
     };
 
     // Fill in basic data
-    cells.name.textContent = patient.name || '';
+    const nameLink = document.createElement('a');
+    nameLink.href = '#';
+    nameLink.textContent = patient.name || '';
+    nameLink.classList.add('text-decoration-none');
+    nameLink.onclick = (e) => {
+        e.preventDefault();
+        editPatient(patient.id);
+    };
+    cells.name.innerHTML = '';
+    cells.name.appendChild(nameLink);
+
     cells.group.textContent = patient.group || '';
     cells.admission.textContent = patient.admission || '';
     cells.discharge.textContent = patient.discharge || '';
@@ -237,15 +247,15 @@ function parseGermanDate(dateStr) {
 }
 
 function getPatientsByRooms(date = null) {
-    const filteredPatients = filterPatients(date);
-    const result = {};
+    const patientsByRooms = {};
+    const { current, dismissed, planned } = filterPatients(date);
 
     // Initialize result with empty arrays for each room-space combination
     for (let roomKey in rooms) {
         for (let spaceKey of ['F', 'T']) {
             if (spaceKey in rooms[roomKey]) {
                 const roomId = `${roomKey}-${spaceKey}`;
-                result[roomId] = {
+                patientsByRooms[roomId] = {
                     current: null,
                     planned: null
                 };
@@ -275,11 +285,11 @@ function getPatientsByRooms(date = null) {
     }
 
     // Process current patients
-    for (let patientId in filteredPatients.current) {
-        const patient = filteredPatients.current[patientId];
+    for (let patientId in current) {
+        const patient = current[patientId];
         const activeRoom = getActiveRoom(patient, date || new Date().toLocaleDateString('de-DE'));
-        if (activeRoom && activeRoom in result) {
-            result[activeRoom].current = {
+        if (activeRoom && activeRoom in patientsByRooms) {
+            patientsByRooms[activeRoom].current = {
                 id: patientId,
                 ...patient
             };
@@ -287,16 +297,16 @@ function getPatientsByRooms(date = null) {
     }
 
     // Process planned patients
-    for (let patientId in filteredPatients.planned) {
-        const patient = filteredPatients.planned[patientId];
+    for (let patientId in planned) {
+        const patient = planned[patientId];
         const activeRoom = getActiveRoom(patient, patient.admission); // Use admission date for planned patients
-        if (activeRoom && activeRoom in result) {
-            result[activeRoom].planned = {
+        if (activeRoom && activeRoom in patientsByRooms) {
+            patientsByRooms[activeRoom].planned = {
                 id: patientId,
                 ...patient
             };
         }
     }
 
-    return result;
+    return patientsByRooms;
 }
