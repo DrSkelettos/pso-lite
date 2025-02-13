@@ -124,7 +124,17 @@ function fillPlannedPatientData(row, patient) {
     };
 
     // Fill in the planned data
-    cells.name.textContent = patient.name || '';
+    const nameLink = document.createElement('a');
+    nameLink.href = '#';
+    nameLink.textContent = patient.name || '';
+    nameLink.classList.add('text-decoration-none');
+    nameLink.onclick = (e) => {
+        e.preventDefault();
+        editPatient(patient.id);
+    };
+    cells.name.innerHTML = '';
+    cells.name.appendChild(nameLink);
+
     cells.group.textContent = patient.group || '';
     cells.admission.textContent = patient.admission || '';
 
