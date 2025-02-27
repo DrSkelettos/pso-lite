@@ -116,3 +116,22 @@ function formatAbsenceForDisplay(absence) {
         planned: absence.planned
     };
 }
+
+function normalizeToMidnight(date) {
+    const normalized = new Date(date);
+    normalized.setHours(0, 0, 0, 0);
+    return normalized;
+}
+
+function isDateInCurrentWeek(dateStr) {
+    if (!dateStr) return false;
+    
+    const date = parseGermanDate(dateStr);
+    const now = normalizeToMidnight(new Date());
+    
+    // Get calendar weeks
+    const dateWeek = getCalendarWeek(date);
+    const currentWeek = getCalendarWeek(now);
+    
+    return dateWeek === currentWeek;
+}

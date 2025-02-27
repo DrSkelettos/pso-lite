@@ -156,6 +156,14 @@ function fillPatientData(row, patient) {
 
         cells.misc.textContent = miscContent.join(' | ');
     }
+    
+    // Add bold class for dates in current week
+    if (isDateInCurrentWeek(patient.admission)) {
+        cells.admission.classList.add('fw-bold');
+    }
+    if (isDateInCurrentWeek(patient.discharge)) {
+        cells.discharge.classList.add('fw-bold');
+    }
 }
 
 function fillPlannedPatientData(row, patient) {
@@ -207,6 +215,11 @@ function fillPlannedPatientData(row, patient) {
     } else if (patient.misc) {
         // If there are no employees but misc is present
         cells.misc.textContent = patient.misc;
+    }
+    
+    // Add bold class for admission date in current week
+    if (isDateInCurrentWeek(patient.admission)) {
+        cells.admission.classList.add('fw-bold');
     }
 }
 
