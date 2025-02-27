@@ -8,7 +8,8 @@
 
 
     <link href="../../src/style.css" rel="stylesheet">
-    
+
+    <script src="../../src/popperjs/popper.min.js"></script>
     <link href="../../src/bootstrap/bootstrap.min.css" rel="stylesheet">
     <script src="../../src/bootstrap/bootstrap.min.js"></script>
     <link href="../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
@@ -34,34 +35,48 @@
                     </a>
                 </li>
                 <li class="nav-item me-2">
-                    <a class="nav-link " href="../../sites/mitarbeiterinnen/index.html">
-                        <i class="bi bi-people me-1 text-light"></i>
-                        Mitarbeiter:innen
-                    </a>
-                </li>
-                <li class="nav-item me-2">
                     <a class="nav-link " href="../../sites/belegung/index.html">
                         <i class="bi bi-calendar-date me-1 text-light"></i>
                         Belegung
                     </a>
                 </li>
                 <li class="nav-item me-2">
-                    <a class="nav-link " href="../../sites/therapiezuordnung/index.html">
+                    <a class="nav-link "
+                        href="../../sites/therapiezuordnung/index.html">
                         <i class="bi bi-list-columns me-1 text-light"></i>
                         Therapiezuordnung
                     </a>
                 </li>
                 <li class="nav-item me-2">
-                    <a class="nav-link active" href="../../sites/chefaerztinvisite/index.html">
+                    <a class="nav-link active"
+                        href="../../sites/chefaerztinvisite/index.html">
                         <i class="bi bi-eye me-1 text-light"></i>
                         Chefärztinvisite
                     </a>
                 </li>
             </ul>
-            <div id="data-changed" class="d-none text-warning fw-bold cursor-pointer" data-bs-toggle="modal" data-bs-target="#saveDataModal">
+
+            <div id="data-changed" class="d-none text-warning fw-bold cursor-pointer" data-bs-toggle="modal"
+                data-bs-target="#saveDataModal">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-md-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
+                        aria-expanded="false">Mehr</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item"
+                                href="../../sites/mitarbeiterinnen/index.html">
+                                <i class="bi bi-people me-1"></i>
+                                Mitarbeiter:innen
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </nav>
 
