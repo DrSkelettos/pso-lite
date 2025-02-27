@@ -35,6 +35,10 @@
                 output += `,\n${indent}${indent}discharge: "${patient.discharge}"`;
             }
 
+            if (patient.discharge_mode) {
+                output += `,\n${indent}${indent}discharge_mode: "${patient.discharge_mode}"`;
+            }
+
             if (patient.misc) {
                 output += `,\n${indent}${indent}misc: "${patient.misc}"`;
             }

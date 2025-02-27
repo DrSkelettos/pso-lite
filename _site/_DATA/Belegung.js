@@ -18,6 +18,7 @@ const patients = {
         group: "1-B",
         admission: "01.02.2025",
         discharge: "01.05.2025",
+        discharge_mode: "p GR; au/WE",
         employees: [
             { employee: "Sa", start: "01.02.2025" }
         ],

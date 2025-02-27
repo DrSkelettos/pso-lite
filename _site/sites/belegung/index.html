@@ -331,6 +331,10 @@
                 output += `,\n${indent}${indent}discharge: "${patient.discharge}"`;
             }
 
+            if (patient.discharge_mode) {
+                output += `,\n${indent}${indent}discharge_mode: "${patient.discharge_mode}"`;
+            }
+
             if (patient.misc) {
                 output += `,\n${indent}${indent}misc: "${patient.misc}"`;
             }
@@ -475,6 +479,11 @@
                     </div>
                     <!-- Bemerkung -->
                     <div class="mb-3">
+                        <label for="editPatientDischargeMode" class="form-label">Entlassungs-Modus</label>
+                        <input type="text" class="form-control" id="editPatientDischargeMode">
+                    </div>
+                    <!-- Bemerkung -->
+                    <div class="mb-3">
                         <label for="editPatientMisc" class="form-label">Bemerkung</label>
                         <input type="text" class="form-control" id="editPatientMisc">
                     </div>
@@ -615,6 +624,7 @@
         document.getElementById('editPatientName').value = patient.name;
         document.getElementById('editPatientGroup').value = patient.group;
         document.getElementById('editPatientAdmission').value = formatDateForInput(patient.admission);
+        document.getElementById('editPatientDischargeMode').value = patient.discharge_mode || '';
         document.getElementById('editPatientMisc').value = patient.misc || '';
         if (patient.discharge) {
             document.getElementById('editPatientDischarge').value = formatDateForInput(patient.discharge);
@@ -683,6 +693,12 @@
         const misc = document.getElementById('editPatientMisc').value;
         if (misc) {
             updatedPatient.misc = misc;
+        }
+
+        // Add discharge mode if present
+        const dischargeMode = document.getElementById('editPatientDischargeMode').value;
+        if (dischargeMode) {
+            updatedPatient.discharge_mode = dischargeMode;
         }
 
         // Gather employee entries

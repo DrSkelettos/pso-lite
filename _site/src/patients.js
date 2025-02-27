@@ -72,7 +72,7 @@ function fillPatientData(row, patient) {
 
     // Fill in basic data
     const nameContainer = document.createElement('div');
-    
+
     // Add name as clickable link
     const nameLink = document.createElement('a');
     nameLink.href = '#';
@@ -110,7 +110,7 @@ function fillPatientData(row, patient) {
 
     cells.group.textContent = patient.group || '';
     cells.admission.textContent = patient.admission || '';
-    
+
     // Make discharge date clickable if present
     if (patient.discharge) {
         const dischargeLink = document.createElement('a');
@@ -127,6 +127,10 @@ function fillPatientData(row, patient) {
         cells.discharge.textContent = '';
     }
 
+    // Show discharge mode
+    if (patient.discharge_mode)
+        cells.discharge_mode.textContent = patient.discharge_mode;
+    
     // Calculate and display week number
     if (patient.admission) {
         cells.week.textContent = calculateWeek(patient.admission);
@@ -135,21 +139,21 @@ function fillPatientData(row, patient) {
     // Fill in employee data
     if (patient.employees && patient.employees.length > 0) {
         cells.employee1.textContent = patient.employees[0].employee;
-        
+
         // Combine additional employees and misc info
         let miscContent = [];
-        
+
         // Add additional employees
         if (patient.employees.length > 1) {
             const additionalEmployees = patient.employees.slice(1).map(emp => emp.employee);
             miscContent.push(additionalEmployees.join(', '));
         }
-        
+
         // Add misc text if present
         if (patient.misc) {
             miscContent.push(patient.misc);
         }
-        
+
         cells.misc.textContent = miscContent.join(' | ');
     }
 }
@@ -184,21 +188,21 @@ function fillPlannedPatientData(row, patient) {
     // Handle employee assignments and misc
     if (patient.employees && patient.employees.length > 0) {
         cells.employee1.textContent = patient.employees[0].employee;
-        
+
         // Combine additional employees and misc info
         let miscContent = [];
-        
+
         // Add additional employees
         if (patient.employees.length > 1) {
             const additionalEmployees = patient.employees.slice(1).map(emp => emp.employee);
             miscContent.push(additionalEmployees.join(', '));
         }
-        
+
         // Add misc text if present
         if (patient.misc) {
             miscContent.push(patient.misc);
         }
-        
+
         cells.misc.textContent = miscContent.join(' | ');
     } else if (patient.misc) {
         // If there are no employees but misc is present
@@ -272,7 +276,7 @@ function filterPatients() {
 
     for (let id in patients) {
         const patient = patients[id];
-        
+
         // Convert dates to Date objects for comparison
         const admissionDate = parseGermanDate(patient.admission);
         const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;

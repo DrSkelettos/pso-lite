@@ -45,7 +45,7 @@ title: Belegung - Ausdruck
 <div class="print-header d-flex justify-content-between align-items-center">
     <h4 class="mb-0">Belegungsplan Station 7.1</h4>
     <div class="text-end">
-        <div>Stand: <span id="currentDate"></span></div>
+        <div>Stand: <span id="currentDate"></span> (KW <span id="currentWeek"></span>)</div>
     </div>
 </div>
 
@@ -91,11 +91,13 @@ title: Belegung - Ausdruck
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const currentDate = document.getElementById('currentDate');
+        const currentWeek = document.getElementById('currentWeek');
 
         // Format current date
         const today = new Date();
         const dateStr = today.toLocaleDateString('de-DE');
         currentDate.textContent = `${dateStr}`;
+        currentWeek.textContent = getCalendarWeek(today);
 
         fillPatientsTable();
     });
