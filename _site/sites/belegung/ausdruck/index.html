@@ -153,18 +153,33 @@
             <td class="data-admission-planned"></td>
         </tr>
     </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="2">Aktuelle Belegung: <span id="currentPatientCount"></span></td>
+            <td colspan="13" class="text-end">
+                <i>
+                    Medizinische Versorgung: Gr. 1 Em/Sa, Gr. 2 Sa/Rad, Gr. 3 Rad/Em
+                </i>
+            </td>
+        </tr>
+    </tfoot>
 </table>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const currentDate = document.getElementById('currentDate');
         const currentWeek = document.getElementById('currentWeek');
+        const currentPatientCount = document.getElementById('currentPatientCount');
 
         // Format current date
         const today = new Date();
         const dateStr = today.toLocaleDateString('de-DE');
         currentDate.textContent = `${dateStr}`;
         currentWeek.textContent = getCalendarWeek(today);
+
+        // Get current patients count
+        currentPatientCount.textContent = Object.keys(filterPatients().current).length;
 
         fillPatientsTable();
     });
