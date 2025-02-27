@@ -264,7 +264,8 @@ function fillAbsencesTable() {
                     startDate,
                     endDate,
                     announcementDate,
-                    planned: absence.planned
+                    planned: absence.planned,
+                    isCurrent: startDate <= now && endDate >= now
                 });
             }
         });
@@ -284,6 +285,11 @@ function fillAbsencesTable() {
         const row = template.cloneNode(true);
         row.classList.remove('d-none');
         row.removeAttribute('id');
+        
+        // Add italic style for current absences
+        if (!absence.isCurrent) {
+            row.classList.add('fst-italic');
+        }
         
         // Fill data
         row.querySelector('.data-name').textContent = absence.employeeName;

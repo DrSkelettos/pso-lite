@@ -64,8 +64,8 @@ function formatWeekSpan(startDate, endDate) {
     const endWeek = getCalendarWeek(endDate);
     
     return startWeek === endWeek ? 
-        `KW${startWeek}` : 
-        `KW${startWeek}-${endWeek}`;
+        `${startWeek}` : 
+        `${startWeek} bis ${endWeek}`;
 }
 
 function formatAnnouncementDate(date) {

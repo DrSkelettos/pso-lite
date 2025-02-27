@@ -14,7 +14,7 @@ const employees = {
                 "planned": true
             },
             {
-                "start": "28.2.2025",
+                "start": "27.2.2025",
                 "end": "28.2.2025",
                 "announcement": "27.2.2025",
                 "planned": false
