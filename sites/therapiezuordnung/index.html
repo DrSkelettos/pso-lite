@@ -47,58 +47,58 @@ dir: ../../
             <th width="100">Entlassung</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody id="new-patients">
         <!-- Head: New Patients -->
         <tr class="table-secondary">
-            <td id="new-count"></td>
+            <td class="patient-count" id="new-count">0</td>
             <td class="fw-bold" colspan="14">Neuaufnahmen</td>
         </tr>
         <!-- Body: New Patients -->
+        
+        <!-- Divider -->
+        <tr height="10">
+            <td colspan="15"></td>
+        </tr>
     </tbody>
 
-    <!-- Divider -->
-    <tr height="10">
-        <td colspan="15"></td>
-    </tr>
-
-    <tbody>
+    <tbody id="group1-patients">
         <!-- Head: Group 1 -->
         <tr class="table-secondary">
-            <td id="group1-count"></td>
+            <td class="patient-count" id="group1-count">0</td>
             <td colspan="14">
                 <span class="fw-bold">Gruppe 1</span>
                 (Essstörungen und Adipositas | KT + GT | Em/Sa)
             </td>
         </tr>
         <!-- Body: Group 1 -->
+        
+        <!-- Divider -->
+        <tr height="10">
+            <td colspan="15"></td>
+        </tr>
     </tbody>
 
-    <!-- Divider -->
-    <tr height="10">
-        <td colspan="15"></td>
-    </tr>
-
-    <tbody>
+    <tbody id="group2-patients">
         <!-- Head: Group 2 -->
         <tr class="table-secondary">
-            <td id="group2-count"></td>
+            <td class="patient-count" id="group2-count">0</td>
             <td colspan="14">
                 <span class="fw-bold">Gruppe 2</span>
                 (Arbeitspsychosomatik, Stress und Belastungsstörungen | MT + GT | Sa/Rad)
             </td>
         </tr>
         <!-- Body: Group 2 -->
+        
+        <!-- Divider -->
+        <tr height="10">
+            <td colspan="15"></td>
+        </tr>
     </tbody>
 
-    <!-- Divider -->
-    <tr height="10">
-        <td colspan="15"></td>
-    </tr>
-
-    <tbody>
+    <tbody id="group3-patients">
         <!-- Head: Group 3 -->
         <tr class="table-secondary">
-            <td id="group3-count"></td>
+            <td class="patient-count" id="group3-count">0</td>
             <td colspan="14">
                 <span class="fw-bold">Gruppe 3</span>
                 (Psychokardiologie und somatische Belastugsstörungen | KT + MT | Rad/Em)
@@ -107,3 +107,9 @@ dir: ../../
         <!-- Body: Group 3 -->
     </tbody>
 </table>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fillTherapyTable();
+    });
+</script>

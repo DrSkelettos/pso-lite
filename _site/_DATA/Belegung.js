@@ -40,7 +40,7 @@ const patients = {
     },
     4: {
         name: "Hr. Westernhagen",
-        group: "1-A",
+        group: "3-A",
         admission: "16.02.2025",
         misc: "XXL",
         employees: [
