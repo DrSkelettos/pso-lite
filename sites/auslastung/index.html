@@ -5,34 +5,49 @@ active_auslastung: active
 dir: ../../
 ---
 
+<script src="{{ dir }}src/patients.js"></script>
 <script src="{{ dir }}src/employees.js"></script>
+<script src="{{ dir }}src/workload.js"></script>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">Auslastung</h5>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th width=100>Name</th>
-                                <th width=50>Kürzel</th>
-                                <th width="100">Patient:innen</th>
-                                <th>Abwesenheiten</th>
-                                <th width="100"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="employeesTableBody">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
+<style>
+    .table-bordered>tbody>tr.border-bottom-3,
+    .table-bordered>thead>tr.border-bottom-3 {
+        border-bottom-width: 3px !important;
+    }
+
+    .table-bordered td.border-end-3,
+    .table-bordered th.border-end-3 {
+        border-right-width: 3px !important;
+    }
+
+    .table th, 
+    .table td,
+    .table tr {
+        font-size: inherit !important;
+    }
+</style>
+
+<div class="container-fluid mt-3">
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+            <thead class="table-light">
+                <tr class="border-bottom-3">
+                    <th class="text-nowrap border-end-3" style="position: sticky; left: 0; z-index: 1;"></th>
+                    <th class="text-center" id="week-header-template" style="display: none;">KW99</th>
+                </tr>
+            </thead>
+            <tbody id="groupWorkloadTableBody">
+                <tr id="group-row-template" style="display: none;">
+                    <th class="text-nowrap border-end-3" style="position: sticky; left: 0; z-index: 1;"></th>
+                    <td class="text-center"></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fillGroupWorkloadTable();
+    });
 </script>

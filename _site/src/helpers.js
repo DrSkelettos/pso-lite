@@ -16,7 +16,7 @@ function parseGermanDate(dateStr) {
 
 function getCalendarWeek(date) {
     // Copy date to avoid modifying the original
-    const target = new Date(date.valueOf());
+    const target = normalizeToMidnight(new Date(date.valueOf()));
     
     // Find Thursday of this week starting on Monday
     const dayNr = (date.getDay() + 6) % 7;
