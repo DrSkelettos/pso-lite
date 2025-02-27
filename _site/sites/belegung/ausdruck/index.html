@@ -73,6 +73,7 @@
 <body>
     
 <script src="../../../src/patients.js"></script>
+<script src="../../../src/employees.js"></script>
 
 <style>
     .print-header {
@@ -97,7 +98,7 @@
     }
 
     /* Override Bootstrap's default font sizes */
-    .table th, 
+    .table th,
     .table td,
     .table tr {
         font-size: inherit !important;
@@ -154,9 +155,10 @@
         </tr>
     </tbody>
     <tfoot>
-        <tr>
-            <td colspan="2">Aktuelle Belegung: <span id="currentPatientCount"></span></td>
-            <td colspan="13" class="text-end">
+        <tr style="border:0px !important;">
+            <td colspan="2" style="border:0px !important;">Aktuelle Belegung: <span id="currentPatientCount"></span>
+            </td>
+            <td colspan="13" style="border:0px !important;" class="text-end">
                 <i>
                     Medizinische Versorgung: Gr. 1 Em/Sa, Gr. 2 Sa/Rad, Gr. 3 Rad/Em
                 </i>
@@ -165,6 +167,29 @@
     </tfoot>
 </table>
 
+
+<table class="table table-sm table-bordered" style="width:auto;">
+    <thead>
+        <tr class="text-center">
+            <th class="text-start">Abwesenheiten</th>
+            <th>Von</th>
+            <th>Bis</th>
+            <th>Dauer</th>
+            <th>KW</th>
+            <th>Ankündigung</th>
+        </tr>
+    </thead>
+    <tbody id="absences-table">
+        <tr id="absence-row" class="text-center d-none">
+            <td class="data-name text-start"></td>
+            <td class="data-start"></td>
+            <td class="data-end"></td>
+            <td class="data-duration"></td>
+            <td class="data-week"></td>
+            <td class="data-announcement"></td>
+        </tr>
+    </tbody>
+</table>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -182,6 +207,7 @@
         currentPatientCount.textContent = Object.keys(filterPatients().current).length;
 
         fillPatientsTable();
+        fillAbsencesTable();
     });
 </script>
 

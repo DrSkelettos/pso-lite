@@ -221,6 +221,7 @@
         for (let key in employees) {
             let employee = employees[key];
             output += `${indent}${key}: {\n`;
+            output += `${indent}${indent}name: "${employee.name}",\n`;
             output += `${indent}${indent}patients: ${employee.patients}`;
             
             if (employee.absences) {

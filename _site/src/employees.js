@@ -230,3 +230,59 @@ function deleteEmployee() {
         bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal')).hide();
     }
 }
+
+function fillAbsencesTable() {
+    const tbody = document.getElementById('absences-table');
+    const template = document.getElementById('absence-row');
+    
+    // Get all current and future absences
+    const now = new Date();
+    const allAbsences = [];
+    
+    Object.entries(employees).forEach(([empKey, employee]) => {
+        if (!employee.absences) return;
+        
+        employee.absences.forEach(absence => {
+            const startDate = parseGermanDate(absence.start);
+            const endDate = parseGermanDate(absence.end);
+            const announcementDate = absence.announcement ? parseGermanDate(absence.announcement) : null;
+            
+            // Only include absences that haven't ended yet
+            if (endDate >= now) {
+                allAbsences.push({
+                    employeeName: employee.name,
+                    startDate,
+                    endDate,
+                    announcementDate,
+                    planned: absence.planned
+                });
+            }
+        });
+    });
+    
+    // Sort by start date and take first 5
+    allAbsences.sort((a, b) => a.startDate - b.startDate);
+    const displayAbsences = allAbsences.slice(0, 5);
+    
+    // Clear existing rows except template
+    Array.from(tbody.children).forEach(child => {
+        if (child !== template) child.remove();
+    });
+    
+    // Fill table
+    displayAbsences.forEach(absence => {
+        const row = template.cloneNode(true);
+        row.classList.remove('d-none');
+        row.removeAttribute('id');
+        
+        // Fill data
+        row.querySelector('.data-name').textContent = absence.employeeName;
+        row.querySelector('.data-start').textContent = formatDateWithWeekday(absence.startDate);
+        row.querySelector('.data-end').textContent = formatDateWithWeekday(absence.endDate);
+        row.querySelector('.data-duration').textContent = formatDuration(absence.startDate, absence.endDate);
+        row.querySelector('.data-week').textContent = formatWeekSpan(absence.startDate, absence.endDate);
+        row.querySelector('.data-announcement').textContent = formatAnnouncementDate(absence.announcementDate);
+        
+        tbody.appendChild(row);
+    });
+}

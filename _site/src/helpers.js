@@ -33,3 +33,44 @@ function getCalendarWeek(date) {
     
     return weekNr;
 }
+
+function getWeekdayShort(date) {
+    const weekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+    return weekdays[date.getDay()];
+}
+
+function formatDateWithWeekday(date) {
+    if (!date) return '';
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    return `${getWeekdayShort(date)} ${day}.${month}.`;
+}
+
+function formatDuration(startDate, endDate) {
+    if (!startDate || !endDate) return '';
+    
+    const days = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+    
+    if (days < 7) return `${days} Tag${days > 1 ? 'e' : ''}`;
+    if (days === 7) return '1 Woche';
+    if (days < 14) return `1 Woche ${days - 7} Tag${days - 7 > 1 ? 'e' : ''}`;
+    return `${Math.round(days / 7)} Wochen`;
+}
+
+function formatWeekSpan(startDate, endDate) {
+    if (!startDate || !endDate) return '';
+    
+    const startWeek = getCalendarWeek(startDate);
+    const endWeek = getCalendarWeek(endDate);
+    
+    return startWeek === endWeek ? 
+        `KW${startWeek}` : 
+        `KW${startWeek}-${endWeek}`;
+}
+
+function formatAnnouncementDate(date) {
+    if (!date) return '';
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    return `${day}.${month}.`;
+}
