@@ -54,6 +54,8 @@
 
 <body>
     
+<script src="../../../src/patients.js"></script>
+
 <style>
     .print-header {
         margin-bottom: 1rem;
@@ -81,7 +83,7 @@
 
     .table {
         font-size: 12px;
-        width:100%;
+        width: 100%;
     }
 </style>
 
@@ -136,10 +138,11 @@
         const currentDate = document.getElementById('currentDate');
 
         // Format current date
-        const now = new Date();
-        const dateStr = now.toLocaleDateString('de-DE');
-
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('de-DE');
         currentDate.textContent = `${dateStr}`;
+
+        fillPatientsTable();
     });
 </script>
 
