@@ -71,9 +71,16 @@ function editEmployee(empKey) {
     if (employee.absences) {
         // Convert single absence to array if needed
         const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
-        absencesArray.forEach(absence => {
+        absencesArray.forEach((absence, index) => {
             const template = document.getElementById('absenceTemplate');
             const absenceDiv = template.content.cloneNode(true).querySelector('.list-group-item');
+            
+            // Generate unique ID for the checkbox
+            const uniqueId = `absence-planned-${currentEmployeeKey}-${index}`;
+            const checkbox = absenceDiv.querySelector('.absence-planned');
+            const label = absenceDiv.querySelector('.form-check-label');
+            checkbox.id = uniqueId;
+            label.setAttribute('for', uniqueId);
             
             const startInput = absenceDiv.querySelector('.absence-start');
             const endInput = absenceDiv.querySelector('.absence-end');
@@ -91,7 +98,7 @@ function editEmployee(empKey) {
             if (absence.announcement) {
                 absenceDiv.querySelector('.absence-announcement').value = formatGermanToISODate(absence.announcement);
             }
-            absenceDiv.querySelector('.absence-planned').checked = absence.planned || false;
+            checkbox.checked = absence.planned || false;
             
             const deleteButton = absenceDiv.querySelector('.btn-outline-danger');
             deleteButton.onclick = function() { this.closest('.list-group-item').remove(); };
@@ -107,6 +114,13 @@ function editEmployee(empKey) {
 function addAbsenceEntry() {
     const template = document.getElementById('absenceTemplate');
     const absenceDiv = template.content.cloneNode(true).querySelector('.list-group-item');
+    
+    // Generate unique ID for the checkbox
+    const uniqueId = 'absence-planned-' + Date.now();
+    const checkbox = absenceDiv.querySelector('.absence-planned');
+    const label = absenceDiv.querySelector('.form-check-label');
+    checkbox.id = uniqueId;
+    label.setAttribute('for', uniqueId);
     
     // Add delete functionality
     const deleteButton = absenceDiv.querySelector('.btn-outline-danger');
@@ -158,16 +172,6 @@ function saveEmployeeEdit() {
     checkData();
     fillEmployeesTable();
     bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal')).hide();
-}
-
-function formatGermanToISODate(germanDate) {
-    const [day, month, year] = germanDate.split('.');
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-}
-
-function formatISOToGermanDate(isoDate) {
-    const [year, month, day] = isoDate.split('-');
-    return `${parseInt(day)}.${parseInt(month)}.${year}`;
 }
 
 function fillEmployeesTable() {
