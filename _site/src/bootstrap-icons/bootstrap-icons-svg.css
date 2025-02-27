@@ -21,6 +21,10 @@
   background-image: url("./svg/calendar-date.svg"); 
 }
 
+.bi-bar-chart::before { 
+  background-image: url("./svg/bar-chart.svg"); 
+}
+
 .bi-eye::before { 
   background-image: url("./svg/eye.svg"); 
 }
