@@ -27,7 +27,21 @@ const employees = {
     },
     Sa: {
         name: "Sa",
-        patients: 3
+        patients: 3,
+        absences: [
+            {
+                "start": "12.3.2025",
+                "end": "20.3.2025",
+                "announcement": null,
+                "planned": false
+            },
+            {
+                "start": "7.3.2025",
+                "end": "7.3.2025",
+                "announcement": null,
+                "planned": false
+            }
+        ]
     },
     Rad: {
         name: "Rad",
@@ -35,7 +49,15 @@ const employees = {
     },
     Kaz: {
         name: "Kaz",
-        patients: 6
+        patients: 6,
+        absences: [
+            {
+                "start": "13.3.2025",
+                "end": "20.3.2025",
+                "announcement": "13.2.2025",
+                "planned": true
+            }
+        ]
     },
     Ulu: {
         name: "Ulu",

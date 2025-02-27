@@ -8,7 +8,7 @@
     <style>
         @page {
             size: A4 landscape;
-            margin: 1cm;
+            margin: 8mm;
         }
 
         html {
@@ -108,6 +108,14 @@
     .table small {
         font-size: 70% !important;
     }
+
+    .table-xs th,
+    .table-xs td,
+    .table-xs tr {
+        font-size: 10px !important;
+        padding: 1px 2px !important;
+    }
+
 </style>
 
 <div class="print-header d-flex justify-content-between align-items-center">
@@ -117,7 +125,7 @@
     </div>
 </div>
 
-<table class="table table-sm table-bordered">
+<table class="table table-sm table-bordered mb-2">
     <thead class="table-light">
         <tr class="text-center">
             <th width="30">Zi.</th>
@@ -155,7 +163,7 @@
         </tr>
     </tbody>
     <tfoot>
-        <tr style="border:0px !important;">
+        <tr style="border:0px !important;  font-size:10px !important;">
             <td colspan="2" style="border:0px !important;">Aktuelle Belegung: <span id="currentPatientCount"></span>
             </td>
             <td colspan="13" style="border:0px !important;" class="text-end">
@@ -168,7 +176,7 @@
 </table>
 
 
-<table class="table table-sm table-bordered" style="width:auto;">
+<table class="table table-xs table-bordered" style="width:auto;">
     <thead class="table-light">
         <tr class="text-center">
             <th width="150" class="text-start">Abwesenheiten</th>

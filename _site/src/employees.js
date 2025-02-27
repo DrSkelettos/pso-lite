@@ -241,39 +241,12 @@ function deleteEmployee() {
     }
 }
 
-function fillAbsencesTable() {
+function fillAbsencesTable(numRows = 20) {
     const tbody = document.getElementById('absences-table');
     const template = document.getElementById('absence-row');
     
-    // Get all current and future absences
-    const now = new Date();
-    const allAbsences = [];
-    
-    Object.entries(employees).forEach(([empKey, employee]) => {
-        if (!employee.absences) return;
-        
-        employee.absences.forEach(absence => {
-            const startDate = parseGermanDate(absence.start);
-            const endDate = parseGermanDate(absence.end);
-            const announcementDate = absence.announcement ? parseGermanDate(absence.announcement) : null;
-            
-            // Only include absences that haven't ended yet
-            if (endDate >= now) {
-                allAbsences.push({
-                    employeeName: employee.name,
-                    startDate,
-                    endDate,
-                    announcementDate,
-                    planned: absence.planned,
-                    isCurrent: startDate <= now && endDate >= now
-                });
-            }
-        });
-    });
-    
-    // Sort by start date and take first 5
-    allAbsences.sort((a, b) => a.startDate - b.startDate);
-    const displayAbsences = allAbsences.slice(0, 5);
+    // Get absences and take first 5
+    const displayAbsences = getEmployeeAbsences().slice(0, numRows);
     
     // Clear existing rows except template
     Array.from(tbody.children).forEach(child => {
@@ -286,18 +259,19 @@ function fillAbsencesTable() {
         row.classList.remove('d-none');
         row.removeAttribute('id');
         
-        // Add italic style for current absences
+        // Add italic style for non-current absences
         if (!absence.isCurrent) {
             row.classList.add('fst-italic');
         }
         
-        // Fill data
-        row.querySelector('.data-name').textContent = absence.employeeName;
-        row.querySelector('.data-start').textContent = formatDateWithWeekday(absence.startDate);
-        row.querySelector('.data-end').textContent = formatDateWithWeekday(absence.endDate);
-        row.querySelector('.data-duration').textContent = formatDuration(absence.startDate, absence.endDate);
-        row.querySelector('.data-week').textContent = formatWeekSpan(absence.startDate, absence.endDate);
-        row.querySelector('.data-announcement').textContent = formatAnnouncementDate(absence.announcementDate);
+        // Format and fill data
+        const displayData = formatAbsenceForDisplay(absence);
+        row.querySelector('.data-name').textContent = displayData.name;
+        row.querySelector('.data-start').textContent = displayData.start;
+        row.querySelector('.data-end').textContent = displayData.end;
+        row.querySelector('.data-duration').textContent = displayData.duration;
+        row.querySelector('.data-week').textContent = displayData.week;
+        row.querySelector('.data-announcement').textContent = displayData.announcement;
         
         tbody.appendChild(row);
     });

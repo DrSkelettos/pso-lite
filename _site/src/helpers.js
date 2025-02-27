@@ -74,3 +74,45 @@ function formatAnnouncementDate(date) {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     return `${day}.${month}.`;
 }
+
+function getEmployeeAbsences(filterDate = new Date()) {
+    const allAbsences = [];
+    
+    Object.entries(employees).forEach(([empKey, employee]) => {
+        if (!employee.absences) return;
+        
+        employee.absences.forEach(absence => {
+            const startDate = parseGermanDate(absence.start);
+            const endDate = parseGermanDate(absence.end);
+            const announcementDate = absence.announcement ? parseGermanDate(absence.announcement) : null;
+            
+            // Only include absences that haven't ended yet
+            if (endDate >= filterDate) {
+                allAbsences.push({
+                    employeeName: employee.name,
+                    startDate,
+                    endDate,
+                    announcementDate,
+                    planned: absence.planned,
+                    isCurrent: startDate <= filterDate && endDate >= filterDate
+                });
+            }
+        });
+    });
+    
+    // Sort by start date
+    return allAbsences.sort((a, b) => a.startDate - b.startDate);
+}
+
+function formatAbsenceForDisplay(absence) {
+    return {
+        name: absence.employeeName,
+        start: formatDateWithWeekday(absence.startDate),
+        end: formatDateWithWeekday(absence.endDate),
+        duration: formatDuration(absence.startDate, absence.endDate),
+        week: formatWeekSpan(absence.startDate, absence.endDate),
+        announcement: formatAnnouncementDate(absence.announcementDate),
+        isCurrent: absence.isCurrent,
+        planned: absence.planned
+    };
+}
