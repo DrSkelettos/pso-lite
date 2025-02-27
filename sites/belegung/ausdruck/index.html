@@ -6,20 +6,33 @@ title: Belegung - Ausdruck
 ---
 
 <style>
-    /* Common styles for both print and screen */
-    .table-compact {
-        width: 100%;
-        margin-bottom: 0;
-    }
-
     .print-header {
         margin-bottom: 1rem;
+        font-size: 12px;
+    }
+
+    .print-header h4 {
+        font-size: 18px;
     }
 
     .print-footer {
         font-size: 10px;
         text-align: right;
         margin-top: 0.5rem;
+    }
+
+    .table-bordered>tbody>tr.border-bottom-3 {
+        border-bottom-width: 3px !important;
+    }
+
+    .table-bordered td.border-end-3,
+    .table-bordered th.border-end-3 {
+        border-right: 3px solid #dee2e6 !important;
+    }
+
+    .table {
+        font-size: 12px;
+        width:100%;
     }
 </style>
 
@@ -30,7 +43,44 @@ title: Belegung - Ausdruck
     </div>
 </div>
 
-...
+<table class="table table-sm table-bordered">
+    <thead class="table-light">
+        <tr class="text-center">
+            <th width="50">Zimmer</th>
+            <th class="text-start">Patient:in</th>
+            <th width="75">Gruppe</th>
+            <th width="75">Therap.</th>
+            <th width="75">Vertr.</th>
+            <th width="95">Aufnahme</th>
+            <th width="40">Wo.</th>
+            <th width="95">Entlassung</th>
+            <th class="border-end-3">E-Modus</th>
+            <th>Geplant</th>
+            <th width="75">Gruppe</th>
+            <th width="75">Therap.</th>
+            <th width="75">Bemerkung</th>
+            <th width="95">Aufnahme</th>
+        </tr>
+    </thead>
+    <tbody id="patients-table">
+        <tr id="patient-row" class="text-center d-none">
+            <td class="data-room"></td>
+            <td class="data-name text-start"></td>
+            <td class="data-group"></td>
+            <td class="data-employee1"></td>
+            <td class="data-misc"></td>
+            <td class="data-admission"></td>
+            <td class="data-week"></td>
+            <td class="data-discharge"></td>
+            <td class="data-discharge_mode border-end-3"></td>
+            <td class="data-name-planned text-start"></td>
+            <td class="data-group-planned"></td>
+            <td class="data-employee1-planned"></td>
+            <td class="data-misc-planned"></td>
+            <td class="data-admission-planned"></td>
+        </tr>
+    </tbody>
+</table>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
