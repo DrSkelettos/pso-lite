@@ -1,3 +1,11 @@
+function deletePoststationaer(id) {
+    if (confirm(`Möchten Sie diese:n poststaionäre:n Patient:in wirklich löschen?`)) {
+        delete poststationaer[id];
+        fillPoststationaerTable();
+        checkData();
+    }
+}
+
 function fillPoststationaerTable() {
     const table = document.getElementById('poststationaerTable');
     const tbody = table.querySelector('tbody');
@@ -33,6 +41,15 @@ function fillPoststationaerTable() {
             const dateCell = document.createElement('td');
             dateCell.textContent = entry.end;
             row.appendChild(dateCell);
+
+            // Action column with delete button
+            const actionCell = document.createElement('td');
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'btn btn-link text-danger p-0';
+            deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
+            deleteButton.onclick = () => deletePoststationaer(id);
+            actionCell.appendChild(deleteButton);
+            row.appendChild(actionCell);
 
             tbody.appendChild(row);
         }
