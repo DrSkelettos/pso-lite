@@ -1,9 +1,10 @@
 // Fill the therapy assignments table
 function fillTherapyTable() {
-    let newCounter = 1;
-    let group1Counter = 1;
-    let group2Counter = 1;
-    let group3Counter = 1;
+    let patientCounter = 1;
+    let newCount = 0;
+    let group1Count = 0;
+    let group2Count = 0;
+    let group3Count = 0;
 
     const now = new Date();
     const currentWeek = getCalendarWeek(now);
@@ -26,6 +27,7 @@ function fillTherapyTable() {
     // Helper to create a table row for a patient
     function createPatientRow(patient) {
         const row = document.createElement('tr');
+        row.className = 'text-center';
         
         // Counter (will be set later)
         const tdCounter = document.createElement('td');
@@ -35,6 +37,7 @@ function fillTherapyTable() {
         // Name
         const tdName = document.createElement('td');
         tdName.textContent = patient.name;
+        tdName.className = 'text-start';
         row.appendChild(tdName);
         
         // Week
@@ -106,40 +109,59 @@ function fillTherapyTable() {
         if (header) section.appendChild(header);
     });
 
-    // Sort and distribute patients
+    // Sort patients into new and existing
+    const newPatients = [];
+    const existingPatients = [];
+    
     Object.entries(currentPatients).forEach(([id, patient]) => {
-        patient.id = id; // Add id to patient object for therapy lookup
+        patient.id = id;
         const admissionDate = parseGermanDate(patient.admission);
         const admissionWeek = getCalendarWeek(admissionDate);
-        const row = createPatientRow(patient);
-
+        
         if (admissionWeek === currentWeek && admissionDate.getFullYear() === currentYear) {
-            row.firstChild.textContent = newCounter++;
-            newSection.appendChild(row);
-        } else if (patient.group) {
+            newPatients.push(patient);
+        } else {
+            existingPatients.push(patient);
+        }
+    });
+
+    // Process new patients first
+    newPatients.forEach(patient => {
+        const row = createPatientRow(patient);
+        row.firstChild.textContent = patientCounter++;
+        newSection.appendChild(row);
+        newCount++;
+    });
+
+    // Then process existing patients
+    existingPatients.forEach(patient => {
+        if (patient.group) {
+            const row = createPatientRow(patient);
+            row.firstChild.textContent = patientCounter++;
             const groupNum = patient.group.charAt(0);
+            
             switch (groupNum) {
                 case '1':
-                    row.firstChild.textContent = group1Counter++;
                     group1Section.appendChild(row);
+                    group1Count++;
                     break;
                 case '2':
-                    row.firstChild.textContent = group2Counter++;
                     group2Section.appendChild(row);
+                    group2Count++;
                     break;
                 case '3':
-                    row.firstChild.textContent = group3Counter++;
                     group3Section.appendChild(row);
+                    group3Count++;
                     break;
             }
         }
     });
 
     // Add dividers back except for last section
-    [newSection, group1Section, group2Section].forEach(section => {
+    [newSection, group1Section, group2Section, group3Section].forEach(section => {
         const divider = document.createElement('tr');
-        divider.height = 10;
         const td = document.createElement('td');
+        td.height = 10;
         td.colSpan = 15;
         divider.appendChild(td);
         section.appendChild(divider);
@@ -147,10 +169,10 @@ function fillTherapyTable() {
 
     // Update counters in headers
     const counts = {
-        'new-count': newCounter - 1,
-        'group1-count': group1Counter - 1,
-        'group2-count': group2Counter - 1,
-        'group3-count': group3Counter - 1
+        'new-count': newCount,
+        'group1-count': group1Count,
+        'group2-count': group2Count,
+        'group3-count': group3Count
     };
 
     Object.entries(counts).forEach(([id, count]) => {

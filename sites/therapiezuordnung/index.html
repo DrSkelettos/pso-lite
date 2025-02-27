@@ -50,11 +50,11 @@ dir: ../../
     <tbody id="new-patients">
         <!-- Head: New Patients -->
         <tr class="table-secondary">
-            <td class="patient-count" id="new-count">0</td>
+            <td class="patient-count text-center fw-bold" id="new-count">0</td>
             <td class="fw-bold" colspan="14">Neuaufnahmen</td>
         </tr>
         <!-- Body: New Patients -->
-        
+
         <!-- Divider -->
         <tr height="10">
             <td colspan="15"></td>
@@ -64,14 +64,14 @@ dir: ../../
     <tbody id="group1-patients">
         <!-- Head: Group 1 -->
         <tr class="table-secondary">
-            <td class="patient-count" id="group1-count">0</td>
+            <td class="patient-count text-center fw-bold" id="group1-count">0</td>
             <td colspan="14">
                 <span class="fw-bold">Gruppe 1</span>
                 (Essstörungen und Adipositas | KT + GT | Em/Sa)
             </td>
         </tr>
         <!-- Body: Group 1 -->
-        
+
         <!-- Divider -->
         <tr height="10">
             <td colspan="15"></td>
@@ -81,14 +81,14 @@ dir: ../../
     <tbody id="group2-patients">
         <!-- Head: Group 2 -->
         <tr class="table-secondary">
-            <td class="patient-count" id="group2-count">0</td>
+            <td class="patient-count text-center fw-bold" id="group2-count">0</td>
             <td colspan="14">
                 <span class="fw-bold">Gruppe 2</span>
                 (Arbeitspsychosomatik, Stress und Belastungsstörungen | MT + GT | Sa/Rad)
             </td>
         </tr>
         <!-- Body: Group 2 -->
-        
+
         <!-- Divider -->
         <tr height="10">
             <td colspan="15"></td>
@@ -98,7 +98,7 @@ dir: ../../
     <tbody id="group3-patients">
         <!-- Head: Group 3 -->
         <tr class="table-secondary">
-            <td class="patient-count" id="group3-count">0</td>
+            <td class="patient-count text-center fw-bold" id="group3-count">0</td>
             <td colspan="14">
                 <span class="fw-bold">Gruppe 3</span>
                 (Psychokardiologie und somatische Belastugsstörungen | KT + MT | Rad/Em)
@@ -106,10 +106,49 @@ dir: ../../
         </tr>
         <!-- Body: Group 3 -->
     </tbody>
+
+    <tfoot>
+        <tr class="table-secondary fw-bold text-center">
+            <td colspan="6" class="border-end-3 text-start">Plätze</td>
+            <td id="maxNum-at">12</td>
+            <td id="maxNum-pmr" class="border-end-3">12</td>
+            <td id="maxNum-haltungsschule" class="border-end-3">3</td>
+            <td id="maxNum-asst">12</td>
+            <td id="maxNum-skt">6</td>
+            <td id="maxNum-biographiearbeit" class="border-end-3">6</td>
+            <td class="border-end-3">Gruppe A</td>
+            <td class="border-end-3">Gruppe B</td>
+            <td>Gesamt</td>
+        </tr>
+        <tr class="text-center">
+            <td colspan="6" class="text-start border-end-3">Davon besetzt</td>
+            <td id="num-at"></td>
+            <td id="num-pmr" class="border-end-3"></td>
+            <td id="num-haltungsschule" class="border-end-3"></td>
+            <td id="num-asst"></td>
+            <td id="num-skt"></td>
+            <td id="num-biographiearbeit" class="border-end-3"></td>
+            <td id="num-group-a" class="border-end-3"></td>
+            <td id="num-group-b" class="border-end-3"></td>
+            <td id="num-total"></td>
+        </tr>
+        <tr class="text-center">
+            <td colspan="6" class="text-start border-end-3">Davon Frei</td>
+            <td id="free-at"></td>
+            <td id="free-pmr" class="border-end-3"></td>
+            <td id="free-haltungsschule" class="border-end-3"></td>
+            <td id="free-asst"></td>
+            <td id="free-skt"></td>
+            <td id="free-biographiearbeit" class="border-end-3"></td>
+            <td class="border-end-3"><small>Sa/Ulu</small></td>
+            <td class="border-end-3"><small>Em/Rad</small></td>
+            <td id="free-total"></td>
+        </tr>
+    </tfoot>
 </table>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         fillTherapyTable();
     });
 </script>
