@@ -56,70 +56,108 @@ function addEmployee() {
 }
 
 function editEmployee(empKey) {
+    currentEmployeeKey = empKey;
     const employee = employees[empKey];
-    if (!employee) return;
+    
+    const nameInput = document.getElementById('employeeName');
+    nameInput.value = employee.name;
 
-    // Store employee ID for saving
-    document.getElementById('editEmployeeId').value = empKey;
-
-    // Set patients
-    document.getElementById('editEmployeePatients').value = employee.patients;
-
-    // Clear and populate absences list
-    const absencesList = document.getElementById('absencesList');
+    const patientsInput = document.getElementById('editEmployeePatients');
+    patientsInput.value = employee.patients || 0;
+    
+    const absencesList = document.getElementById('absences');
     absencesList.innerHTML = '';
     
     if (employee.absences) {
         // Convert single absence to array if needed
         const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
         absencesArray.forEach(absence => {
-            addAbsenceEntry(absence.start, absence.end);
+            const template = document.getElementById('absenceTemplate');
+            const absenceDiv = template.content.cloneNode(true).querySelector('.list-group-item');
+            
+            const startInput = absenceDiv.querySelector('.absence-start');
+            const endInput = absenceDiv.querySelector('.absence-end');
+            
+            startInput.value = formatGermanToISODate(absence.start);
+            endInput.value = formatGermanToISODate(absence.end);
+            
+            // Add start date change handler
+            startInput.addEventListener('change', function() {
+                if (!endInput.value) {
+                    endInput.value = this.value;
+                }
+            });
+            
+            if (absence.announcement) {
+                absenceDiv.querySelector('.absence-announcement').value = formatGermanToISODate(absence.announcement);
+            }
+            absenceDiv.querySelector('.absence-planned').checked = absence.planned || false;
+            
+            const deleteButton = absenceDiv.querySelector('.btn-outline-danger');
+            deleteButton.onclick = function() { this.closest('.list-group-item').remove(); };
+            
+            absencesList.appendChild(absenceDiv);
         });
     }
-
-    // Show modal
+    
     const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
     modal.show();
 }
 
-function addAbsenceEntry(start = '', end = '') {
-    const absencesList = document.getElementById('absencesList');
-    const absenceDiv = document.createElement('div');
-    absenceDiv.className = 'absence-entry d-flex gap-2 align-items-center mb-2';
+function addAbsenceEntry() {
+    const template = document.getElementById('absenceTemplate');
+    const absenceDiv = template.content.cloneNode(true).querySelector('.list-group-item');
     
-    // Create the elements first so we can add event listeners
-    const startInput = document.createElement('input');
-    startInput.type = 'date';
-    startInput.className = 'form-control absence-start';
-    startInput.value = start ? formatGermanToISODate(start) : '';
-    startInput.required = true;
-
-    const endInput = document.createElement('input');
-    endInput.type = 'date';
-    endInput.className = 'form-control absence-end';
-    endInput.value = end ? formatGermanToISODate(end) : '';
-    endInput.required = true;
-
-    // Add event listener to start date
+    // Add delete functionality
+    const deleteButton = absenceDiv.querySelector('.btn-outline-danger');
+    deleteButton.onclick = function() { this.closest('.list-group-item').remove(); };
+    
+    // Add start date change handler
+    const startInput = absenceDiv.querySelector('.absence-start');
+    const endInput = absenceDiv.querySelector('.absence-end');
     startInput.addEventListener('change', function() {
         if (!endInput.value) {
             endInput.value = this.value;
         }
     });
-
-    // Assemble the div
-    absenceDiv.appendChild(startInput);
-    absenceDiv.appendChild(document.createTextNode('-'));
-    absenceDiv.appendChild(endInput);
     
-    const deleteButton = document.createElement('button');
-    deleteButton.type = 'button';
-    deleteButton.className = 'btn btn-outline-danger btn-sm';
-    deleteButton.innerHTML = '<i class="bi bi-trash text-danger"></i>';
-    deleteButton.onclick = function() { this.parentElement.remove(); };
-    absenceDiv.appendChild(deleteButton);
+    document.getElementById('absences').appendChild(absenceDiv);
+}
 
-    absencesList.appendChild(absenceDiv);
+function saveEmployeeEdit() {
+    const nameInput = document.getElementById('employeeName');
+    if (!nameInput.value.trim()) {
+        alert('Bitte geben Sie einen Namen ein.');
+        return;
+    }
+
+    const patientsInput = document.getElementById('editEmployeePatients');
+    const patients = parseInt(patientsInput.value) || 0;
+
+    const absencesList = document.getElementById('absences');
+    const absences = Array.from(absencesList.children).map(absenceDiv => {
+        const start = absenceDiv.querySelector('.absence-start').value;
+        const end = absenceDiv.querySelector('.absence-end').value;
+        const announcement = absenceDiv.querySelector('.absence-announcement').value;
+        const planned = absenceDiv.querySelector('.absence-planned').checked;
+
+        return {
+            start: formatISOToGermanDate(start),
+            end: formatISOToGermanDate(end),
+            announcement: announcement ? formatISOToGermanDate(announcement) : null,
+            planned: planned
+        };
+    }).filter(absence => absence.start && absence.end);
+
+    employees[currentEmployeeKey] = {
+        name: nameInput.value.trim(),
+        patients: patients,
+        absences: absences
+    };
+
+    checkData();
+    fillEmployeesTable();
+    bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal')).hide();
 }
 
 function formatGermanToISODate(germanDate) {
@@ -130,70 +168,6 @@ function formatGermanToISODate(germanDate) {
 function formatISOToGermanDate(isoDate) {
     const [year, month, day] = isoDate.split('-');
     return `${parseInt(day)}.${parseInt(month)}.${year}`;
-}
-
-function saveEmployeeEdit() {
-    const form = document.getElementById('editEmployeeForm');
-    if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-    }
-
-    const empKey = document.getElementById('editEmployeeId').value;
-    const patients = parseInt(document.getElementById('editEmployeePatients').value);
-
-    // Update employee data
-    employees[empKey].patients = patients;
-
-    // Get absences
-    const absenceEntries = document.querySelectorAll('.absence-entry');
-    if (absenceEntries.length > 0) {
-        const absences = [];
-        absenceEntries.forEach(entry => {
-            const start = entry.querySelector('.absence-start').value;
-            const end = entry.querySelector('.absence-end').value;
-            
-            if (start && end) {
-                absences.push({
-                    start: formatISOToGermanDate(start),
-                    end: formatISOToGermanDate(end)
-                });
-            }
-        });
-        
-        if (absences.length > 0) {
-            employees[empKey].absences = absences;
-        } else {
-            delete employees[empKey].absences;
-        }
-    } else {
-        delete employees[empKey].absences;
-    }
-
-    // Hide modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal'));
-    modal.hide();
-
-    // Update table and mark changes
-    fillEmployeesTable();
-    checkData();
-}
-
-function deleteEmployee() {
-    const empKey = document.getElementById('editEmployeeId').value;
-    if (!empKey) return;
-
-    if (confirm('Möchten Sie diese:n Mitarbeiter:in wirklich löschen?')) {
-        delete employees[empKey];
-
-        // Hide modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal'));
-        modal.hide();
-
-        // Update table and mark changes
-        fillEmployeesTable();
-        checkData();
-    }
 }
 
 function fillEmployeesTable() {
@@ -223,7 +197,7 @@ function fillEmployeesTable() {
             
             absencesArray.forEach(absence => {
                 const badge = document.createElement('span');
-                badge.className = 'badge bg-warning text-dark me-1';
+                badge.className = `badge ${absence.planned ? 'bg-success' : 'bg-warning'} me-1`;
                 badge.textContent = formatAbsenceDates(absence.start, absence.end);
                 absencesCell.appendChild(badge);
             });
@@ -241,5 +215,14 @@ function fillEmployeesTable() {
         row.appendChild(actionsCell);
 
         tbody.appendChild(row);
+    }
+}
+
+function deleteEmployee() {
+    if (confirm('Möchten Sie diese:n Mitarbeiter:in wirklich löschen?')) {
+        delete employees[currentEmployeeKey];
+        checkData();
+        fillEmployeesTable();
+        bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal')).hide();
     }
 }

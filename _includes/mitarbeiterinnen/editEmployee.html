@@ -1,6 +1,6 @@
 <!-- Edit Employee Modal -->
 <div class="modal fade" id="editEmployeeModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Mitarbeiter:in bearbeiten</h5>
@@ -15,12 +15,41 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Abwesenheiten</label>
-                        <div id="absencesList" class="mb-2">
+                        <div id="absences" class="list-group mb-3">
                             <!-- Absences will be added here dynamically -->
                         </div>
                         <button type="button" class="btn btn-outline-primary btn-sm" onclick="addAbsenceEntry()">
                             <i class="bi bi-plus-lg me-1 text-primary"></i>Abwesenheit hinzufügen
                         </button>
+                        <template id="absenceTemplate">
+                            <div class="list-group-item">
+                                <div class="row g-3 align-items-center">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Von</label>
+                                        <input type="date" class="form-control form-control-sm absence-start" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Bis</label>
+                                        <input type="date" class="form-control form-control-sm absence-end" required>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Ankündigung</label>
+                                        <input type="date" class="form-control form-control-sm absence-announcement">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-check mt-4">
+                                            <input class="form-check-input absence-planned" type="checkbox">
+                                            <label class="form-check-label">Geplant</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <button type="button" class="btn btn-outline-danger btn-sm mt-4">
+                                            <i class="bi bi-trash text-danger"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
                     </div>
                 </form>
             </div>
