@@ -1,8 +1,10 @@
 ---
-layout: layout.html
-active_therapiezuordnung: active
-title: Therapiezuordnung
-dir: ../../
+layout: layout_print
+active_belegung: active
+dir: ../../../
+page_size: A4 portrait
+page_width: 210mm
+title: Therapiezuordnung - Ausdruck
 ---
 
 <script src="{{ dir }}_DATA/Therapiezuordnung.js"></script>
@@ -10,25 +12,49 @@ dir: ../../
 <script src="{{ dir }}src/therapies.js"></script>
 
 <style>
-    .table-bordered tr.border-bottom-3 {
+    .print-header {
+        margin-bottom: 1rem;
+    }
+
+    .print-header h4 {
+        font-size: 18px !important;
+    }
+
+    .table-bordered>tbody>tr.border-bottom-3 {
         border-bottom-width: 3px !important;
     }
 
     .table-bordered td.border-end-3,
     .table-bordered th.border-end-3 {
-        border-right-width: 3px !important;
+        border-right: 3px solid #dee2e6 !important;
     }
 
+    /* Override Bootstrap's default font sizes */
     .table th,
     .table td,
     .table tr {
         font-size: inherit !important;
         padding: 2px 4px !important;
     }
+
+    .font-small {
+        font-size: 70% !important;
+    }
+
 </style>
+
+<div class="print-header d-flex justify-content-between align-items-center">
+    <h4 class="mb-0">Therapiezuordnung Station 7.1</h4>
+    <div class="text-end">
+        <div>Stand: <span id="currentDate"></span> (KW <span id="currentWeek"></span>)</div>
+    </div>
+</div>
 
 <table class="table table-sm table-bordered table-hover mx-auto" style="width: auto;">
     <thead>
+        <tr>
+            <td colspan="15"></td>
+        </tr>
         <tr class="text-start table-text-vertical" height="200">
             <th width="30"></th>
             <th width="250"></th>
@@ -147,18 +173,17 @@ dir: ../../
     </tfoot>
 </table>
 
-
-<div class="text-center mt-4">
-    <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#saveDataModal">
-        <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
-    </button>
-    <button type="button" class="btn btn-outline-primary me-2" onclick="window.open('ausdruck/index.html')">
-        <i class="bi bi-printer text-primary me-1"></i> Ausdruck
-    </button>
-</div>
-
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        const currentDate = document.getElementById('currentDate');
+        const currentWeek = document.getElementById('currentWeek');
+
+        // Format current date
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('de-DE');
+        currentDate.textContent = `${dateStr}`;
+        currentWeek.textContent = getCalendarWeek(today);
+
         fillTherapyTable();
     });
 </script>

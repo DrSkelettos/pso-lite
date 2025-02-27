@@ -106,7 +106,7 @@ function fillTherapyTable() {
         
         // Column 10: Kreativ-Einzel
         const tdKreativ = document.createElement('td');
-        tdKreativ.className = 'border-end-3';
+        tdKreativ.className = 'border-end-3 font-small';
         tdKreativ.textContent = therapyData.kreativ_einzel || '';
         row.appendChild(tdKreativ);
         

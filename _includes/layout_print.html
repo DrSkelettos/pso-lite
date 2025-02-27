@@ -7,7 +7,7 @@
     <title>PSO - {{ title }}</title>
     <style>
         @page {
-            size: A4 landscape;
+            size: {{ page_size }};
             margin: 8mm;
         }
 
@@ -51,12 +51,14 @@
         /* Preview styles (when viewing in browser) */
         @media screen {
             body {
-                max-width: 297mm;
+                max-width: {{ page_width }};
                 margin: 0 auto;
                 padding: 1rem;
             }
         }
     </style>
+
+    <link href="{{ dir }}src/style.css" rel="stylesheet">
 
     <link href="{{ dir }}src/bootstrap/bootstrap.min.css" rel="stylesheet">
     <script src="{{ dir }}src/bootstrap/bootstrap.min.js"></script>
