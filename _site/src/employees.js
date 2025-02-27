@@ -32,17 +32,19 @@ function addEmployee() {
         return;
     }
 
+    const key = document.getElementById('employeeKey').value.trim();
     const name = document.getElementById('employeeName').value.trim();
     const patients = parseInt(document.getElementById('employeePatients').value);
 
     // Check if employee already exists
-    if (name in employees) {
-        alert('Eine:r Mitarbeiter:in mit diesem Namen existiert bereits.');
+    if (key in employees) {
+        alert('Eine:r Mitarbeiter:in mit diesem Kürzel existiert bereits.');
         return;
     }
 
     // Add new employee
-    employees[name] = {
+    employees[key] = {
+        name: name,
         patients: patients
     };
 
@@ -184,8 +186,13 @@ function fillEmployeesTable() {
 
         // Name cell
         const nameCell = document.createElement('td');
-        nameCell.textContent = empKey;
+        nameCell.textContent = employee.name;
         row.appendChild(nameCell);
+
+        // Key cell
+        const keyCell = document.createElement('td');
+        keyCell.textContent = empKey;
+        row.appendChild(keyCell);
 
         // Patients cell
         const patientsCell = document.createElement('td');
