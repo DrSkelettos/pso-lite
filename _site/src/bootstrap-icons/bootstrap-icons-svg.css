@@ -33,6 +33,10 @@
   background-image: url("./svg/floppy-fill.svg"); 
 }
 
+.bi-printer::before { 
+  background-image: url("./svg/printer.svg"); 
+}
+
 .bi-house::before { 
   background-image: url("./svg/house.svg"); 
 }

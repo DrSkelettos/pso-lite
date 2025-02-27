@@ -9,8 +9,8 @@ const patients = {
             { employee: "CP", start: "01.03.2025", end: "14.03.2025" }
         ],
         rooms: [
-            { room: "103-T", start: "01.01.2025", end: "16.02.2025" },
-            { room: "104-F", start: "16.02.2025" }
+            { room: "103-T", start: "01.01.2025", end: "02.03.2025" },
+            { room: "104-F", start: "02.03.2025" }
         ]
     },
     2: {

@@ -5,23 +5,42 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PSO - {{ title }}</title>
-
     <style>
         @page {
             size: A4 landscape;
             margin: 1cm;
         }
 
-        @media print {
-            body {
-                font-size: 12px;
-                color: black !important;
-                background: none !important;
-            }
+        html {
+            font-size: 12px !important;
+            color: black !important;
+        }
 
+        body {
+            font-size: 12px !important;
+            color: black !important;
+            background: none !important;
+        }
+
+        a {
+            text-decoration: none;
+            color: black !important;
+            cursor: default !important;
+        }
+
+        @media print {
             a {
                 text-decoration: none;
-                color: black;
+                color: black !important;
+            }
+
+            .table {
+                font-size: inherit !important;
+            }
+
+            .table th,
+            .table td {
+                font-size: inherit !important;
             }
 
             .no-print {
@@ -32,7 +51,6 @@
         /* Preview styles (when viewing in browser) */
         @media screen {
             body {
-                font-size: 12px;
                 max-width: 297mm;
                 margin: 0 auto;
                 padding: 1rem;

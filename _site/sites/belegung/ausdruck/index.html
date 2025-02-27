@@ -5,23 +5,42 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>PSO - Belegung - Ausdruck</title>
-
     <style>
         @page {
             size: A4 landscape;
             margin: 1cm;
         }
 
-        @media print {
-            body {
-                font-size: 12px;
-                color: black !important;
-                background: none !important;
-            }
+        html {
+            font-size: 12px !important;
+            color: black !important;
+        }
 
+        body {
+            font-size: 12px !important;
+            color: black !important;
+            background: none !important;
+        }
+
+        a {
+            text-decoration: none;
+            color: black !important;
+            cursor: default !important;
+        }
+
+        @media print {
             a {
                 text-decoration: none;
-                color: black;
+                color: black !important;
+            }
+
+            .table {
+                font-size: inherit !important;
+            }
+
+            .table th,
+            .table td {
+                font-size: inherit !important;
             }
 
             .no-print {
@@ -32,7 +51,6 @@
         /* Preview styles (when viewing in browser) */
         @media screen {
             body {
-                font-size: 12px;
                 max-width: 297mm;
                 margin: 0 auto;
                 padding: 1rem;
@@ -59,17 +77,10 @@
 <style>
     .print-header {
         margin-bottom: 1rem;
-        font-size: 12px;
     }
 
     .print-header h4 {
-        font-size: 18px;
-    }
-
-    .print-footer {
-        font-size: 10px;
-        text-align: right;
-        margin-top: 0.5rem;
+        font-size: 18px !important;
     }
 
     .table-bordered>tbody>tr.border-bottom-3 {
@@ -82,8 +93,18 @@
     }
 
     .table {
-        font-size: 12px;
         width: 100%;
+    }
+
+    /* Override Bootstrap's default font sizes */
+    .table th, 
+    .table td,
+    .table tr {
+        font-size: inherit !important;
+    }
+
+    .table small {
+        font-size: 70% !important;
     }
 </style>
 
@@ -97,20 +118,20 @@
 <table class="table table-sm table-bordered">
     <thead class="table-light">
         <tr class="text-center">
-            <th width="50">Zimmer</th>
-            <th class="text-start">Patient:in</th>
-            <th width="75">Gruppe</th>
-            <th width="75">Therap.</th>
-            <th width="75">Vertr.</th>
-            <th width="95">Aufnahme</th>
-            <th width="40">Wo.</th>
-            <th width="95">Entlassung</th>
-            <th class="border-end-3">E-Modus</th>
-            <th>Geplant</th>
-            <th width="75">Gruppe</th>
-            <th width="75">Therap.</th>
-            <th width="75">Bemerkung</th>
-            <th width="95">Aufnahme</th>
+            <th width="30">Zi.</th>
+            <th width="200" class="text-start">Patient:in</th>
+            <th width="30">Gr.</th>
+            <th width="50">Therap.</th>
+            <th width="50">Vertr.</th>
+            <th width="75">Aufnahme</th>
+            <th width="30">Wo.</th>
+            <th width="75">Entlassung</th>
+            <th width="100" class="border-end-3">E-Modus</th>
+            <th width="150">Geplant</th>
+            <th width="30">Gr.</th>
+            <th width="50">Therap.</th>
+            <th>Bemerkung</th>
+            <th width="75">Aufnahme</th>
         </tr>
     </thead>
     <tbody id="patients-table">
