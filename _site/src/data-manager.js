@@ -4,6 +4,7 @@ function setOriginalData() {
     original.employees = JSON.stringify(employees);
     original.therapies = JSON.stringify(therapies);
     original.patients = JSON.stringify(patients);
+    original.poststationaer = JSON.stringify(poststationaer);
 }
 setOriginalData();
 

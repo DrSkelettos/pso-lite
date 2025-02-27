@@ -17,6 +17,10 @@
   filter: none;
 }
 
+.bi-person-x::before { 
+  background-image: url("./svg/person-x.svg"); 
+}
+
 .bi-calendar-date::before { 
   background-image: url("./svg/calendar-date.svg"); 
 }

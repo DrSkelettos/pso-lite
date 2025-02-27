@@ -1,0 +1,322 @@
+<!-- Edit Patient Modal -->
+<div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editPatientModalLabel">Patient:in bearbeiten</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editPatientForm">
+                    <input type="hidden" id="editPatientId">
+                    <!-- Name -->
+                    <div class="mb-3">
+                        <label for="editPatientName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="editPatientName" required>
+                    </div>
+                    <!-- Zimmer -->
+                    <div class="mb-3">
+                        <label class="form-label">Zimmer</label>
+                        <div id="editRoomsList" class="list-group mb-2">
+                            <!-- Room entries will be added here dynamically -->
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addRoomEntry()">
+                            <i class="bi bi-plus-circle text-primary"></i> Zimmer hinzufügen
+                        </button>
+                    </div>
+                    <!-- Therapeut:innen -->
+                    <div class="mb-3">
+                        <label class="form-label">Therapeut:innen</label>
+                        <div id="editEmployeesList" class="list-group mb-2">
+                            <!-- Employee entries will be added here dynamically -->
+                        </div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addEmployeeEntry()">
+                            <i class="bi bi-plus-circle text-primary"></i> Therapeut:in hinzufügen
+                        </button>
+                    </div>
+                    <!-- Gruppe -->
+                    <div class="mb-3">
+                        <label for="editPatientGroup" class="form-label">Gruppe</label>
+                        <select class="form-select" id="editPatientGroup">
+                            <option value="">Bitte wählen...</option>
+                            <option value="1-A">1-A</option>
+                            <option value="1-B">1-B</option>
+                            <option value="2-A">2-A</option>
+                            <option value="2-B">2-B</option>
+                            <option value="3-A">3-A</option>
+                            <option value="3-B">3-B</option>
+                        </select>
+                    </div>
+                    <!-- Daten -->
+                    <div class="mb-3">
+                        <label for="editPatientAdmission" class="form-label">Aufnahmedatum</label>
+                        <input type="date" class="form-control" id="editPatientAdmission" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editPatientDischarge" class="form-label">Entlassungsdatum</label>
+                        <input type="date" class="form-control" id="editPatientDischarge">
+                    </div>
+                    <!-- Bemerkung -->
+                    <div class="mb-3">
+                        <label for="editPatientDischargeMode" class="form-label">Entlassungs-Modus</label>
+                        <input type="text" class="form-control" id="editPatientDischargeMode">
+                    </div>
+                    <!-- Bemerkung -->
+                    <div class="mb-3">
+                        <label for="editPatientMisc" class="form-label">Bemerkung</label>
+                        <input type="text" class="form-control" id="editPatientMisc">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger me-auto" onclick="deletePatient()">
+                    <i class="bi bi-trash me-1 text-danger"></i>Löschen
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="saveEditPatient()">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="employeeEntryTemplate">
+    <div class="list-group-item p-3">
+        <div class="row g-2">
+            <div class="col-md-4">
+                <select class="form-select employee-select" required>
+                    <option value="">Bitte wählen...</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="date" class="form-control start-date" placeholder="Start" required>
+            </div>
+            <div class="col-md-3">
+                <input type="date" class="form-control end-date" placeholder="Ende">
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-outline-danger btn-sm"
+                    onclick="this.closest('.list-group-item').remove()">
+                    <i class="bi bi-trash text-danger"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="roomEntryTemplate">
+    <div class="list-group-item p-3">
+        <div class="row g-2">
+            <div class="col-md-4">
+                <select class="form-select room-select" required>
+                    <option value="">Bitte wählen...</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <input type="date" class="form-control start-date" placeholder="Start" required>
+            </div>
+            <div class="col-md-3">
+                <input type="date" class="form-control end-date" placeholder="Ende">
+            </div>
+            <div class="col-md-2">
+                <button type="button" class="btn btn-outline-danger btn-sm"
+                    onclick="this.closest('.list-group-item').remove()">
+                    <i class="bi bi-trash text-danger"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    function addEmployeeEntry(employee = null) {
+        const template = document.getElementById('employeeEntryTemplate');
+        const entry = template.content.cloneNode(true);
+        const select = entry.querySelector('.employee-select');
+
+        // Populate employee options
+        for (let id in employees) {
+            const option = document.createElement('option');
+            option.value = id;
+            option.textContent = id;
+            select.appendChild(option);
+        }
+
+        // Set values if editing existing entry
+        if (employee) {
+            select.value = employee.employee;
+            entry.querySelector('.start-date').value = formatDateForInput(employee.start);
+            if (employee.end) {
+                entry.querySelector('.end-date').value = formatDateForInput(employee.end);
+            }
+        }
+
+        document.getElementById('editEmployeesList').appendChild(entry);
+    }
+
+    function addRoomEntry(room = null) {
+        const template = document.getElementById('roomEntryTemplate');
+        const entry = template.content.cloneNode(true);
+        const select = entry.querySelector('.room-select');
+
+        // Populate room options
+        for (let roomId in rooms) {
+            for (let space of ['F', 'T']) {
+                if (space in rooms[roomId]) {
+                    const option = document.createElement('option');
+                    option.value = `${roomId}-${space}`;
+                    option.textContent = `${roomId}-${space}`;
+                    select.appendChild(option);
+                }
+            }
+        }
+
+        // Set values if editing existing entry
+        if (room) {
+            select.value = room.room;
+            entry.querySelector('.start-date').value = formatDateForInput(room.start);
+            if (room.end) {
+                entry.querySelector('.end-date').value = formatDateForInput(room.end);
+            }
+        }
+
+        document.getElementById('editRoomsList').appendChild(entry);
+    }
+
+    function formatDateForInput(dateStr) {
+        // Convert DD.MM.YYYY to YYYY-MM-DD
+        const [day, month, year] = dateStr.split('.');
+        return `${year}-${month}-${day}`;
+    }
+
+    function formatDateFromInput(dateStr) {
+        // Convert YYYY-MM-DD to DD.MM.YYYY
+        const [year, month, day] = dateStr.split('-');
+        return `${day}.${month}.${year}`;
+    }
+
+    function editPatient(patientId) {
+        const patient = patients[patientId];
+        if (!patient) return;
+
+        // Set basic info
+        document.getElementById('editPatientId').value = patientId;
+        document.getElementById('editPatientName').value = patient.name;
+        document.getElementById('editPatientGroup').value = patient.group;
+        document.getElementById('editPatientAdmission').value = formatDateForInput(patient.admission);
+        document.getElementById('editPatientDischargeMode').value = patient.discharge_mode || '';
+        document.getElementById('editPatientMisc').value = patient.misc || '';
+        if (patient.discharge) {
+            document.getElementById('editPatientDischarge').value = formatDateForInput(patient.discharge);
+        }
+
+        // Clear existing entries
+        document.getElementById('editEmployeesList').innerHTML = '';
+        document.getElementById('editRoomsList').innerHTML = '';
+
+        // Add employee entries
+        if (patient.employees) {
+            patient.employees.forEach(emp => addEmployeeEntry(emp));
+        }
+
+        // Add room entries
+        if (patient.rooms) {
+            patient.rooms.forEach(room => addRoomEntry(room));
+        }
+
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editPatientModal'));
+        modal.show();
+    }
+
+    function deletePatient() {
+        const patientId = document.getElementById('editPatientId').value;
+        if (!patientId) return;
+
+        if (confirm('Möchten Sie diese:n Patient:in wirklich löschen?')) {
+            // Delete the patient
+            delete patients[patientId];
+
+            // Hide modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
+            modal.hide();
+
+            // Update table and mark changes
+            fillPatientsTable();
+            checkData();
+        }
+    }
+
+    function saveEditPatient() {
+        const form = document.getElementById('editPatientForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const patientId = document.getElementById('editPatientId').value;
+
+        // Gather basic info
+        const updatedPatient = {
+            name: document.getElementById('editPatientName').value,
+            group: document.getElementById('editPatientGroup').value,
+            admission: formatDateFromInput(document.getElementById('editPatientAdmission').value)
+        };
+
+        // Add discharge date if present
+        const discharge = document.getElementById('editPatientDischarge').value;
+        if (discharge) {
+            updatedPatient.discharge = formatDateFromInput(discharge);
+        }
+
+        // Add misc if present
+        const misc = document.getElementById('editPatientMisc').value;
+        if (misc) {
+            updatedPatient.misc = misc;
+        }
+
+        // Add discharge mode if present
+        const dischargeMode = document.getElementById('editPatientDischargeMode').value;
+        if (dischargeMode) {
+            updatedPatient.discharge_mode = dischargeMode;
+        }
+
+        // Gather employee entries
+        updatedPatient.employees = [];
+        document.querySelectorAll('#editEmployeesList .list-group-item').forEach(item => {
+            const entry = {
+                employee: item.querySelector('.employee-select').value,
+                start: formatDateFromInput(item.querySelector('.start-date').value)
+            };
+            const end = item.querySelector('.end-date').value;
+            if (end) {
+                entry.end = formatDateFromInput(end);
+            }
+            updatedPatient.employees.push(entry);
+        });
+
+        // Gather room entries
+        updatedPatient.rooms = [];
+        document.querySelectorAll('#editRoomsList .list-group-item').forEach(item => {
+            const entry = {
+                room: item.querySelector('.room-select').value,
+                start: formatDateFromInput(item.querySelector('.start-date').value)
+            };
+            const end = item.querySelector('.end-date').value;
+            if (end) {
+                entry.end = formatDateFromInput(end);
+            }
+            updatedPatient.rooms.push(entry);
+        });
+
+        // Update patient data
+        patients[patientId] = updatedPatient;
+
+        // Update UI
+        fillPatientsTable();
+        checkData();
+
+        // Close modal
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
+        modal.hide();
+    }
+</script>

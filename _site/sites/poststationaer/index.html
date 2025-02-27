@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PSO - Belegung</title>
+    <title>PSO - Poststationär</title>
 
 
     <link href="../../src/style.css" rel="stylesheet">
@@ -37,7 +37,7 @@
                     </a>
                 </li>
                 <li class="nav-item me-2">
-                    <a class="nav-link active" href="../../sites/belegung/index.html">
+                    <a class="nav-link " href="../../sites/belegung/index.html">
                         <i class="bi bi-calendar-date me-1 text-light"></i>
                         Belegung
                     </a>
@@ -50,7 +50,7 @@
                     </a>
                 </li>
                 <li class="nav-item me-2">
-                    <a class="nav-link "
+                    <a class="nav-link active"
                         href="../../sites/poststationaer/index.html">
                         <i class="bi bi-person-x me-1 text-light"></i>
                         Poststationär
@@ -96,85 +96,37 @@
 
     <div class="container-fluid">
         
-<script src="../../src/patients.js"></script>
+<script src="../../src/poststationaer.js"></script>
 
 <style>
     .table-bordered tr.border-bottom-3 {
         border-bottom-width: 3px !important;
     }
-
-    .table-bordered td.border-end-3,
-    .table-bordered th.border-end-3 {
-        border-right: 3px solid #dee2e6 !important;
-    }
-
-    .table th, 
-    .table td,
-    .table tr {
-        font-size: inherit !important;
-        padding: 2px 4px !important;
-    }
 </style>
 
-<table class="table table-sm table-bordered table-hover">
-    <thead class="table-light">
-        <tr class="text-center">
-            <th width="50">Zi.</th>
-            <th class="text-start">Patient:in</th>
-            <th width="50">Gr.</th>
-            <th width="75">Therap.</th>
-            <th width="75">Vertr.</th>
-            <th width="95">Aufnahme</th>
-            <th width="40">Wo.</th>
-            <th width="95">Entlassung</th>
-            <th class="border-end-3">E-Modus</th>
-            <th>Geplant</th>
-            <th width="50">Gr.</th>
-            <th width="75">Therap.</th>
-            <th width="75">Bemerkung</th>
-            <th width="95">Aufnahme</th>
+<table id="poststationaerTable" class="table table-sm table-bordered table-hover mx-auto" style="width: auto;">
+    <thead>
+        <tr class="text-center table-light">
+            <th width="250" class="text-start">Patient:in</th>
+            <th width="50">GR</th>
+            <th width="50">MT</th>
+            <th width="50">GT</th>
+            <th width="50">KT</th>
+            <th width="150">Ende</th>
         </tr>
     </thead>
-    <tbody id="patients-table">
-        <tr id="patient-row" class="text-center d-none">
-            <td class="data-room"></td>
-            <td class="data-name text-start"></td>
-            <td class="data-group"></td>
-            <td class="data-employee1"></td>
-            <td class="data-misc"></td>
-            <td class="data-admission"></td>
-            <td class="data-week"></td>
-            <td class="data-discharge"></td>
-            <td class="data-discharge_mode border-end-3"></td>
-            <td class="data-name-planned text-start"></td>
-            <td class="data-group-planned"></td>
-            <td class="data-employee1-planned"></td>
-            <td class="data-misc-planned"></td>
-            <td class="data-admission-planned"></td>
-        </tr>
+    <tbody>
+
     </tbody>
 </table>
 
-<div class="d-flex justify-content-between align-items-center my-4">
-    <div>
-        <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#saveDataModal">
-            <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
-        </button>
-        <button type="button" class="btn btn-outline-primary me-2" onclick="window.open('ausdruck/index.html')">
-            <i class="bi bi-printer text-primary me-1"></i> Ausdruck
-        </button>
-        <button type="button" class="btn btn-outline-primary me-2" onclick="location.href='../auslastung/index.html'">
-            <i class="bi bi-bar-chart text-primary me-1"></i> Auslastung
-        </button>
-        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
-            <i class="bi bi-plus-circle text-primary me-1"></i> Patient:in hinzufügen
-        </button>
-    </div>
-    <div class="d-flex align-items-center">
-        <label for="tableDate" class="form-label mb-0 me-2">Datum:</label>
-        <input type="date" class="form-control" id="tableDate" style="width: 150px;"
-            onchange="updateTableDate(this.value)">
-    </div>
+<div class="text-center mt-4">
+    <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#saveDataModal">
+        <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
+    </button>
+    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
+        <i class="bi bi-plus-circle text-primary me-1"></i> Patient:in hinzufügen
+    </button>
 </div>
 
 <!-- Add Patient Modal -->
@@ -182,7 +134,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addPatientModalLabel">Neue:n Patient:in hinzufügen</h5>
+                <h5 class="modal-title" id="addPatientModalLabel">Neue:n poststationäre:n Patient:in hinzufügen</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -192,36 +144,43 @@
                         <input type="text" class="form-control" id="patientName" required>
                     </div>
                     <div class="mb-3">
-                        <label for="patientRoom" class="form-label">Zimmer</label>
-                        <select class="form-select" id="patientRoom" required>
-                            <option value="">Bitte wählen...</option>
+                        <label for="patientGR" class="form-label">Gruppentherapie</label>
+                        <select class="form-select" id="patientGR">
+                            <option value="">Nicht zugeordnet</option>
+                            <option value="A">Gruppe A</option>
+                            <option value="B">Gruppe B</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="patientEmployee" class="form-label">Therapeut:in</label>
-                        <select class="form-select" id="patientEmployee" required>
-                            <option value="">Bitte wählen...</option>
+                        <label for="patientMT" class="form-label">Musiktherapie</label>
+                        <select class="form-select" id="patientMT">
+                            <option value="">Nicht zugeordnet</option>
+                            <option value="1">Gruppe 1</option>
+                            <option value="2">Gruppe 2</option>
+                            <option value="3">Gruppe 3</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="patientGroup" class="form-label">Gruppe</label>
-                        <select class="form-select" id="patientGroup">
-                            <option value="">Bitte wählen...</option>
-                            <option value="1-A">1-A</option>
-                            <option value="1-B">1-B</option>
-                            <option value="2-A">2-A</option>
-                            <option value="2-B">2-B</option>
-                            <option value="3-A">3-A</option>
-                            <option value="3-B">3-B</option>
+                        <label for="patientGT" class="form-label">Gestaltungstherapie</label>
+                        <select class="form-select" id="patientGT">
+                            <option value="">Nicht zugeordnet</option>
+                            <option value="1">Gruppe 1</option>
+                            <option value="2">Gruppe 2</option>
+                            <option value="3">Gruppe 3</option>
                         </select>
                     </div>
                     <div class="mb-3">
-                        <label for="patientAdmission" class="form-label">Aufnahmedatum</label>
-                        <input type="date" class="form-control" id="patientAdmission" required>
+                        <label for="patientKT" class="form-label">Körper- und Tanztherapie</label>
+                        <select class="form-select" id="patientKT">
+                            <option value="">Nicht zugeordnet</option>
+                            <option value="1">Gruppe 1</option>
+                            <option value="2">Gruppe 2</option>
+                            <option value="3">Gruppe 3</option>
+                        </select>
                     </div>
                     <div class="mb-3">
-                        <label for="patientMisc" class="form-label">Bemerkung</label>
-                        <input type="text" class="form-control" id="patientMisc">
+                        <label for="patientEnd" class="form-label">Enddatum</label>
+                        <input type="date" class="form-control" id="patientEnd" required>
                     </div>
                 </form>
             </div>
@@ -239,53 +198,6 @@
         document.getElementById('addPatientForm').reset();
     });
 
-    // Initialize form when modal is shown
-    document.getElementById('addPatientModal').addEventListener('show.bs.modal', function () {
-        initializeAddPatientForm();
-    });
-
-    function initializeAddPatientForm() {
-        // Initialize employee select
-        const employeeSelect = document.getElementById('patientEmployee');
-        employeeSelect.innerHTML = ''; // Clear existing options
-        
-        // Add empty option
-        const emptyEmployeeOption = document.createElement('option');
-        emptyEmployeeOption.value = '';
-        emptyEmployeeOption.textContent = 'Bitte wählen...';
-        employeeSelect.appendChild(emptyEmployeeOption);
-
-        // Add employee options
-        for (let empKey in employees) {
-            const option = document.createElement('option');
-            option.value = empKey;
-            option.textContent = empKey;
-            employeeSelect.appendChild(option);
-        }
-
-        // Initialize room select
-        const roomSelect = document.getElementById('patientRoom');
-        roomSelect.innerHTML = ''; // Clear existing options
-        
-        // Add empty option
-        const emptyRoomOption = document.createElement('option');
-        emptyRoomOption.value = '';
-        emptyRoomOption.textContent = 'Bitte wählen...';
-        roomSelect.appendChild(emptyRoomOption);
-
-        // Add room options
-        for (let roomKey in rooms) {
-            for (let space of ['F', 'T']) {
-                if (space in rooms[roomKey]) {
-                    const option = document.createElement('option');
-                    option.value = `${roomKey}-${space}`;
-                    option.textContent = `${roomKey}-${space}`;
-                    roomSelect.appendChild(option);
-                }
-            }
-        }
-    }
-
     function addPatient() {
         const form = document.getElementById('addPatientForm');
         if (!form.checkValidity()) {
@@ -294,36 +206,37 @@
         }
 
         const name = document.getElementById('patientName').value;
-        const group = document.getElementById('patientGroup').value;
-        const employee = document.getElementById('patientEmployee').value;
-        const room = document.getElementById('patientRoom').value;
-        const admission = document.getElementById('patientAdmission').value;
-        const misc = document.getElementById('patientMisc').value;
+        const gr = document.getElementById('patientGR').value;
+        const mt = document.getElementById('patientMT').value;
+        const gt = document.getElementById('patientGT').value;
+        const kt = document.getElementById('patientKT').value;
+        const endDate = document.getElementById('patientEnd').value;
 
         // Convert ISO date to German format
-        const [year, month, day] = admission.split('-');
-        const admissionDate = `${day}.${month}.${year}`;
+        const [year, month, day] = endDate.split('-');
+        const formattedEndDate = `${day}.${month}.${year}`;
 
-        // Find next available patient ID
-        const nextId = Math.max(...Object.keys(patients).map(Number)) + 1;
+        // Find next available ID
+        const nextId = Math.max(...Object.keys(poststationaer).map(Number), 0) + 1;
 
-        // Create new patient object
-        patients[nextId] = {
+        // Create new poststationaer entry
+        poststationaer[nextId] = {
             name: name,
-            group: group,
-            admission: admissionDate,
-            employees: employee ? [{ employee: employee, start: admissionDate }] : [],
-            rooms: room ? [{ room: room, start: admissionDate }] : [],
-            misc: misc
+            end: formattedEndDate
         };
 
-        // Hide modal
-        const modal = bootstrap.Modal.getInstance(document.getElementById('addPatientModal'));
-        modal.hide();
+        // Add optional therapy groups if selected
+        if (gr) poststationaer[nextId].gr = gr;
+        if (mt) poststationaer[nextId].mt = mt;
+        if (gt) poststationaer[nextId].gt = gt;
+        if (kt) poststationaer[nextId].kt = kt;
 
-        // Update table
-        fillPatientsTable();
+        // Close modal
+        bootstrap.Modal.getInstance(document.getElementById('addPatientModal')).hide();
+
+        // Refresh table
         checkData();
+        fillPoststationaerTable();
     }
 </script>
 <!-- Save Data Modal -->
@@ -335,7 +248,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Speichern Sie den folgenden Code als <code>_DATA/Belegung.js</code>:</p>
+                <p>Speichern Sie den folgenden Code als <code>_DATA/Poststationaer.js</code>:</p>
                 <pre class="bg-light p-3 cursor-pointer"  onclick="selectCodeContent()"><code id="saveDataContent"></code></pre>
             </div>
             <div class="modal-footer">
@@ -350,57 +263,24 @@
 <script>
     function formatPatientData() {
         const indent = '    ';
-        let output = 'const patients = {\n';
+        let output = 'const poststationaer = {\n';
 
-        for (let key in patients) {
-            let patient = patients[key];
+        for (let key in poststationaer) {
+            let entry = poststationaer[key];
             output += `${indent}${key}: {\n`;
-            output += `${indent}${indent}name: "${patient.name}",\n`;
-            output += `${indent}${indent}group: "${patient.group}",\n`;
-            output += `${indent}${indent}admission: "${patient.admission}"`;
+            output += `${indent}${indent}name: "${entry.name}",\n`;
+            
+            // Add optional properties if they exist
+            if (entry.gr) output += `${indent}${indent}gr: "${entry.gr}",\n`;
+            if (entry.mt) output += `${indent}${indent}mt: "${entry.mt}",\n`;
+            if (entry.gt) output += `${indent}${indent}gt: "${entry.gt}",\n`;
+            if (entry.kt) output += `${indent}${indent}kt: "${entry.kt}",\n`;
+            
+            // Add end date (remove trailing comma from last property)
+            output += `${indent}${indent}end: "${entry.end}"\n`;
 
-            if (patient.discharge) {
-                output += `,\n${indent}${indent}discharge: "${patient.discharge}"`;
-            }
-
-            if (patient.discharge_mode) {
-                output += `,\n${indent}${indent}discharge_mode: "${patient.discharge_mode}"`;
-            }
-
-            if (patient.misc) {
-                output += `,\n${indent}${indent}misc: "${patient.misc}"`;
-            }
-
-            if (patient.employees && patient.employees.length > 0) {
-                output += `,\n${indent}${indent}employees: [\n`;
-                patient.employees.forEach((emp, index) => {
-                    output += `${indent}${indent}${indent}{ employee: "${emp.employee}", start: "${emp.start}"`;
-                    if (emp.end) {
-                        output += `, end: "${emp.end}"`;
-                    }
-                    output += ' }';
-                    if (index < patient.employees.length - 1) output += ',';
-                    output += '\n';
-                });
-                output += `${indent}${indent}]`;
-            }
-
-            if (patient.rooms && patient.rooms.length > 0) {
-                output += `,\n${indent}${indent}rooms: [\n`;
-                patient.rooms.forEach((room, index) => {
-                    output += `${indent}${indent}${indent}{ room: "${room.room}", start: "${room.start}"`;
-                    if (room.end) {
-                        output += `, end: "${room.end}"`;
-                    }
-                    output += ' }';
-                    if (index < patient.rooms.length - 1) output += ',';
-                    output += '\n';
-                });
-                output += `${indent}${indent}]`;
-            }
-
-            output += `\n${indent}}`;
-            if (Object.keys(patients).indexOf(key) < Object.keys(patients).length - 1) {
+            output += `${indent}}`;
+            if (Object.keys(poststationaer).indexOf(key) < Object.keys(poststationaer).length - 1) {
                 output += ',';
             }
             output += '\n';
@@ -775,13 +655,7 @@
 </script>
 
 <script>
-    // Set default date to today
-    const today = new Date();
-    document.getElementById('tableDate').value = today.toISOString().split('T')[0];
-    
-    // Initialize form dropdowns and table
-    initializeAddPatientForm();
-    fillPatientsTable();
+    fillPoststationaerTable();
 </script>
     </div>
 

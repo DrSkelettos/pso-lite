@@ -1,0 +1,110 @@
+<!-- Add Patient Modal -->
+<div class="modal fade" id="addPatientModal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addPatientModalLabel">Neue:n poststationäre:n Patient:in hinzufügen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPatientForm">
+                    <div class="mb-3">
+                        <label for="patientName" class="form-label">Name</label>
+                        <input type="text" class="form-control" id="patientName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="patientGR" class="form-label">Gruppentherapie</label>
+                        <select class="form-select" id="patientGR">
+                            <option value="">Nicht zugeordnet</option>
+                            <option value="A">Gruppe A</option>
+                            <option value="B">Gruppe B</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="patientMT" class="form-label">Musiktherapie</label>
+                        <select class="form-select" id="patientMT">
+                            <option value="">Nicht zugeordnet</option>
+                            <option value="1">Gruppe 1</option>
+                            <option value="2">Gruppe 2</option>
+                            <option value="3">Gruppe 3</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="patientGT" class="form-label">Gestaltungstherapie</label>
+                        <select class="form-select" id="patientGT">
+                            <option value="">Nicht zugeordnet</option>
+                            <option value="1">Gruppe 1</option>
+                            <option value="2">Gruppe 2</option>
+                            <option value="3">Gruppe 3</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="patientKT" class="form-label">Körper- und Tanztherapie</label>
+                        <select class="form-select" id="patientKT">
+                            <option value="">Nicht zugeordnet</option>
+                            <option value="1">Gruppe 1</option>
+                            <option value="2">Gruppe 2</option>
+                            <option value="3">Gruppe 3</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="patientEnd" class="form-label">Enddatum</label>
+                        <input type="date" class="form-control" id="patientEnd" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="addPatient()">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Reset form when modal is hidden
+    document.getElementById('addPatientModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('addPatientForm').reset();
+    });
+
+    function addPatient() {
+        const form = document.getElementById('addPatientForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const name = document.getElementById('patientName').value;
+        const gr = document.getElementById('patientGR').value;
+        const mt = document.getElementById('patientMT').value;
+        const gt = document.getElementById('patientGT').value;
+        const kt = document.getElementById('patientKT').value;
+        const endDate = document.getElementById('patientEnd').value;
+
+        // Convert ISO date to German format
+        const [year, month, day] = endDate.split('-');
+        const formattedEndDate = `${day}.${month}.${year}`;
+
+        // Find next available ID
+        const nextId = Math.max(...Object.keys(poststationaer).map(Number), 0) + 1;
+
+        // Create new poststationaer entry
+        poststationaer[nextId] = {
+            name: name,
+            end: formattedEndDate
+        };
+
+        // Add optional therapy groups if selected
+        if (gr) poststationaer[nextId].gr = gr;
+        if (mt) poststationaer[nextId].mt = mt;
+        if (gt) poststationaer[nextId].gt = gt;
+        if (kt) poststationaer[nextId].kt = kt;
+
+        // Close modal
+        bootstrap.Modal.getInstance(document.getElementById('addPatientModal')).hide();
+
+        // Refresh table
+        checkData();
+        fillPoststationaerTable();
+    }
+</script>

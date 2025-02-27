@@ -1,0 +1,92 @@
+<!-- Save Data Modal -->
+<div class="modal fade" id="saveDataModal" tabindex="-1" aria-labelledby="saveDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveDataModalLabel">Daten speichern</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Speichern Sie den folgenden Code als <code>_DATA/Poststationaer.js</code>:</p>
+                <pre class="bg-light p-3 cursor-pointer"  onclick="selectCodeContent()"><code id="saveDataContent"></code></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                <button type="button" class="btn btn-primary" onclick="copyToClipboard()">In Zwischenablage kopieren</button>
+                <button type="button" class="btn btn-success" onclick="confirmSave()">Bestätigen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function formatPatientData() {
+        const indent = '    ';
+        let output = 'const poststationaer = {\n';
+
+        for (let key in poststationaer) {
+            let entry = poststationaer[key];
+            output += `${indent}${key}: {\n`;
+            output += `${indent}${indent}name: "${entry.name}",\n`;
+            
+            // Add optional properties if they exist
+            if (entry.gr) output += `${indent}${indent}gr: "${entry.gr}",\n`;
+            if (entry.mt) output += `${indent}${indent}mt: "${entry.mt}",\n`;
+            if (entry.gt) output += `${indent}${indent}gt: "${entry.gt}",\n`;
+            if (entry.kt) output += `${indent}${indent}kt: "${entry.kt}",\n`;
+            
+            // Add end date (remove trailing comma from last property)
+            output += `${indent}${indent}end: "${entry.end}"\n`;
+
+            output += `${indent}}`;
+            if (Object.keys(poststationaer).indexOf(key) < Object.keys(poststationaer).length - 1) {
+                output += ',';
+            }
+            output += '\n';
+        }
+
+        output += '}';
+        return output;
+    }
+
+    function selectCodeContent() {
+        const codeElement = document.getElementById('saveDataContent');
+        const range = document.createRange();
+        range.selectNodeContents(codeElement);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    function updateSaveDataContent() {
+        const content = formatPatientData();
+        document.getElementById('saveDataContent').textContent = content;
+        // Select the content after a short delay to ensure the modal is fully shown
+        setTimeout(selectCodeContent, 100);
+    }
+
+    function copyToClipboard() {
+        const content = document.getElementById('saveDataContent').textContent;
+        navigator.clipboard.writeText(content).then(() => {
+            const copyBtn = document.querySelector('#saveDataModal .btn-primary');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Kopiert!';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        });
+    }
+
+    function confirmSave() {
+        setOriginalData();
+        checkData();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('saveDataModal'));
+        modal.hide();
+    }
+
+    // Update and select content when modal is shown
+    document.getElementById('saveDataModal').addEventListener('show.bs.modal', updateSaveDataContent);
+
+    // Add click handler to select all code when clicking anywhere in the code block
+    document.getElementById('saveDataContent').addEventListener('click', selectCodeContent);
+</script>
