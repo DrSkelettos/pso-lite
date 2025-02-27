@@ -114,8 +114,9 @@
         <table class="table table-sm table-bordered">
             <thead class="table-light">
                 <tr class="border-bottom-3">
-                    <th class="text-nowrap border-end-3" style="position: sticky; left: 0; z-index: 1;"></th>
-                    <th class="text-center" id="week-header-template" style="display: none;">KW99</th>
+                    <th width="250" class="text-nowrap border-end-3" style="position: sticky; left: 0; z-index: 1;">
+                        Gruppe</th>
+                    <th class="text-center" id="group-week-header-template" style="display: none;">KW99</th>
                 </tr>
             </thead>
             <tbody id="groupWorkloadTableBody">
@@ -128,8 +129,31 @@
     </div>
 </div>
 
+<div class="container-fluid mt-5">
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+            <thead class="table-light">
+                <tr class="border-bottom-3">
+                    <th width="250" class="text-nowrap border-end-3" style="position: sticky; left: 0; z-index: 1;">
+                        Mitarbeiter:in</th>
+                    <th class="text-center" id="employee-week-header-template" style="display: none;">KW99</th>
+                </tr>
+            </thead>
+            <tbody id="employeeWorkloadTableBody">
+                <tr id="employee-row-template" style="display: none;">
+                    <th class="text-nowrap border-end-3" style="position: sticky; left: 0; z-index: 1;"></th>
+                    <td class="text-center"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <script>
-    fillGroupWorkloadTable();
+    document.addEventListener('DOMContentLoaded', function () {
+        fillGroupWorkloadTable();
+        fillEmployeeWorkloadTable();
+    });
 </script>
     </div>
 
