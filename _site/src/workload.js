@@ -183,7 +183,7 @@ function isEmployeeAbsentMajority(employeeId, weekStart) {
         });
     }
 
-    return absenceDays > 2;
+    return absenceDays >= 3;
 }
 
 // Fill the employee workload table
@@ -232,7 +232,17 @@ function fillEmployeeWorkloadTable() {
             th.style.position = 'sticky';
             th.style.left = '0';
             th.style.zIndex = '1';
-            th.textContent = shortname;
+            
+            // Add employee name and patient count
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = shortname;
+            th.appendChild(nameSpan);
+            
+            const patientCountSpan = document.createElement('small');
+            patientCountSpan.className = 'float-end text-muted fw-normal';
+            patientCountSpan.textContent = (employee.patients || 0) + " P.";
+            th.appendChild(patientCountSpan);
+            
             row.appendChild(th);
             
             // Fill counts for each week
@@ -246,9 +256,25 @@ function fillEmployeeWorkloadTable() {
                 
                 const td = document.createElement('td');
                 td.className = 'text-center';
+                
+                // Absence
                 if (isAbsent) {
-                    td.classList.add('bg-secondary', 'text-white');
+                    td.classList.add('bg-secondary-striped');
                 }
+
+                // Add warning/danger classes based on patient count
+                const maxPatients = employee.patients || 0;
+                const warningThreshold = maxPatients < 6 ? maxPatients + 1 : maxPatients + 2;
+                const dangerThreshold = warningThreshold + 1;
+                
+                if (count >= dangerThreshold) {
+                    td.classList.add('text-danger');
+                } else if (count >= warningThreshold) {
+                    td.classList.add('text-warning');
+                } else if (count < maxPatients) {
+                    td.classList.add('text-success');
+                }
+                
                 td.textContent = count;
                 row.appendChild(td);
             });

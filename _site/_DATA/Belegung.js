@@ -20,7 +20,8 @@ const patients = {
         discharge: "28.02.2025",
         discharge_mode: "p GR; au/WE",
         employees: [
-            { employee: "Sa", start: "01.02.2025" }
+            { employee: "Sa", start: "01.02.2025" },
+            { employee: "LS", start: "25.02.2025", end: "02.03.2025" }
         ],
         rooms: [
             { room: "103-F", start: "01.02.2025" }
