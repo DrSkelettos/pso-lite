@@ -43,3 +43,6 @@
     transform: rotate(180deg);
 }
 
+tr.no-hover:hover {
+    --bs-table-hover-bg: transparent !important;
+}

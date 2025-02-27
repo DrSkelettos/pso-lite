@@ -107,7 +107,6 @@
     .font-small {
         font-size: 70% !important;
     }
-
 </style>
 
 <div class="print-header d-flex justify-content-between align-items-center">
@@ -119,10 +118,10 @@
 
 <table class="table table-sm table-bordered table-hover mx-auto" style="width: auto;">
     <thead>
-        <tr>
+        <tr class="no-hover">
             <td colspan="15"></td>
         </tr>
-        <tr class="text-start table-text-vertical" height="200">
+        <tr class="text-start table-text-vertical no-hover" height="200">
             <th width="30"></th>
             <th width="250"></th>
             <th width="50" class="border-end-3">Woche</th>
@@ -142,7 +141,7 @@
     </thead>
     <tbody id="new-patients">
         <!-- Head: New Patients -->
-        <tr class="table-secondary">
+        <tr class="table-secondary no-hover">
             <td class="patient-count text-center fw-bold" id="new-count">0</td>
             <td class="fw-bold" colspan="14">Neuaufnahmen</td>
         </tr>
@@ -156,7 +155,7 @@
 
     <tbody id="group1-patients">
         <!-- Head: Group 1 -->
-        <tr class="table-secondary">
+        <tr class="table-secondary no-hover">
             <td class="patient-count text-center fw-bold" id="group1-count">0</td>
             <td colspan="14">
                 <span class="fw-bold">Gruppe 1</span>
@@ -173,7 +172,7 @@
 
     <tbody id="group2-patients">
         <!-- Head: Group 2 -->
-        <tr class="table-secondary">
+        <tr class="table-secondary no-hover">
             <td class="patient-count text-center fw-bold" id="group2-count">0</td>
             <td colspan="14">
                 <span class="fw-bold">Gruppe 2</span>
@@ -190,7 +189,7 @@
 
     <tbody id="group3-patients">
         <!-- Head: Group 3 -->
-        <tr class="table-secondary">
+        <tr class="table-secondary no-hover">
             <td class="patient-count text-center fw-bold" id="group3-count">0</td>
             <td colspan="14">
                 <span class="fw-bold">Gruppe 3</span>
@@ -201,7 +200,7 @@
     </tbody>
 
     <tfoot>
-        <tr class="table-secondary fw-bold text-center">
+        <tr class="table-secondary fw-bold text-center no-hover">
             <td colspan="6" class="border-end-3 text-start">Plätze</td>
             <td id="maxNum-at">12</td>
             <td id="maxNum-pmr" class="border-end-3">12</td>
@@ -213,7 +212,7 @@
             <td class="border-end-3">Gruppe B</td>
             <td>Gesamt</td>
         </tr>
-        <tr class="text-center">
+        <tr class="text-center no-hover">
             <td colspan="6" class="text-start border-end-3">Davon besetzt</td>
             <td id="num-at"></td>
             <td id="num-pmr" class="border-end-3 bg-light"></td>
@@ -225,7 +224,7 @@
             <td id="num-group-b" class="border-end-3 bg-light"></td>
             <td id="num-total"></td>
         </tr>
-        <tr class="text-center">
+        <tr class="text-center no-hover">
             <td colspan="6" class="text-start border-end-3">Davon Frei</td>
             <td id="free-at"></td>
             <td id="free-pmr" class="border-end-3 bg-light"></td>

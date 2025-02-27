@@ -106,14 +106,18 @@ function fillTherapyTable() {
         
         // Column 10: Kreativ-Einzel
         const tdKreativ = document.createElement('td');
-        tdKreativ.className = 'border-end-3 font-small';
-        tdKreativ.textContent = therapyData.kreativ_einzel || '';
+        tdKreativ.className = 'border-end-3';
+        const smallKreativ = document.createElement('small');
+        smallKreativ.textContent = therapyData.kreativ_einzel || '';
+        tdKreativ.appendChild(smallKreativ);
         row.appendChild(tdKreativ);
         
         // Column 11: Einzel-Physiotherapie
         const tdPhysio = document.createElement('td');
         tdPhysio.className = 'border-end-3 bg-light';
-        tdPhysio.textContent = therapyData.einzel_physio || '';
+        const smallPhysio = document.createElement('small');
+        smallPhysio.textContent = therapyData.einzel_physio || '';
+        tdPhysio.appendChild(smallPhysio);
         row.appendChild(tdPhysio);
         
         // Column 12: Discharge date
@@ -207,6 +211,7 @@ function fillTherapyTable() {
     // Add dividers back except for last section
     [newSection, group1Section, group2Section, group3Section].forEach(section => {
         const divider = document.createElement('tr');
+        divider.className = 'no-hover';
         const td = document.createElement('td');
         td.height = 10;
         td.colSpan = 15;
