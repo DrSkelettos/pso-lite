@@ -208,7 +208,10 @@ function fillEmployeesTable() {
             
             absencesArray.forEach(absence => {
                 const badge = document.createElement('span');
-                badge.className = `badge ${absence.planned ? 'bg-success' : 'bg-warning'} me-1`;
+                const badgeClass = absence.planned ? 'bg-success' : 
+                                 absence.announcement ? 'bg-warning' : 
+                                 'bg-danger';
+                badge.className = `badge ${badgeClass} me-1`;
                 badge.textContent = formatAbsenceDates(absence.start, absence.end);
                 absencesCell.appendChild(badge);
             });
