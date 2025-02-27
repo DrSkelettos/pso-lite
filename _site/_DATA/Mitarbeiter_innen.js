@@ -28,6 +28,6 @@ const employees = {
         patients: 6
     },
     Ulu: {
-        patients: 5
+        patients: 6
     },
 };

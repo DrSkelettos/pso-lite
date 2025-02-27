@@ -38,16 +38,15 @@
         }
     </style>
 
-    <link href="/src/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <script src="/src/bootstrap/bootstrap.min.js"></script>
-    <link href="/src/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="{{ dir }}src/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="{{ dir }}src/bootstrap/bootstrap.min.js"></script>
+    <link href="{{ dir }}src/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
 
-    <script src="/_DATA/Zimmer.js"></script>
-    <script src="/_DATA/Mitarbeiter_innen.js"></script>
-    <script src="/_DATA/Belegung.js"></script>
-
-    <script src="/src/patients.js"></script>
-    <script src="/src/data-manager.js"></script>
+    <script src="{{ dir }}_DATA/Zimmer.js"></script>
+    <script src="{{ dir }}_DATA/Mitarbeiter_innen.js"></script>
+    <script src="{{ dir }}_DATA/Belegung.js"></script>
+    
+    <script src="{{ dir }}src/data-manager.js"></script>
 </head>
 
 <body>
@@ -57,31 +56,31 @@
 
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item me-2">
-                    <a class="nav-link {{ active_index }}" href="/index.html">
+                    <a class="nav-link {{ active_index }}" href="{{ dir }}index.html">
                         <i class="bi bi-house me-1"></i>
                         Startseite
                     </a>
                 </li>
                 <li class="nav-item me-2">
-                    <a class="nav-link {{ active_mitarbeiterinnen }}" href="/sites/mitarbeiterinnen/index.html">
+                    <a class="nav-link {{ active_mitarbeiterinnen }}" href="{{ dir }}sites/mitarbeiterinnen/index.html">
                         <i class="bi bi-people me-1"></i>
                         Mitarbeiter:innen
                     </a>
                 </li>
                 <li class="nav-item me-2">
-                    <a class="nav-link {{ active_belegung }}" href="/sites/belegung/index.html">
+                    <a class="nav-link {{ active_belegung }}" href="{{ dir }}sites/belegung/index.html">
                         <i class="bi bi-calendar-date me-1"></i>
                         Belegung
                     </a>
                 </li>
                 <li class="nav-item me-2">
-                    <a class="nav-link {{ active_therapiezuordnung }}" href="/sites/therapiezuordnung/index.html">
+                    <a class="nav-link {{ active_therapiezuordnung }}" href="{{ dir }}sites/therapiezuordnung/index.html">
                         <i class="bi bi-list-columns me-1"></i>
                         Therapiezuordnung
                     </a>
                 </li>
                 <li class="nav-item me-2">
-                    <a class="nav-link {{ active_chefaerztinvisite }}" href="/sites/chefaerztinvisite/index.html">
+                    <a class="nav-link {{ active_chefaerztinvisite }}" href="{{ dir }}sites/chefaerztinvisite/index.html">
                         <i class="bi bi-eye me-1"></i>
                         Chefärztinvisite
                     </a>
