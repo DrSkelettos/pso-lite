@@ -17,6 +17,7 @@
     <script src="../../_DATA/Zimmer.js"></script>
     <script src="../../_DATA/Mitarbeiter_innen.js"></script>
     <script src="../../_DATA/Belegung.js"></script>
+    <script src="../../_DATA/Therapiezuordnung.js"></script>
 
     <script src="../../src/data-manager.js"></script>
     <script src="../../src/helpers.js"></script>
@@ -87,7 +88,6 @@
 
     <div class="container-fluid">
         
-<script src="../../_DATA/Therapiezuordnung.js"></script>
 <script src="../../src/patients.js"></script>
 <script src="../../src/therapies.js"></script>
 
@@ -264,65 +264,34 @@
 </div>
 
 <script>
-    function formatPatientData() {
-        const indent = '    ';
-        let output = 'const patients = {\n';
+    function formatTherapyData() {
+        let output = 'const therapies = {\n';
 
-        for (let key in patients) {
-            let patient = patients[key];
-            output += `${indent}${key}: {\n`;
-            output += `${indent}${indent}name: "${patient.name}",\n`;
-            output += `${indent}${indent}group: "${patient.group}",\n`;
-            output += `${indent}${indent}admission: "${patient.admission}"`;
+        Object.entries(therapies).forEach(([patientId, therapyData], index) => {
+            output += `    ${patientId}: {\n`;
 
-            if (patient.discharge) {
-                output += `,\n${indent}${indent}discharge: "${patient.discharge}"`;
+            // Standard therapies
+            const standardTherapies = ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'];
+            standardTherapies.forEach(therapy => {
+                const value = therapyData[therapy] || '';
+                output += `        ${therapy}: '${value}',\n`;
+            });
+
+            // Special therapies (if present)
+            if (therapyData.kreativ_einzel) {
+                output += `        kreativ_einzel: "${therapyData.kreativ_einzel}",\n`;
+            }
+            if (therapyData.einzel_physio) {
+                output += `        einzel_physio: "${therapyData.einzel_physio}",\n`;
             }
 
-            if (patient.discharge_mode) {
-                output += `,\n${indent}${indent}discharge_mode: "${patient.discharge_mode}"`;
-            }
+            // Close patient object
+            output = output.replace(/,\n$/, '\n'); // Remove trailing comma
+            output += '    }';
+            output += index < Object.keys(therapies).length - 1 ? ',\n' : '\n';
+        });
 
-            if (patient.misc) {
-                output += `,\n${indent}${indent}misc: "${patient.misc}"`;
-            }
-
-            if (patient.employees && patient.employees.length > 0) {
-                output += `,\n${indent}${indent}employees: [\n`;
-                patient.employees.forEach((emp, index) => {
-                    output += `${indent}${indent}${indent}{ employee: "${emp.employee}", start: "${emp.start}"`;
-                    if (emp.end) {
-                        output += `, end: "${emp.end}"`;
-                    }
-                    output += ' }';
-                    if (index < patient.employees.length - 1) output += ',';
-                    output += '\n';
-                });
-                output += `${indent}${indent}]`;
-            }
-
-            if (patient.rooms && patient.rooms.length > 0) {
-                output += `,\n${indent}${indent}rooms: [\n`;
-                patient.rooms.forEach((room, index) => {
-                    output += `${indent}${indent}${indent}{ room: "${room.room}", start: "${room.start}"`;
-                    if (room.end) {
-                        output += `, end: "${room.end}"`;
-                    }
-                    output += ' }';
-                    if (index < patient.rooms.length - 1) output += ',';
-                    output += '\n';
-                });
-                output += `${indent}${indent}]`;
-            }
-
-            output += `\n${indent}}`;
-            if (Object.keys(patients).indexOf(key) < Object.keys(patients).length - 1) {
-                output += ',';
-            }
-            output += '\n';
-        }
-
-        output += '}';
+        output += '};';
         return output;
     }
 
@@ -336,7 +305,7 @@
     }
 
     function updateSaveDataContent() {
-        const content = formatPatientData();
+        const content = formatTherapyData();
         document.getElementById('saveDataContent').textContent = content;
         // Select the content after a short delay to ensure the modal is fully shown
         setTimeout(selectCodeContent, 100);
@@ -371,7 +340,10 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Therapien bearbeiten</h5>
+                <div>
+                    <h5 class="modal-title">Therapien bearbeiten</h5>
+                    <small id="editTherapiesPatientName" class="text-muted"></small>
+                </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
@@ -575,9 +547,11 @@
 <script>
     function editTherapies(patientId) {
         const therapyData = therapies[patientId] || {};
-
-        // Set patient ID
+        const patient = patients[patientId];
+        
+        // Set patient info
         document.getElementById('editTherapiesPatientId').value = patientId;
+        document.getElementById('editTherapiesPatientName').textContent = patient ? patient.name : '';
 
         // Set standard therapies
         const standardTherapies = ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'];

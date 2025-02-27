@@ -41,6 +41,8 @@ function fillTherapyTable() {
     function createPatientRow(patient) {
         const row = document.createElement('tr');
         row.className = 'text-center';
+        row.style.cursor = 'pointer';
+        row.onclick = () => editTherapies(patient.id);
         
         // Counter (will be set later)
         const tdCounter = document.createElement('td');
@@ -103,8 +105,6 @@ function fillTherapyTable() {
             
             // Display therapy status
             td.textContent = therapyData[therapy] || '';
-            td.style.cursor = 'pointer';
-            td.onclick = () => editTherapies(patient.id);
             row.appendChild(td);
         });
         

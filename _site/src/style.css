@@ -46,3 +46,7 @@
 tr.no-hover:hover {
     --bs-table-hover-bg: transparent !important;
 }
+
+.form-check-input, .form-check-label {
+    cursor: pointer !important;
+}
