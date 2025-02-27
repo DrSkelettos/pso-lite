@@ -30,12 +30,12 @@ const patients = {
     3: {
         name: "Hr. Meier",
         group: "2-A",
-        admission: "01.05.2025",
+        admission: "26.02.2025",
         employees: [
-            { employee: "Em", start: "01.05.2025" }
+            { employee: "Em", start: "26.02.2025" }
         ],
         rooms: [
-            { room: "103-T", start: "01.05.2025" }
+            { room: "104-F", start: "26.02.2025" }
         ]
     },
     4: {

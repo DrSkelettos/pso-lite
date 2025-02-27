@@ -36,3 +36,10 @@
             #ebebec 6px);
 }
 
+.table-text-vertical th {
+    writing-mode: vertical-lr; /* Dreht den Text von unten nach oben */
+    text-align: left; /* Zentriert den Text horizontal */
+    vertical-align: middle; /* Zentriert den Text vertikal */
+    transform: rotate(180deg);
+}
+

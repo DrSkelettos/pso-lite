@@ -5,4 +5,105 @@ title: Therapiezuordnung
 dir: ../../
 ---
 
-<h1>{{ title }}</h1>
+<script src="{{ dir }}_DATA/Therapiezuordnung.js"></script>
+<script src="{{ dir }}src/patients.js"></script>
+<script src="{{ dir }}src/therapies.js"></script>
+
+<style>
+    .table-bordered tr.border-bottom-3 {
+        border-bottom-width: 3px !important;
+    }
+
+    .table-bordered td.border-end-3,
+    .table-bordered th.border-end-3 {
+        border-right-width: 3px !important;
+    }
+
+    .table th,
+    .table td,
+    .table tr {
+        font-size: inherit !important;
+        padding: 2px 4px !important;
+    }
+</style>
+
+<table class="table table-sm table-bordered table-hover mx-auto" style="width: auto;">
+    <thead>
+        <tr class="text-start table-text-vertical" height="200">
+            <th width="30"></th>
+            <th width="250"></th>
+            <th width="50" class="border-end-3">Woche</th>
+            <th width="75">Therapeut:in</th>
+            <th width="50">Therapieplan</th>
+            <th width="50" class="border-end-3">Gruppentherapie</th>
+            <th width="50">AT</th>
+            <th width="50" class="border-end-3">PMR</th>
+            <th width="50" class="border-end-3">Haltungsschule</th>
+            <th width="50">ASST</th>
+            <th width="50">SKT</th>
+            <th width="50" class="border-end-3">Biographiearbeit</th>
+            <th width="150" class="border-end-3">Kreativ-Einzel</th>
+            <th width="150" class="border-end-3">Einzel-Physiotherapie</th>
+            <th width="100">Entlassung</th>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Head: New Patients -->
+        <tr class="table-secondary">
+            <td id="new-count"></td>
+            <td class="fw-bold" colspan="14">Neuaufnahmen</td>
+        </tr>
+        <!-- Body: New Patients -->
+    </tbody>
+
+    <!-- Divider -->
+    <tr height="10">
+        <td colspan="15"></td>
+    </tr>
+
+    <tbody>
+        <!-- Head: Group 1 -->
+        <tr class="table-secondary">
+            <td id="group1-count"></td>
+            <td colspan="14">
+                <span class="fw-bold">Gruppe 1</span>
+                (Essstörungen und Adipositas | KT + GT | Em/Sa)
+            </td>
+        </tr>
+        <!-- Body: Group 1 -->
+    </tbody>
+
+    <!-- Divider -->
+    <tr height="10">
+        <td colspan="15"></td>
+    </tr>
+
+    <tbody>
+        <!-- Head: Group 2 -->
+        <tr class="table-secondary">
+            <td id="group2-count"></td>
+            <td colspan="14">
+                <span class="fw-bold">Gruppe 2</span>
+                (Arbeitspsychosomatik, Stress und Belastungsstörungen | MT + GT | Sa/Rad)
+            </td>
+        </tr>
+        <!-- Body: Group 2 -->
+    </tbody>
+
+    <!-- Divider -->
+    <tr height="10">
+        <td colspan="15"></td>
+    </tr>
+
+    <tbody>
+        <!-- Head: Group 3 -->
+        <tr class="table-secondary">
+            <td id="group3-count"></td>
+            <td colspan="14">
+                <span class="fw-bold">Gruppe 3</span>
+                (Psychokardiologie und somatische Belastugsstörungen | KT + MT | Rad/Em)
+            </td>
+        </tr>
+        <!-- Body: Group 3 -->
+    </tbody>
+</table>
