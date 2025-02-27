@@ -9,6 +9,7 @@ title: Therapiezuordnung 7.1
 
 <script src="{{ dir }}src/patients.js"></script>
 <script src="{{ dir }}src/therapies.js"></script>
+<script src="{{ dir }}src/poststationaer.js"></script>
 
 <style>
     .print-header {
@@ -57,7 +58,7 @@ title: Therapiezuordnung 7.1
             <th width="30"></th>
             <th width="250"></th>
             <th width="50" class="border-end-3">Woche</th>
-            <th width="75">Therapeut:in</th>
+            <th width="50">Therapeut:in</th>
             <th width="50">Therapieplan</th>
             <th width="50" class="border-end-3">Gruppentherapie</th>
             <th width="50">AT</th>
@@ -169,7 +170,27 @@ title: Therapiezuordnung 7.1
             <td></td>
         </tr>
     </tfoot>
+
+
 </table>
+
+<table id="poststationaer-table" class="table table-sm table-bordered table-hover" style="width: auto;">
+    <thead>
+        <tr class="table-secondary fw-bold text-center no-hover">
+            <td width="162" colspan="2" class="border-end-3 text-start">Poststationär</td>
+            <td width="35">GR</td>
+            <td width="35">MT</td>
+            <td width="35">GT</td>
+            <td width="35">KT</td>
+            <td width="71">Ende</td>
+        </tr>
+    </thead>
+    <tbody id="poststationaer-table-body">
+        
+    </tbody>
+</table>
+
+
 
 <script>
     const currentDate = document.getElementById('currentDate');
@@ -185,4 +206,5 @@ title: Therapiezuordnung 7.1
     document.title = document.title + ' - ' + dateStr;
 
     fillTherapyTable();
+    fillPoststationaerTherapyTable();
 </script>
