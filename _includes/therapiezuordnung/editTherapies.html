@@ -8,48 +8,191 @@
             <div class="modal-body">
                 <form id="editTherapiesForm">
                     <input type="hidden" id="editTherapiesPatientId">
-                    
-                    <!-- Standard therapies -->
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="editTherapiesAt">
-                                <label class="form-check-label" for="editTherapiesAt">AT</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="editTherapiesPmr">
-                                <label class="form-check-label" for="editTherapiesPmr">PMR</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="editTherapiesHaltungsschule">
-                                <label class="form-check-label" for="editTherapiesHaltungsschule">Haltungsschule</label>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="editTherapiesAsst">
-                                <label class="form-check-label" for="editTherapiesAsst">ASST</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="editTherapiesSkt">
-                                <label class="form-check-label" for="editTherapiesSkt">SKT</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" id="editTherapiesBiographiearbeit">
-                                <label class="form-check-label" for="editTherapiesBiographiearbeit">Biographiearbeit</label>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Special therapies -->
+                    <!-- Standard therapies -->
                     <div class="mb-3">
-                        <label for="editTherapiesKreativEinzel" class="form-label">Kreativ-Einzel</label>
-                        <input type="text" class="form-control" id="editTherapiesKreativEinzel">
-                    </div>
-                    <div class="mb-3">
-                        <label for="editTherapiesEinzelPhysio" class="form-label">Einzel-Physiotherapie</label>
-                        <input type="text" class="form-control" id="editTherapiesEinzelPhysio">
-                    </div>
+                        <!-- AT -->
+                        <div class="mb-3">
+                            <label class="form-label">AT</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesAt"
+                                        id="editTherapiesAt-none" value="">
+                                    <label class="form-check-label" for="editTherapiesAt-none">Nicht verordnet</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesAt"
+                                        id="editTherapiesAt-active" value="X">
+                                    <label class="form-check-label" for="editTherapiesAt-active">Aktiv</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesAt"
+                                        id="editTherapiesAt-planned" value="(X)">
+                                    <label class="form-check-label" for="editTherapiesAt-planned">Geplant</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesAt"
+                                        id="editTherapiesAt-canceled" value=">">
+                                    <label class="form-check-label" for="editTherapiesAt-canceled">Abgesetzt</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PMR -->
+                        <div class="mb-3">
+                            <label class="form-label">PMR</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesPmr"
+                                        id="editTherapiesPmr-none" value="">
+                                    <label class="form-check-label" for="editTherapiesPmr-none">Nicht
+                                        verordnet</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesPmr"
+                                        id="editTherapiesPmr-active" value="X">
+                                    <label class="form-check-label" for="editTherapiesPmr-active">Aktiv</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesPmr"
+                                        id="editTherapiesPmr-planned" value="(X)">
+                                    <label class="form-check-label" for="editTherapiesPmr-planned">Geplant</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesPmr"
+                                        id="editTherapiesPmr-canceled" value=">">
+                                    <label class="form-check-label" for="editTherapiesPmr-canceled">Abgesetzt</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Haltungsschule -->
+                        <div class="mb-3">
+                            <label class="form-label">Haltungsschule</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesHaltungsschule"
+                                        id="editTherapiesHaltungsschule-none" value="">
+                                    <label class="form-check-label" for="editTherapiesHaltungsschule-none">Nicht
+                                        verordnet</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesHaltungsschule"
+                                        id="editTherapiesHaltungsschule-active" value="X">
+                                    <label class="form-check-label"
+                                        for="editTherapiesHaltungsschule-active">Aktiv</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesHaltungsschule"
+                                        id="editTherapiesHaltungsschule-planned" value="(X)">
+                                    <label class="form-check-label"
+                                        for="editTherapiesHaltungsschule-planned">Geplant</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesHaltungsschule"
+                                        id="editTherapiesHaltungsschule-canceled" value=">">
+                                    <label class="form-check-label"
+                                        for="editTherapiesHaltungsschule-canceled">Abgesetzt</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ASST -->
+                        <div class="mb-3">
+                            <label class="form-label">ASST</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesAsst"
+                                        id="editTherapiesAsst-none" value="">
+                                    <label class="form-check-label" for="editTherapiesAsst-none">Nicht
+                                        verordnet</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesAsst"
+                                        id="editTherapiesAsst-active" value="X">
+                                    <label class="form-check-label" for="editTherapiesAsst-active">Aktiv</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesAsst"
+                                        id="editTherapiesAsst-planned" value="(X)">
+                                    <label class="form-check-label" for="editTherapiesAsst-planned">Geplant</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesAsst"
+                                        id="editTherapiesAsst-canceled" value=">">
+                                    <label class="form-check-label" for="editTherapiesAsst-canceled">Abgesetzt</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- SKT -->
+                        <div class="mb-3">
+                            <label class="form-label">SKT</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesSkt"
+                                        id="editTherapiesSkt-none" value="">
+                                    <label class="form-check-label" for="editTherapiesSkt-none">Nicht
+                                        verordnet</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesSkt"
+                                        id="editTherapiesSkt-active" value="X">
+                                    <label class="form-check-label" for="editTherapiesSkt-active">Aktiv</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesSkt"
+                                        id="editTherapiesSkt-planned" value="(X)">
+                                    <label class="form-check-label" for="editTherapiesSkt-planned">Geplant</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesSkt"
+                                        id="editTherapiesSkt-canceled" value=">">
+                                    <label class="form-check-label" for="editTherapiesSkt-canceled">Abgesetzt</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Biographiearbeit -->
+                        <div class="mb-3">
+                            <label class="form-label">Biographiearbeit</label>
+                            <div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesBiographiearbeit"
+                                        id="editTherapiesBiographiearbeit-none" value="">
+                                    <label class="form-check-label" for="editTherapiesBiographiearbeit-none">Nicht
+                                        verordnet</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesBiographiearbeit"
+                                        id="editTherapiesBiographiearbeit-active" value="X">
+                                    <label class="form-check-label"
+                                        for="editTherapiesBiographiearbeit-active">Aktiv</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesBiographiearbeit"
+                                        id="editTherapiesBiographiearbeit-planned" value="(X)">
+                                    <label class="form-check-label"
+                                        for="editTherapiesBiographiearbeit-planned">Geplant</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input type="radio" class="form-check-input" name="editTherapiesBiographiearbeit"
+                                        id="editTherapiesBiographiearbeit-canceled" value=">">
+                                    <label class="form-check-label"
+                                        for="editTherapiesBiographiearbeit-canceled">Abgesetzt</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Special therapies -->
+                        <div class="mb-3">
+                            <label for="editTherapiesKreativEinzel" class="form-label">Kreativ-Einzel</label>
+                            <input type="text" class="form-control" id="editTherapiesKreativEinzel">
+                        </div>
+                        <div class="mb-3">
+                            <label for="editTherapiesEinzelPhysio" class="form-label">Einzel-Physiotherapie</label>
+                            <input type="text" class="form-control" id="editTherapiesEinzelPhysio">
+                        </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -63,22 +206,37 @@
 <script>
     function editTherapies(patientId) {
         const therapyData = therapies[patientId] || {};
-        
+
         // Set patient ID
         document.getElementById('editTherapiesPatientId').value = patientId;
-        
+
         // Set standard therapies
-        document.getElementById('editTherapiesAt').checked = !!therapyData.at;
-        document.getElementById('editTherapiesPmr').checked = !!therapyData.pmr;
-        document.getElementById('editTherapiesHaltungsschule').checked = !!therapyData.haltungsschule;
-        document.getElementById('editTherapiesAsst').checked = !!therapyData.asst;
-        document.getElementById('editTherapiesSkt').checked = !!therapyData.skt;
-        document.getElementById('editTherapiesBiographiearbeit').checked = !!therapyData.biographiearbeit;
-        
+        const standardTherapies = ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'];
+        standardTherapies.forEach(therapy => {
+            // Capitalize first letter for ID
+            const capitalizedTherapy = therapy.charAt(0).toUpperCase() + therapy.slice(1);
+            const value = therapyData[therapy] || '';
+
+            // Find and check the appropriate radio button
+            const radioSelector = `input[name="editTherapies${capitalizedTherapy}"]`;
+            const radios = document.querySelectorAll(radioSelector);
+
+            // Reset all radio buttons first
+            radios.forEach(radio => radio.checked = false);
+
+            // Check the matching radio button or default to "none"
+            const matchingRadio = Array.from(radios).find(radio => radio.value === value);
+            if (matchingRadio) {
+                matchingRadio.checked = true;
+            } else {
+                document.getElementById(`editTherapies${capitalizedTherapy}-none`).checked = true;
+            }
+        });
+
         // Set special therapies
         document.getElementById('editTherapiesKreativEinzel').value = therapyData.kreativ_einzel || '';
         document.getElementById('editTherapiesEinzelPhysio').value = therapyData.einzel_physio || '';
-        
+
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('editTherapiesModal'));
         modal.show();
@@ -86,24 +244,25 @@
 
     function saveTherapies() {
         const patientId = document.getElementById('editTherapiesPatientId').value;
-        
+
         // Get therapy data
         const therapyData = {
-            at: document.getElementById('editTherapiesAt').checked ? 1 : 0,
-            pmr: document.getElementById('editTherapiesPmr').checked ? 1 : 0,
-            haltungsschule: document.getElementById('editTherapiesHaltungsschule').checked ? 1 : 0,
-            asst: document.getElementById('editTherapiesAsst').checked ? 1 : 0,
-            skt: document.getElementById('editTherapiesSkt').checked ? 1 : 0,
-            biographiearbeit: document.getElementById('editTherapiesBiographiearbeit').checked ? 1 : 0,
+            at: document.querySelector('input[name="editTherapiesAt"]:checked')?.value || '',
+            pmr: document.querySelector('input[name="editTherapiesPmr"]:checked')?.value || '',
+            haltungsschule: document.querySelector('input[name="editTherapiesHaltungsschule"]:checked')?.value || '',
+            asst: document.querySelector('input[name="editTherapiesAsst"]:checked')?.value || '',
+            skt: document.querySelector('input[name="editTherapiesSkt"]:checked')?.value || '',
+            biographiearbeit: document.querySelector('input[name="editTherapiesBiographiearbeit"]:checked')?.value || '',
             kreativ_einzel: document.getElementById('editTherapiesKreativEinzel').value,
             einzel_physio: document.getElementById('editTherapiesEinzelPhysio').value
         };
-        
+
         // Update therapies
         therapies[patientId] = therapyData;
-        
+
         // Close modal and refresh table
         bootstrap.Modal.getInstance(document.getElementById('editTherapiesModal')).hide();
         fillTherapyTable();
+        checkData();
     }
 </script>

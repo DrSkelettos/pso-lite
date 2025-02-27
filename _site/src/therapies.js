@@ -15,7 +15,8 @@ function fillTherapyTable() {
         skt: 0,
         biographiearbeit: 0,
         group_a: 0,
-        group_b: 0
+        group_b: 0,
+        total: 0
     };
 
     const now = new Date();
@@ -80,7 +81,7 @@ function fillTherapyTable() {
         // Get therapy data
         const therapyData = therapies[patient.id] || {};
         
-        // Standard therapies (X if true/1)
+        // Standard therapies
         const standardTherapies = ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'];
         standardTherapies.forEach((therapy, index) => {
             const td = document.createElement('td');
@@ -100,7 +101,8 @@ function fillTherapyTable() {
                 td.className = classes.join(' ');
             }
             
-            td.textContent = therapyData[therapy] ? 'X' : '';
+            // Display therapy status
+            td.textContent = therapyData[therapy] || '';
             td.style.cursor = 'pointer';
             td.onclick = () => editTherapies(patient.id);
             row.appendChild(td);
@@ -140,7 +142,7 @@ function fillTherapyTable() {
         
         // Count standard therapies
         ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'].forEach(therapy => {
-            if (therapyData[therapy]) {
+            if (therapyData[therapy] === 'X') {
                 therapyCounts[therapy]++;
             }
         });
@@ -148,6 +150,11 @@ function fillTherapyTable() {
         // Count group assignments (A/B)
         if (therapyData.kreativ_einzel) therapyCounts.group_a++;
         if (therapyData.einzel_physio) therapyCounts.group_b++;
+        
+        // Count total if any therapy is active
+        if (Object.values(therapyData).some(value => value === 'X' || value)) {
+            therapyCounts.total++;
+        }
     }
 
     // Get sections
@@ -239,30 +246,21 @@ function fillTherapyTable() {
     });
 
     // Update therapy counts in footer
-    const totalPatients = newCount + group1Count + group2Count + group3Count;
+    document.getElementById('num-at').textContent = therapyCounts.at;
+    document.getElementById('num-pmr').textContent = therapyCounts.pmr;
+    document.getElementById('num-haltungsschule').textContent = therapyCounts.haltungsschule;
+    document.getElementById('num-asst').textContent = therapyCounts.asst;
+    document.getElementById('num-skt').textContent = therapyCounts.skt;
+    document.getElementById('num-biographiearbeit').textContent = therapyCounts.biographiearbeit;
+    document.getElementById('num-group-a').textContent = therapyCounts.group_a;
+    document.getElementById('num-group-b').textContent = therapyCounts.group_b;
+    document.getElementById('num-total').textContent = therapyCounts.total;
 
-    // Update occupied slots
-    Object.entries(therapyCounts).forEach(([therapy, count]) => {
-        const numCell = document.getElementById(`num-${therapy.replace('_', '-')}`);
-        if (numCell) numCell.textContent = count;
-    });
-    document.getElementById('num-total').textContent = totalPatients;
-
-    // Update free slots
-    const maxSlots = {
-        at: 12,
-        pmr: 12,
-        haltungsschule: 3,
-        asst: 12,
-        skt: 6,
-        biographiearbeit: 6
-    };
-
-    Object.entries(maxSlots).forEach(([therapy, max]) => {
-        const freeCell = document.getElementById(`free-${therapy}`);
-        if (freeCell) {
-            const occupied = therapyCounts[therapy];
-            freeCell.textContent = max - occupied;
-        }
-    });
+    // Calculate and update free slots
+    document.getElementById('free-at').textContent = document.getElementById('maxNum-at').textContent - therapyCounts.at;
+    document.getElementById('free-pmr').textContent = document.getElementById('maxNum-pmr').textContent - therapyCounts.pmr;
+    document.getElementById('free-haltungsschule').textContent = document.getElementById('maxNum-haltungsschule').textContent - therapyCounts.haltungsschule;
+    document.getElementById('free-asst').textContent = document.getElementById('maxNum-asst').textContent - therapyCounts.asst;
+    document.getElementById('free-skt').textContent = document.getElementById('maxNum-skt').textContent - therapyCounts.skt;
+    document.getElementById('free-biographiearbeit').textContent = document.getElementById('maxNum-biographiearbeit').textContent - therapyCounts.biographiearbeit;
 }

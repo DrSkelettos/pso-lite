@@ -2,6 +2,7 @@ let original = {};
 
 function setOriginalData() {
     original.employees = JSON.stringify(employees);
+    original.therapies = JSON.stringify(therapies);
     original.patients = JSON.stringify(patients);
 }
 setOriginalData();
