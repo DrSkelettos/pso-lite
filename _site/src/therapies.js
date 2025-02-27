@@ -60,19 +60,20 @@ function fillTherapyTable() {
         tdWeek.textContent = weeksSinceAdmission;
         row.appendChild(tdWeek);
         
-        // Current Employee
+        // Column 1: Current Employee
         const tdEmployee = document.createElement('td');
         tdEmployee.textContent = getCurrentEmployee(patient);
+        tdEmployee.className = 'bg-light';
         row.appendChild(tdEmployee);
         
-        // Group number
+        // Column 2: Group number
         const tdGroup = document.createElement('td');
         tdGroup.textContent = patient.group ? patient.group.charAt(0) : '';
         row.appendChild(tdGroup);
         
-        // Group letter
+        // Column 3: Group letter
         const tdGroupLetter = document.createElement('td');
-        tdGroupLetter.className = 'border-end-3';
+        tdGroupLetter.className = 'border-end-3 bg-light';
         tdGroupLetter.textContent = patient.group ? patient.group.charAt(2) || '' : '';
         row.appendChild(tdGroupLetter);
         
@@ -83,23 +84,39 @@ function fillTherapyTable() {
         const standardTherapies = ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'];
         standardTherapies.forEach((therapy, index) => {
             const td = document.createElement('td');
-            if (index === 1 || index === 2 || index === 5) td.className = 'border-end-3';
+            const classes = [];
+            
+            // Add border class
+            if (index === 1 || index === 2 || index === 5) {
+                classes.push('border-end-3');
+            }
+            
+            // Add bg-light to odd-numbered columns (PMR, ASST, Biographiearbeit)
+            if (index === 1 || index === 3 || index === 5) {
+                classes.push('bg-light');
+            }
+            
+            if (classes.length > 0) {
+                td.className = classes.join(' ');
+            }
+            
             td.textContent = therapyData[therapy] ? 'X' : '';
             row.appendChild(td);
         });
         
-        // Special therapies (show content if set)
+        // Column 10: Kreativ-Einzel
         const tdKreativ = document.createElement('td');
         tdKreativ.className = 'border-end-3';
         tdKreativ.textContent = therapyData.kreativ_einzel || '';
         row.appendChild(tdKreativ);
         
+        // Column 11: Einzel-Physiotherapie
         const tdPhysio = document.createElement('td');
-        tdPhysio.className = 'border-end-3';
+        tdPhysio.className = 'border-end-3 bg-light';
         tdPhysio.textContent = therapyData.einzel_physio || '';
         row.appendChild(tdPhysio);
         
-        // Discharge date
+        // Column 12: Discharge date
         const tdDischarge = document.createElement('td');
         tdDischarge.textContent = patient.discharge || '';
         row.appendChild(tdDischarge);
