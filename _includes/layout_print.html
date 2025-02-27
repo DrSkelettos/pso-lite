@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PSO - {{ title }}</title>
+
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+
+        @media print {
+            body {
+                width: 297mm;
+                /* A4 width in landscape */
+                height: 210mm;
+                /* A4 height in landscape */
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Hide elements not needed for printing */
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Preview styles (when viewing in browser) */
+        @media screen {
+            body {
+                max-width: 297mm;
+                margin: 0 auto;
+                padding: 1rem;
+            }
+        }
+    </style>
+
+    <link href="{{ dir }}src/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="{{ dir }}src/bootstrap/bootstrap.min.js"></script>
+    <link href="{{ dir }}src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+
+    <script src="{{ dir }}_DATA/Zimmer.js"></script>
+    <script src="{{ dir }}_DATA/Mitarbeiter_innen.js"></script>
+    <script src="{{ dir }}_DATA/Belegung.js"></script>
+
+    <script src="{{ dir }}src/data-manager.js"></script>
+    <script src="{{ dir }}src/helpers.js"></script>
+</head>
+
+<body>
+    {{ content}}
+
+</body>
+
+</html>

@@ -1,0 +1,45 @@
+---
+layout: layout_print
+active_belegung: active
+dir: ../../../
+title: Belegung - Ausdruck
+---
+
+<style>
+    /* Common styles for both print and screen */
+    .table-compact {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .print-header {
+        margin-bottom: 1rem;
+    }
+
+    .print-footer {
+        font-size: 10px;
+        text-align: right;
+        margin-top: 0.5rem;
+    }
+</style>
+
+<div class="print-header d-flex justify-content-between align-items-center">
+    <h4 class="mb-0">Belegungsplan Station 7.1</h4>
+    <div class="text-end">
+        <div>Stand: <span id="currentDate"></span></div>
+    </div>
+</div>
+
+...
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentDate = document.getElementById('currentDate');
+
+        // Format current date
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('de-DE');
+
+        currentDate.textContent = `${dateStr}`;
+    });
+</script>

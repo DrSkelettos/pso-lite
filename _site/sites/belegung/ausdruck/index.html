@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PSO - Belegung - Ausdruck</title>
+
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 1cm;
+        }
+
+        @media print {
+            body {
+                width: 297mm;
+                /* A4 width in landscape */
+                height: 210mm;
+                /* A4 height in landscape */
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Hide elements not needed for printing */
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Preview styles (when viewing in browser) */
+        @media screen {
+            body {
+                max-width: 297mm;
+                margin: 0 auto;
+                padding: 1rem;
+            }
+        }
+    </style>
+
+    <link href="../../../src/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="../../../src/bootstrap/bootstrap.min.js"></script>
+    <link href="../../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+
+    <script src="../../../_DATA/Zimmer.js"></script>
+    <script src="../../../_DATA/Mitarbeiter_innen.js"></script>
+    <script src="../../../_DATA/Belegung.js"></script>
+
+    <script src="../../../src/data-manager.js"></script>
+    <script src="../../../src/helpers.js"></script>
+</head>
+
+<body>
+    
+<style>
+    /* Common styles for both print and screen */
+    .table-compact {
+        width: 100%;
+        margin-bottom: 0;
+    }
+
+    .print-header {
+        margin-bottom: 1rem;
+    }
+
+    .print-footer {
+        font-size: 10px;
+        text-align: right;
+        margin-top: 0.5rem;
+    }
+</style>
+
+<div class="print-header d-flex justify-content-between align-items-center">
+    <h4 class="mb-0">Belegungsplan Station 7.1</h4>
+    <div class="text-end">
+        <div>Stand: <span id="currentDate"></span></div>
+    </div>
+</div>
+
+...
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const currentDate = document.getElementById('currentDate');
+
+        // Format current date
+        const now = new Date();
+        const dateStr = now.toLocaleDateString('de-DE');
+
+        currentDate.textContent = `${dateStr}`;
+    });
+</script>
+
+</body>
+
+</html>
