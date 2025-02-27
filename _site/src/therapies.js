@@ -6,6 +6,18 @@ function fillTherapyTable() {
     let group2Count = 0;
     let group3Count = 0;
 
+    // Therapy counts
+    const therapyCounts = {
+        at: 0,
+        pmr: 0,
+        haltungsschule: 0,
+        asst: 0,
+        skt: 0,
+        biographiearbeit: 0,
+        group_a: 0,
+        group_b: 0
+    };
+
     const now = new Date();
     const currentWeek = getCalendarWeek(now);
     const currentYear = now.getFullYear();
@@ -95,6 +107,22 @@ function fillTherapyTable() {
         return row;
     }
 
+    // Helper to count therapies for a patient
+    function countPatientTherapies(patient) {
+        const therapyData = therapies[patient.id] || {};
+        
+        // Count standard therapies
+        ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'].forEach(therapy => {
+            if (therapyData[therapy]) {
+                therapyCounts[therapy]++;
+            }
+        });
+
+        // Count group assignments (A/B)
+        if (therapyData.kreativ_einzel) therapyCounts.group_a++;
+        if (therapyData.einzel_physio) therapyCounts.group_b++;
+    }
+
     // Get sections
     const newSection = document.getElementById('new-patients');
     const group1Section = document.getElementById('group1-patients');
@@ -131,6 +159,7 @@ function fillTherapyTable() {
         row.firstChild.textContent = patientCounter++;
         newSection.appendChild(row);
         newCount++;
+        countPatientTherapies(patient);
     });
 
     // Then process existing patients
@@ -154,6 +183,7 @@ function fillTherapyTable() {
                     group3Count++;
                     break;
             }
+            countPatientTherapies(patient);
         }
     });
 
@@ -178,5 +208,33 @@ function fillTherapyTable() {
     Object.entries(counts).forEach(([id, count]) => {
         const countCell = document.getElementById(id);
         if (countCell) countCell.textContent = count;
+    });
+
+    // Update therapy counts in footer
+    const totalPatients = newCount + group1Count + group2Count + group3Count;
+
+    // Update occupied slots
+    Object.entries(therapyCounts).forEach(([therapy, count]) => {
+        const numCell = document.getElementById(`num-${therapy.replace('_', '-')}`);
+        if (numCell) numCell.textContent = count;
+    });
+    document.getElementById('num-total').textContent = totalPatients;
+
+    // Update free slots
+    const maxSlots = {
+        at: 12,
+        pmr: 12,
+        haltungsschule: 3,
+        asst: 12,
+        skt: 6,
+        biographiearbeit: 6
+    };
+
+    Object.entries(maxSlots).forEach(([therapy, max]) => {
+        const freeCell = document.getElementById(`free-${therapy}`);
+        if (freeCell) {
+            const occupied = therapyCounts[therapy];
+            freeCell.textContent = max - occupied;
+        }
     });
 }
