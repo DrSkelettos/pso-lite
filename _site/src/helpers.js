@@ -5,7 +5,7 @@ function formatGermanToISODate(germanDate) {
 
 function formatISOToGermanDate(isoDate) {
     const [year, month, day] = isoDate.split('-');
-    return `${parseInt(day)}.${parseInt(month)}.${year}`;
+    return `${day.padStart(2, '0')}.${month.padStart(2, '0')}.${year}`;
 }
 
 function parseGermanDate(dateStr) {

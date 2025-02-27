@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PSO - Belegung - Ausdruck</title>
+    <title>Belegungsplan 7.1</title>
     <style>
         @page {
             size: A4 landscape;
@@ -118,7 +118,6 @@
         font-size: 10px !important;
         padding: 1px 2px !important;
     }
-
 </style>
 
 <div class="print-header d-flex justify-content-between align-items-center">
@@ -203,23 +202,24 @@
 </table>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const currentDate = document.getElementById('currentDate');
-        const currentWeek = document.getElementById('currentWeek');
-        const currentPatientCount = document.getElementById('currentPatientCount');
+    const currentDate = document.getElementById('currentDate');
+    const currentWeek = document.getElementById('currentWeek');
+    const currentPatientCount = document.getElementById('currentPatientCount');
 
-        // Format current date
-        const today = new Date();
-        const dateStr = today.toLocaleDateString('de-DE');
-        currentDate.textContent = `${dateStr}`;
-        currentWeek.textContent = getCalendarWeek(today);
+    // Format current date
+    const today = new Date();
+    const dateStr = formatISOToGermanDate(today.toISOString().split('T')[0]);
+    currentDate.textContent = `${dateStr}`;
+    currentWeek.textContent = getCalendarWeek(today);
 
-        // Get current patients count
-        currentPatientCount.textContent = Object.keys(filterPatients().current).length;
+    // Get current patients count
+    currentPatientCount.textContent = Object.keys(filterPatients().current).length;
 
-        fillPatientsTable();
-        fillAbsencesTable();
-    });
+    // Update document title with current date
+    document.title = document.title + ' - ' + dateStr;
+
+    fillPatientsTable();
+    fillAbsencesTable();
 </script>
 
 </body>

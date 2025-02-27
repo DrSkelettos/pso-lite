@@ -34,13 +34,5 @@ const therapies = {
         skt: '',
         biographiearbeit: 'X',
         kreativ_einzel: "G Do. 15:30"
-    },
-    5: {
-        at: 'X',
-        pmr: '',
-        haltungsschule: '(X)',
-        asst: '',
-        skt: '',
-        biographiearbeit: ''
     }
 };

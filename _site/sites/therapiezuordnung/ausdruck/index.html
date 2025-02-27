@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PSO - Therapiezuordnung - Ausdruck</title>
+    <title>Therapiezuordnung 7.1</title>
     <style>
         @page {
             size: A4 portrait;
@@ -240,18 +240,19 @@
 </table>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const currentDate = document.getElementById('currentDate');
-        const currentWeek = document.getElementById('currentWeek');
+    const currentDate = document.getElementById('currentDate');
+    const currentWeek = document.getElementById('currentWeek');
 
-        // Format current date
-        const today = new Date();
-        const dateStr = today.toLocaleDateString('de-DE');
-        currentDate.textContent = `${dateStr}`;
-        currentWeek.textContent = getCalendarWeek(today);
+    // Format current date
+    const today = new Date();
+    const dateStr = formatISOToGermanDate(today.toISOString().split('T')[0]);
+    currentDate.textContent = `${dateStr}`;
+    currentWeek.textContent = getCalendarWeek(today);
 
-        fillTherapyTable();
-    });
+    // Update document title with current date
+    document.title = document.title + ' - ' + dateStr;
+
+    fillTherapyTable();
 </script>
 
 </body>
