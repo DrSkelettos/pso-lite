@@ -242,6 +242,241 @@
     </button>
 </div>
 
+<!-- Save Data Modal -->
+<div class="modal fade" id="saveDataModal" tabindex="-1" aria-labelledby="saveDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="saveDataModalLabel">Daten speichern</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Speichern Sie den folgenden Code als <code>_DATA/Belegung.js</code>:</p>
+                <pre class="bg-light p-3 cursor-pointer"  onclick="selectCodeContent()"><code id="saveDataContent"></code></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
+                <button type="button" class="btn btn-primary" onclick="copyToClipboard()">In Zwischenablage kopieren</button>
+                <button type="button" class="btn btn-success" onclick="confirmSave()">Bestätigen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function formatPatientData() {
+        const indent = '    ';
+        let output = 'const patients = {\n';
+
+        for (let key in patients) {
+            let patient = patients[key];
+            output += `${indent}${key}: {\n`;
+            output += `${indent}${indent}name: "${patient.name}",\n`;
+            output += `${indent}${indent}group: "${patient.group}",\n`;
+            output += `${indent}${indent}admission: "${patient.admission}"`;
+
+            if (patient.discharge) {
+                output += `,\n${indent}${indent}discharge: "${patient.discharge}"`;
+            }
+
+            if (patient.discharge_mode) {
+                output += `,\n${indent}${indent}discharge_mode: "${patient.discharge_mode}"`;
+            }
+
+            if (patient.misc) {
+                output += `,\n${indent}${indent}misc: "${patient.misc}"`;
+            }
+
+            if (patient.employees && patient.employees.length > 0) {
+                output += `,\n${indent}${indent}employees: [\n`;
+                patient.employees.forEach((emp, index) => {
+                    output += `${indent}${indent}${indent}{ employee: "${emp.employee}", start: "${emp.start}"`;
+                    if (emp.end) {
+                        output += `, end: "${emp.end}"`;
+                    }
+                    output += ' }';
+                    if (index < patient.employees.length - 1) output += ',';
+                    output += '\n';
+                });
+                output += `${indent}${indent}]`;
+            }
+
+            if (patient.rooms && patient.rooms.length > 0) {
+                output += `,\n${indent}${indent}rooms: [\n`;
+                patient.rooms.forEach((room, index) => {
+                    output += `${indent}${indent}${indent}{ room: "${room.room}", start: "${room.start}"`;
+                    if (room.end) {
+                        output += `, end: "${room.end}"`;
+                    }
+                    output += ' }';
+                    if (index < patient.rooms.length - 1) output += ',';
+                    output += '\n';
+                });
+                output += `${indent}${indent}]`;
+            }
+
+            output += `\n${indent}}`;
+            if (Object.keys(patients).indexOf(key) < Object.keys(patients).length - 1) {
+                output += ',';
+            }
+            output += '\n';
+        }
+
+        output += '}';
+        return output;
+    }
+
+    function selectCodeContent() {
+        const codeElement = document.getElementById('saveDataContent');
+        const range = document.createRange();
+        range.selectNodeContents(codeElement);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    function updateSaveDataContent() {
+        const content = formatPatientData();
+        document.getElementById('saveDataContent').textContent = content;
+        // Select the content after a short delay to ensure the modal is fully shown
+        setTimeout(selectCodeContent, 100);
+    }
+
+    function copyToClipboard() {
+        const content = document.getElementById('saveDataContent').textContent;
+        navigator.clipboard.writeText(content).then(() => {
+            const copyBtn = document.querySelector('#saveDataModal .btn-primary');
+            const originalText = copyBtn.textContent;
+            copyBtn.textContent = 'Kopiert!';
+            setTimeout(() => {
+                copyBtn.textContent = originalText;
+            }, 2000);
+        });
+    }
+
+    function confirmSave() {
+        setOriginalData();
+        checkData();
+        const modal = bootstrap.Modal.getInstance(document.getElementById('saveDataModal'));
+        modal.hide();
+    }
+
+    // Update and select content when modal is shown
+    document.getElementById('saveDataModal').addEventListener('show.bs.modal', updateSaveDataContent);
+
+    // Add click handler to select all code when clicking anywhere in the code block
+    document.getElementById('saveDataContent').addEventListener('click', selectCodeContent);
+</script>
+<div class="modal fade" id="editTherapiesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Therapien bearbeiten</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTherapiesForm">
+                    <input type="hidden" id="editTherapiesPatientId">
+                    
+                    <!-- Standard therapies -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesAt">
+                                <label class="form-check-label" for="editTherapiesAt">AT</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesPmr">
+                                <label class="form-check-label" for="editTherapiesPmr">PMR</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesHaltungsschule">
+                                <label class="form-check-label" for="editTherapiesHaltungsschule">Haltungsschule</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesAsst">
+                                <label class="form-check-label" for="editTherapiesAsst">ASST</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesSkt">
+                                <label class="form-check-label" for="editTherapiesSkt">SKT</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesBiographiearbeit">
+                                <label class="form-check-label" for="editTherapiesBiographiearbeit">Biographiearbeit</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Special therapies -->
+                    <div class="mb-3">
+                        <label for="editTherapiesKreativEinzel" class="form-label">Kreativ-Einzel</label>
+                        <input type="text" class="form-control" id="editTherapiesKreativEinzel">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTherapiesEinzelPhysio" class="form-label">Einzel-Physiotherapie</label>
+                        <input type="text" class="form-control" id="editTherapiesEinzelPhysio">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="saveTherapies()">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function editTherapies(patientId) {
+        const therapyData = therapies[patientId] || {};
+        
+        // Set patient ID
+        document.getElementById('editTherapiesPatientId').value = patientId;
+        
+        // Set standard therapies
+        document.getElementById('editTherapiesAt').checked = !!therapyData.at;
+        document.getElementById('editTherapiesPmr').checked = !!therapyData.pmr;
+        document.getElementById('editTherapiesHaltungsschule').checked = !!therapyData.haltungsschule;
+        document.getElementById('editTherapiesAsst').checked = !!therapyData.asst;
+        document.getElementById('editTherapiesSkt').checked = !!therapyData.skt;
+        document.getElementById('editTherapiesBiographiearbeit').checked = !!therapyData.biographiearbeit;
+        
+        // Set special therapies
+        document.getElementById('editTherapiesKreativEinzel').value = therapyData.kreativ_einzel || '';
+        document.getElementById('editTherapiesEinzelPhysio').value = therapyData.einzel_physio || '';
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editTherapiesModal'));
+        modal.show();
+    }
+
+    function saveTherapies() {
+        const patientId = document.getElementById('editTherapiesPatientId').value;
+        
+        // Get therapy data
+        const therapyData = {
+            at: document.getElementById('editTherapiesAt').checked ? 1 : 0,
+            pmr: document.getElementById('editTherapiesPmr').checked ? 1 : 0,
+            haltungsschule: document.getElementById('editTherapiesHaltungsschule').checked ? 1 : 0,
+            asst: document.getElementById('editTherapiesAsst').checked ? 1 : 0,
+            skt: document.getElementById('editTherapiesSkt').checked ? 1 : 0,
+            biographiearbeit: document.getElementById('editTherapiesBiographiearbeit').checked ? 1 : 0,
+            kreativ_einzel: document.getElementById('editTherapiesKreativEinzel').value,
+            einzel_physio: document.getElementById('editTherapiesEinzelPhysio').value
+        };
+        
+        // Update therapies
+        therapies[patientId] = therapyData;
+        
+        // Close modal and refresh table
+        bootstrap.Modal.getInstance(document.getElementById('editTherapiesModal')).hide();
+        fillTherapyTable();
+    }
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         fillTherapyTable();

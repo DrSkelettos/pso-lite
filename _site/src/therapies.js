@@ -101,6 +101,8 @@ function fillTherapyTable() {
             }
             
             td.textContent = therapyData[therapy] ? 'X' : '';
+            td.style.cursor = 'pointer';
+            td.onclick = () => editTherapies(patient.id);
             row.appendChild(td);
         });
         
@@ -110,6 +112,8 @@ function fillTherapyTable() {
         const smallKreativ = document.createElement('small');
         smallKreativ.textContent = therapyData.kreativ_einzel || '';
         tdKreativ.appendChild(smallKreativ);
+        tdKreativ.style.cursor = 'pointer';
+        tdKreativ.onclick = () => editTherapies(patient.id);
         row.appendChild(tdKreativ);
         
         // Column 11: Einzel-Physiotherapie
@@ -118,6 +122,8 @@ function fillTherapyTable() {
         const smallPhysio = document.createElement('small');
         smallPhysio.textContent = therapyData.einzel_physio || '';
         tdPhysio.appendChild(smallPhysio);
+        tdPhysio.style.cursor = 'pointer';
+        tdPhysio.onclick = () => editTherapies(patient.id);
         row.appendChild(tdPhysio);
         
         // Column 12: Discharge date

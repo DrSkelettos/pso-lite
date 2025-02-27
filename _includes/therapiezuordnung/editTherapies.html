@@ -1,0 +1,109 @@
+<div class="modal fade" id="editTherapiesModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Therapien bearbeiten</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editTherapiesForm">
+                    <input type="hidden" id="editTherapiesPatientId">
+                    
+                    <!-- Standard therapies -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesAt">
+                                <label class="form-check-label" for="editTherapiesAt">AT</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesPmr">
+                                <label class="form-check-label" for="editTherapiesPmr">PMR</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesHaltungsschule">
+                                <label class="form-check-label" for="editTherapiesHaltungsschule">Haltungsschule</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesAsst">
+                                <label class="form-check-label" for="editTherapiesAsst">ASST</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesSkt">
+                                <label class="form-check-label" for="editTherapiesSkt">SKT</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="editTherapiesBiographiearbeit">
+                                <label class="form-check-label" for="editTherapiesBiographiearbeit">Biographiearbeit</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Special therapies -->
+                    <div class="mb-3">
+                        <label for="editTherapiesKreativEinzel" class="form-label">Kreativ-Einzel</label>
+                        <input type="text" class="form-control" id="editTherapiesKreativEinzel">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTherapiesEinzelPhysio" class="form-label">Einzel-Physiotherapie</label>
+                        <input type="text" class="form-control" id="editTherapiesEinzelPhysio">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="saveTherapies()">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function editTherapies(patientId) {
+        const therapyData = therapies[patientId] || {};
+        
+        // Set patient ID
+        document.getElementById('editTherapiesPatientId').value = patientId;
+        
+        // Set standard therapies
+        document.getElementById('editTherapiesAt').checked = !!therapyData.at;
+        document.getElementById('editTherapiesPmr').checked = !!therapyData.pmr;
+        document.getElementById('editTherapiesHaltungsschule').checked = !!therapyData.haltungsschule;
+        document.getElementById('editTherapiesAsst').checked = !!therapyData.asst;
+        document.getElementById('editTherapiesSkt').checked = !!therapyData.skt;
+        document.getElementById('editTherapiesBiographiearbeit').checked = !!therapyData.biographiearbeit;
+        
+        // Set special therapies
+        document.getElementById('editTherapiesKreativEinzel').value = therapyData.kreativ_einzel || '';
+        document.getElementById('editTherapiesEinzelPhysio').value = therapyData.einzel_physio || '';
+        
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('editTherapiesModal'));
+        modal.show();
+    }
+
+    function saveTherapies() {
+        const patientId = document.getElementById('editTherapiesPatientId').value;
+        
+        // Get therapy data
+        const therapyData = {
+            at: document.getElementById('editTherapiesAt').checked ? 1 : 0,
+            pmr: document.getElementById('editTherapiesPmr').checked ? 1 : 0,
+            haltungsschule: document.getElementById('editTherapiesHaltungsschule').checked ? 1 : 0,
+            asst: document.getElementById('editTherapiesAsst').checked ? 1 : 0,
+            skt: document.getElementById('editTherapiesSkt').checked ? 1 : 0,
+            biographiearbeit: document.getElementById('editTherapiesBiographiearbeit').checked ? 1 : 0,
+            kreativ_einzel: document.getElementById('editTherapiesKreativEinzel').value,
+            einzel_physio: document.getElementById('editTherapiesEinzelPhysio').value
+        };
+        
+        // Update therapies
+        therapies[patientId] = therapyData;
+        
+        // Close modal and refresh table
+        bootstrap.Modal.getInstance(document.getElementById('editTherapiesModal')).hide();
+        fillTherapyTable();
+    }
+</script>
