@@ -99,11 +99,11 @@ function fillGroupWorkloadTable() {
     
     // Define groups to display
     const groups = [
-        { id: '1', name: 'Gruppe 1' },
-        { id: '2', name: 'Gruppe 2' },
-        { id: '3', name: 'Gruppe 3' },
-        { id: 'A', name: 'Gruppentherapie A' },
-        { id: 'B', name: 'Gruppentherapie B' }
+        { id: '1', name: 'Gruppe 1', maxPatients: 8 },
+        { id: '2', name: 'Gruppe 2', maxPatients: 8 },
+        { id: '3', name: 'Gruppe 3', maxPatients: 8 },
+        { id: 'A', name: 'Gruppentherapie A', maxPatients: 12 },
+        { id: 'B', name: 'Gruppentherapie B', maxPatients: 12 }
     ];
     
     // Clear existing rows
@@ -124,17 +124,38 @@ function fillGroupWorkloadTable() {
         th.style.position = 'sticky';
         th.style.left = '0';
         th.style.zIndex = '1';
-        th.textContent = group.name;
+        
+        // Add group name and max patients
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = group.name;
+        th.appendChild(nameSpan);
+        
+        const maxPatientsSpan = document.createElement('small');
+        maxPatientsSpan.className = 'float-end text-muted fw-normal';
+        maxPatientsSpan.textContent = group.maxPatients + " P.";
+        th.appendChild(maxPatientsSpan);
+        
         row.appendChild(th);
         
         // Fill counts for each week
         weeks.forEach(week => {
             const thursday = getThursdayOfWeek(currentYear, week);
             const counts = countPatientsByGroup(thursday);
+            const count = counts[group.id] || 0;
             
             const td = document.createElement('td');
             td.className = 'text-center';
-            td.textContent = counts[group.id];
+            
+            // Add warning/danger classes based on patient count
+            if (count > group.maxPatients) {
+                td.classList.add('text-danger');
+            } else if (count === group.maxPatients) {
+                td.classList.add('text-warning');
+            } else if (count < group.maxPatients * 0.8) {
+                td.classList.add('text-success');
+            }
+            
+            td.textContent = count;
             row.appendChild(td);
         });
         
