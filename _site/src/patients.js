@@ -98,7 +98,9 @@ function fillPatientData(row, patient) {
             const nextRoom = futureRooms[0];
             const futureInfo = document.createElement('small');
             futureInfo.classList.add('text-muted', 'ms-2', 'font-12');
-            futureInfo.textContent = `>${nextRoom.room} am ${nextRoom.start}`;
+            // Format date to show only DD.MM.
+            const [day, month] = nextRoom.start.split('.').slice(0, 2);
+            futureInfo.textContent = `>${nextRoom.room} am ${day}.${month}.`;
             nameContainer.appendChild(futureInfo);
         }
     }
@@ -288,12 +290,6 @@ function filterPatients() {
     }
 
     return { current, dismissed, planned };
-}
-
-function parseGermanDate(dateStr) {
-    if (!dateStr) return null;
-    const [day, month, year] = dateStr.split('.');
-    return new Date(year, month - 1, day);
 }
 
 function getActiveRoom(patient, date = null) {

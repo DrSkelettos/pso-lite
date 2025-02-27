@@ -8,3 +8,9 @@ function formatISOToGermanDate(isoDate) {
     const [year, month, day] = isoDate.split('-');
     return `${parseInt(day)}.${parseInt(month)}.${year}`;
 }
+
+function parseGermanDate(dateStr) {
+    if (!dateStr) return null;
+    const [day, month, year] = dateStr.split('.');
+    return new Date(year, month - 1, day);
+}
