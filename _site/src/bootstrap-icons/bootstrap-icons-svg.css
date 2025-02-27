@@ -1,0 +1,140 @@
+.bi::before,
+[class^="bi-"]::before,
+[class*=" bi-"]::before {
+  content: "";
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  vertical-align: -.125em;
+}
+
+.bi::before,
+[class^="bi-"]::before,
+[class*=" bi-"]::before {
+  filter: none;
+}
+
+.bi-calendar-date::before { 
+  background-image: url("./svg/calendar-date.svg"); 
+}
+
+.bi-eye::before { 
+  background-image: url("./svg/eye.svg"); 
+}
+
+.bi-floppy::before { 
+  background-image: url("./svg/floppy.svg"); 
+}
+
+.bi-floppy-fill::before { 
+  background-image: url("./svg/floppy-fill.svg"); 
+}
+
+.bi-house::before { 
+  background-image: url("./svg/house.svg"); 
+}
+
+.bi-list-columns::before { 
+  background-image: url("./svg/list-columns.svg"); 
+}
+
+.bi-pencil::before { 
+  background-image: url("./svg/pencil.svg"); 
+}
+
+.bi-pencil-square::before { 
+  background-image: url("./svg/pencil-square.svg"); 
+}
+
+.bi-people::before { 
+  background-image: url("./svg/people.svg"); 
+}
+
+.bi-plus-circle::before { 
+  background-image: url("./svg/plus-circle.svg"); 
+}
+
+.bi-plus-lg::before { 
+  background-image: url("./svg/plus-lg.svg"); 
+}
+
+.bi-trash::before { 
+  background-image: url("./svg/trash.svg"); 
+}
+
+/* Bootstrap theme color classes */
+.text-primary .bi::before,
+.text-primary[class^="bi-"]::before,
+.text-primary[class*=" bi-"]::before {
+  filter: invert(34%) sepia(77%) saturate(861%) hue-rotate(182deg) brightness(96%) contrast(98%);
+}
+
+.text-secondary .bi::before,
+.text-secondary[class^="bi-"]::before,
+.text-secondary[class*=" bi-"]::before {
+  filter: invert(50%) sepia(9%) saturate(360%) hue-rotate(167deg) brightness(88%) contrast(84%);
+}
+
+.text-success .bi::before,
+.text-success[class^="bi-"]::before,
+.text-success[class*=" bi-"]::before {
+  filter: invert(72%) sepia(40%) saturate(463%) hue-rotate(101deg) brightness(93%) contrast(87%);
+}
+
+.text-danger .bi::before,
+.text-danger[class^="bi-"]::before,
+.text-danger[class*=" bi-"]::before {
+  filter: invert(29%) sepia(94%) saturate(2258%) hue-rotate(331deg) brightness(85%) contrast(101%);
+}
+
+.text-warning .bi::before,
+.text-warning[class^="bi-"]::before,
+.text-warning[class*=" bi-"]::before {
+  filter: invert(70%) sepia(96%) saturate(489%) hue-rotate(332deg) brightness(105%) contrast(101%);
+}
+
+.text-info .bi::before,
+.text-info[class^="bi-"]::before,
+.text-info[class*=" bi-"]::before {
+  filter: invert(66%) sepia(16%) saturate(847%) hue-rotate(155deg) brightness(89%) contrast(84%);
+}
+
+.text-light .bi::before,
+.text-light[class^="bi-"]::before,
+.text-light[class*=" bi-"]::before {
+  filter: invert(100%) brightness(100%) contrast(100%);
+}
+
+.text-dark .bi::before,
+.text-dark[class^="bi-"]::before,
+.text-dark[class*=" bi-"]::before {
+  filter: invert(100%) brightness(100%) contrast(100%);
+}
+
+/* Color helper classes */
+.icon-black {
+  --bs-icon-color-invert: 0;
+}
+
+.icon-white {
+  --bs-icon-color-invert: 1;
+}
+
+.icon-primary {
+  --bs-icon-color-invert: 0.48;
+}
+
+.icon-secondary {
+  --bs-icon-color-invert: 0.6;
+}
+
+.icon-success {
+  --bs-icon-color-invert: 0.42;
+}
+
+.icon-danger {
+  --bs-icon-color-invert: 0.32;
+}

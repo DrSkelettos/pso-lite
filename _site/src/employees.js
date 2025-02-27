@@ -115,7 +115,7 @@ function addAbsenceEntry(start = '', end = '') {
     const deleteButton = document.createElement('button');
     deleteButton.type = 'button';
     deleteButton.className = 'btn btn-outline-danger btn-sm';
-    deleteButton.innerHTML = '<i class="bi bi-trash"></i>';
+    deleteButton.innerHTML = '<i class="bi bi-trash text-danger"></i>';
     deleteButton.onclick = function() { this.parentElement.remove(); };
     absenceDiv.appendChild(deleteButton);
 
@@ -235,7 +235,7 @@ function fillEmployeesTable() {
         actionsCell.className = 'text-end';
         const editButton = document.createElement('button');
         editButton.className = 'btn btn-sm btn-outline-primary';
-        editButton.innerHTML = '<i class="bi bi-pencil"></i>';
+        editButton.innerHTML = '<i class="bi bi-pencil text-primary"></i>';
         editButton.onclick = () => editEmployee(empKey);
         actionsCell.appendChild(editButton);
         row.appendChild(actionsCell);

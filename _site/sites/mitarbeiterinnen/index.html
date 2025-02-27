@@ -40,12 +40,12 @@
 
     <link href="../../src/bootstrap/bootstrap.min.css" rel="stylesheet">
     <script src="../../src/bootstrap/bootstrap.min.js"></script>
-    <link href="../../src/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
 
     <script src="../../_DATA/Zimmer.js"></script>
     <script src="../../_DATA/Mitarbeiter_innen.js"></script>
     <script src="../../_DATA/Belegung.js"></script>
-    
+
     <script src="../../src/data-manager.js"></script>
 </head>
 
@@ -57,38 +57,38 @@
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item me-2">
                     <a class="nav-link " href="../../index.html">
-                        <i class="bi bi-house me-1"></i>
+                        <i class="bi bi-house me-1 text-light"></i>
                         Startseite
                     </a>
                 </li>
                 <li class="nav-item me-2">
                     <a class="nav-link active" href="../../sites/mitarbeiterinnen/index.html">
-                        <i class="bi bi-people me-1"></i>
+                        <i class="bi bi-people me-1 text-light"></i>
                         Mitarbeiter:innen
                     </a>
                 </li>
                 <li class="nav-item me-2">
                     <a class="nav-link " href="../../sites/belegung/index.html">
-                        <i class="bi bi-calendar-date me-1"></i>
+                        <i class="bi bi-calendar-date me-1 text-light"></i>
                         Belegung
                     </a>
                 </li>
                 <li class="nav-item me-2">
                     <a class="nav-link " href="../../sites/therapiezuordnung/index.html">
-                        <i class="bi bi-list-columns me-1"></i>
+                        <i class="bi bi-list-columns me-1 text-light"></i>
                         Therapiezuordnung
                     </a>
                 </li>
                 <li class="nav-item me-2">
                     <a class="nav-link " href="../../sites/chefaerztinvisite/index.html">
-                        <i class="bi bi-eye me-1"></i>
+                        <i class="bi bi-eye me-1 text-light"></i>
                         Chefärztinvisite
                     </a>
                 </li>
             </ul>
             <div id="data-changed" class="d-none text-warning fw-bold cursor-pointer" data-bs-toggle="modal" data-bs-target="#saveDataModal">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
-                <i class="ms-2 bi bi-floppy-fill fs-4"></i>
+                <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
         </div>
     </nav>
@@ -104,7 +104,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Mitarbeiter:innen</h5>
                     <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
-                        <i class="bi bi-plus-lg me-1"></i>Mitarbeiter:in hinzufügen
+                        <i class="bi bi-plus-lg me-1 text-light"></i>Mitarbeiter:in hinzufügen
                     </button>
                 </div>
                 <div class="card-body p-0">
@@ -175,14 +175,14 @@
                             <!-- Absences will be added here dynamically -->
                         </div>
                         <button type="button" class="btn btn-outline-primary btn-sm" onclick="addAbsenceEntry()">
-                            <i class="bi bi-plus-lg me-1"></i>Abwesenheit hinzufügen
+                            <i class="bi bi-plus-lg me-1 text-primary"></i>Abwesenheit hinzufügen
                         </button>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-danger me-auto" onclick="deleteEmployee()">
-                    <i class="bi bi-trash me-1"></i>Löschen
+                    <i class="bi bi-trash me-1 text-danger"></i>Löschen
                 </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
                 <button type="button" class="btn btn-primary" onclick="saveEmployeeEdit()">Speichern</button>
