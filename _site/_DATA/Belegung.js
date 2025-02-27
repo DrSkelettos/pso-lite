@@ -49,5 +49,16 @@ const patients = {
         rooms: [
             { room: "116-T", start: "16.02.2025" }
         ]
+    },
+    5: {
+        name: "Hr. Mustermann",
+        group: "3-B",
+        admission: "24.02.2025",
+        employees: [
+            { employee: "Em", start: "24.02.2025" }
+        ],
+        rooms: [
+            { room: "109-F", start: "24.02.2025" }
+        ]
     }
 }
