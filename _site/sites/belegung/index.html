@@ -658,9 +658,10 @@
         document.getElementById('editPatientAdmission').value = formatDateForInput(patient.admission);
         document.getElementById('editPatientDischargeMode').value = patient.discharge_mode || '';
         document.getElementById('editPatientMisc').value = patient.misc || '';
-        if (patient.discharge) {
+        if (patient.discharge)
             document.getElementById('editPatientDischarge').value = formatDateForInput(patient.discharge);
-        }
+        else
+            document.getElementById('editPatientDischarge').value = '';
 
         // Clear existing entries
         document.getElementById('editEmployeesList').innerHTML = '';

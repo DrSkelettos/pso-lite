@@ -60,55 +60,60 @@ function addEmployee() {
 function editEmployee(empKey) {
     currentEmployeeKey = empKey;
     const employee = employees[empKey];
-    
+
     const nameInput = document.getElementById('employeeName');
     nameInput.value = employee.name;
 
     const patientsInput = document.getElementById('editEmployeePatients');
     patientsInput.value = employee.patients || 0;
-    
+
     const absencesList = document.getElementById('absences');
     absencesList.innerHTML = '';
-    
+
     if (employee.absences) {
         // Convert single absence to array if needed
         const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
         absencesArray.forEach((absence, index) => {
             const template = document.getElementById('absenceTemplate');
             const absenceDiv = template.content.cloneNode(true).querySelector('.list-group-item');
-            
+
             // Generate unique ID for the checkbox
             const uniqueId = `absence-planned-${currentEmployeeKey}-${index}`;
             const checkbox = absenceDiv.querySelector('.absence-planned');
             const label = absenceDiv.querySelector('.form-check-label');
             checkbox.id = uniqueId;
             label.setAttribute('for', uniqueId);
-            
+
             const startInput = absenceDiv.querySelector('.absence-start');
             const endInput = absenceDiv.querySelector('.absence-end');
-            
+
             startInput.value = formatGermanToISODate(absence.start);
             endInput.value = formatGermanToISODate(absence.end);
-            
+
             // Add start date change handler
-            startInput.addEventListener('change', function() {
+            startInput.addEventListener('change', function () {
                 if (!endInput.value) {
-                    endInput.value = this.value;
+                    // Parse the date and ensure we use the correct year
+                    const date = new Date(this.value);
+                    if (date.getFullYear() < 2024) {  // If year is too old
+                        date.setFullYear(new Date().getFullYear());  // Set to current year
+                    }
+                    endInput.value = date.toISOString().split('T')[0];
                 }
             });
-            
+
             if (absence.announcement) {
                 absenceDiv.querySelector('.absence-announcement').value = formatGermanToISODate(absence.announcement);
             }
             checkbox.checked = absence.planned || false;
-            
+
             const deleteButton = absenceDiv.querySelector('.btn-outline-danger');
-            deleteButton.onclick = function() { this.closest('.list-group-item').remove(); };
-            
+            deleteButton.onclick = function () { this.closest('.list-group-item').remove(); };
+
             absencesList.appendChild(absenceDiv);
         });
     }
-    
+
     const modal = new bootstrap.Modal(document.getElementById('editEmployeeModal'));
     modal.show();
 }
@@ -116,58 +121,76 @@ function editEmployee(empKey) {
 function addAbsenceEntry() {
     const template = document.getElementById('absenceTemplate');
     const absenceDiv = template.content.cloneNode(true).querySelector('.list-group-item');
-    
+
     // Generate unique ID for the checkbox
     const uniqueId = 'absence-planned-' + Date.now();
     const checkbox = absenceDiv.querySelector('.absence-planned');
     const label = absenceDiv.querySelector('.form-check-label');
     checkbox.id = uniqueId;
     label.setAttribute('for', uniqueId);
-    
+
     // Add delete functionality
     const deleteButton = absenceDiv.querySelector('.btn-outline-danger');
-    deleteButton.onclick = function() { this.closest('.list-group-item').remove(); };
-    
+    deleteButton.onclick = function () { this.closest('.list-group-item').remove(); };
+
     // Add start date change handler
     const startInput = absenceDiv.querySelector('.absence-start');
     const endInput = absenceDiv.querySelector('.absence-end');
-    startInput.addEventListener('change', function() {
+    startInput.addEventListener('change', function () {
         if (!endInput.value) {
-            endInput.value = this.value;
+            // Parse the date and ensure we use the correct year
+            const date = new Date(this.value);
+            if (date.getFullYear() < 2024) {  // If year is too old
+                date.setFullYear(new Date().getFullYear());  // Set to current year
+            }
+            endInput.value = date.toISOString().split('T')[0];
         }
     });
-    
+
     document.getElementById('absences').appendChild(absenceDiv);
 }
 
 function saveEmployeeEdit() {
     const nameInput = document.getElementById('employeeName');
-    if (!nameInput.value.trim()) {
-        alert('Bitte geben Sie einen Namen ein.');
-        return;
-    }
-
     const patientsInput = document.getElementById('editEmployeePatients');
-    const patients = parseInt(patientsInput.value) || 0;
 
+    // Get all absences
     const absencesList = document.getElementById('absences');
-    const absences = Array.from(absencesList.children).map(absenceDiv => {
-        const start = absenceDiv.querySelector('.absence-start').value;
-        const end = absenceDiv.querySelector('.absence-end').value;
-        const announcement = absenceDiv.querySelector('.absence-announcement').value;
-        const planned = absenceDiv.querySelector('.absence-planned').checked;
+    const absences = [];
+    const now = new Date();
+    now.setHours(0, 0, 0, 0); // Normalize to start of day
 
-        return {
-            start: formatISOToGermanDate(start),
-            end: formatISOToGermanDate(end),
-            announcement: announcement ? formatISOToGermanDate(announcement) : null,
-            planned: planned
-        };
-    }).filter(absence => absence.start && absence.end);
+    absencesList.querySelectorAll('.list-group-item').forEach(absenceDiv => {
+        const startInput = absenceDiv.querySelector('.absence-start');
+        const endInput = absenceDiv.querySelector('.absence-end');
+        const announcementInput = absenceDiv.querySelector('.absence-announcement');
+        const plannedCheckbox = absenceDiv.querySelector('.absence-planned');
 
+        if (startInput.value && endInput.value) {
+            const endDate = new Date(endInput.value);
+            // Skip if end date is in the past
+            if (endDate < now) return;
+
+            absences.push({
+                start: formatISOToGermanDate(startInput.value),
+                end: formatISOToGermanDate(endInput.value),
+                announcement: announcementInput.value ? formatISOToGermanDate(announcementInput.value) : null,
+                planned: plannedCheckbox.checked
+            });
+        }
+    });
+
+    // Sort absences by start date
+    absences.sort((a, b) => {
+        const dateA = parseGermanDate(a.start);
+        const dateB = parseGermanDate(b.start);
+        return dateA - dateB;
+    });
+
+    // Update employee data
     employees[currentEmployeeKey] = {
-        name: nameInput.value.trim(),
-        patients: patients,
+        name: nameInput.value,
+        patients: parseInt(patientsInput.value) || 0,
         absences: absences
     };
 
@@ -197,7 +220,10 @@ function fillEmployeesTable() {
         // Patients cell
         const patientsCell = document.createElement('td');
         patientsCell.classList.add('text-center');
-        patientsCell.textContent = employee.patients;
+        if (employee.patients >= 0)
+            patientsCell.textContent = employee.patients;
+        else
+            patientsCell.textContent = "/";
         row.appendChild(patientsCell);
 
         // Absences cell
@@ -205,12 +231,25 @@ function fillEmployeesTable() {
         if (employee.absences) {
             // Convert single absence to array if needed
             const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
-            
+
             absencesArray.forEach(absence => {
                 const badge = document.createElement('span');
-                const badgeClass = absence.planned ? 'bg-success' : 
-                                 absence.announcement ? 'bg-warning' : 
-                                 'bg-danger';
+                const startDate = parseGermanDate(absence.start);
+                const now = new Date();
+                const oneMonthFromNow = new Date(now);
+                oneMonthFromNow.setMonth(now.getMonth() + 1);
+
+                let badgeClass;
+                if (absence.planned) {
+                    badgeClass = 'bg-success';
+                } else if (absence.announcement) {
+                    badgeClass = 'bg-warning';
+                } else if (startDate > oneMonthFromNow) {
+                    badgeClass = 'bg-secondary';
+                } else {
+                    badgeClass = 'bg-danger';
+                }
+                
                 badge.className = `badge ${badgeClass} me-1`;
                 badge.textContent = formatAbsenceDates(absence.start, absence.end);
                 absencesCell.appendChild(badge);
@@ -244,26 +283,26 @@ function deleteEmployee() {
 function fillAbsencesTable(numRows = 20) {
     const tbody = document.getElementById('absences-table');
     const template = document.getElementById('absence-row');
-    
+
     // Get absences and take first 5
     const displayAbsences = getEmployeeAbsences().slice(0, numRows);
-    
+
     // Clear existing rows except template
     Array.from(tbody.children).forEach(child => {
         if (child !== template) child.remove();
     });
-    
+
     // Fill table
     displayAbsences.forEach(absence => {
         const row = template.cloneNode(true);
         row.classList.remove('d-none');
         row.removeAttribute('id');
-        
+
         // Add italic style for non-current absences
         if (!absence.isCurrent) {
             row.classList.add('fst-italic');
         }
-        
+
         // Format and fill data
         const displayData = formatAbsenceForDisplay(absence);
         row.querySelector('.data-name').textContent = displayData.name;
@@ -272,7 +311,7 @@ function fillAbsencesTable(numRows = 20) {
         row.querySelector('.data-duration').textContent = displayData.duration;
         row.querySelector('.data-week').textContent = displayData.week;
         row.querySelector('.data-announcement').textContent = displayData.announcement;
-        
+
         tbody.appendChild(row);
     });
 }

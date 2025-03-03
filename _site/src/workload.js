@@ -13,6 +13,28 @@ function getThursdayOfWeek(year, week) {
     return thursday;
 }
 
+// Helper function to get Monday of a week
+function getMondayOfWeek(year, week) {
+    const thursday = getThursdayOfWeek(year, week);
+    const monday = new Date(thursday);
+    monday.setDate(thursday.getDate() - 3);
+    return monday;
+}
+
+// Helper function to format date as DD.MM.
+function formatShortDate(date) {
+    return date.getDate().toString().padStart(2, '0') + '.' + 
+           (date.getMonth() + 1).toString().padStart(2, '0') + '.';
+}
+
+// Helper function to get week date range
+function getWeekDateRange(year, week) {
+    const monday = getMondayOfWeek(year, week);
+    const friday = new Date(monday);
+    friday.setDate(monday.getDate() + 4);
+    return formatShortDate(monday) + '-' + formatShortDate(friday);
+}
+
 // Test getThursdayOfWeek function
 
 // Helper function to split group string into numeric and letter parts
@@ -31,13 +53,20 @@ function parseGroup(groupStr) {
 // Get patients for a specific Thursday
 function getPatientsForDate(date) {
     const patients = [];
+    const mondayOfWeek = new Date(date);
+    mondayOfWeek.setDate(date.getDate() - date.getDay() + 1); // Get Monday of the week
+    const fridayOfWeek = new Date(mondayOfWeek);
+    fridayOfWeek.setDate(mondayOfWeek.getDate() + 4); // Get Friday of the week
     
-    Object.entries(filterPatients().current).forEach(([id, patient]) => {
+    const { current, planned } = filterPatients();
+    const allPatients = { ...current, ...planned };
+    
+    Object.entries(allPatients).forEach(([id, patient]) => {
         const admissionDate = parseGermanDate(patient.admission);
         const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;
         
-        // Check if patient is present on the given date
-        if (admissionDate <= date && (!dischargeDate || dischargeDate >= date)) {
+        // Check if patient is present during the week
+        if ((!dischargeDate || dischargeDate >= mondayOfWeek) && admissionDate <= fridayOfWeek) {
             patients.push(patient);
         }
     });
@@ -49,22 +78,83 @@ function getPatientsForDate(date) {
 function countPatientsByGroup(date) {
     const patients = getPatientsForDate(date);
     const counts = {
-        '1': 0,
-        '2': 0,
-        '3': 0,
-        'A': 0,
-        'B': 0
+        '1': { count: 0, patients: [], female: 0, male: 0 },
+        '2': { count: 0, patients: [], female: 0, male: 0 },
+        '3': { count: 0, patients: [], female: 0, male: 0 },
+        'A': { count: 0, patients: [], female: 0, male: 0 },
+        'B': { count: 0, patients: [], female: 0, male: 0 }
     };
     
     patients.forEach(patient => {
         if (!patient.group) return;
         
         const { numeric, letter } = parseGroup(patient.group);
-        if (numeric) counts[numeric.toString()]++;
-        if (letter) counts[letter]++;
+        const isFemale = patient.name.startsWith('Fr');
+        const isMale = patient.name.startsWith('Hr');
+        
+        if (numeric) {
+            counts[numeric.toString()].count++;
+            counts[numeric.toString()].patients.push(patient.name);
+            if (isFemale) counts[numeric.toString()].female++;
+            if (isMale) counts[numeric.toString()].male++;
+        }
+        if (letter) {
+            counts[letter].count++;
+            counts[letter].patients.push(patient.name);
+            if (isFemale) counts[letter].female++;
+            if (isMale) counts[letter].male++;
+        }
     });
     
     return counts;
+}
+
+// Count patients assigned to employee for a specific date
+function countPatientsForEmployee(employee, date) {
+    const patients = getPatientsForDate(date);
+    let count = 0;
+    const assignedPatients = [];
+    
+    patients.forEach(patient => {
+        if (patient.employees) {
+            const isAssigned = patient.employees.some(assignment => 
+                assignment.employee === employee &&
+                (!assignment.end || parseGermanDate(assignment.end) >= date) &&
+                parseGermanDate(assignment.start) <= date
+            );
+            if (isAssigned) {
+                count++;
+                assignedPatients.push(patient.name);
+            }
+        }
+    });
+    
+    return { count, patients: assignedPatients };
+}
+
+// Check if employee is absent for more than 2 days in a week
+function isEmployeeAbsentMajority(employeeId, weekStart) {
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    
+    let absenceDays = 0;
+    const employeeData = employees[employeeId];
+    
+    if (employeeData && employeeData.absences) {
+        employeeData.absences.forEach(absence => {
+            const startDate = parseGermanDate(absence.start);
+            const endDate = absence.end ? parseGermanDate(absence.end) : startDate;
+            
+            // Count overlapping days
+            for (let day = new Date(weekStart); day <= weekEnd; day.setDate(day.getDate() + 1)) {
+                if (day >= startDate && day <= endDate) {
+                    absenceDays++;
+                }
+            }
+        });
+    }
+
+    return absenceDays >= 3;
 }
 
 // Fill the workload table
@@ -93,7 +183,7 @@ function fillGroupWorkloadTable() {
     weeks.forEach(week => {
         const th = document.createElement('th');
         th.className = 'text-center border-bottom-3';
-        th.textContent = `KW${week}`;
+        th.innerHTML = `KW${week}<br><small class='fw-normal'>${getWeekDateRange(currentYear, week)}</small>`;
         thead.rows[0].appendChild(th);
     });
     
@@ -114,8 +204,8 @@ function fillGroupWorkloadTable() {
     // Create rows for each group
     groups.forEach((group, index) => {
         const row = document.createElement('tr');
-        // Add border-bottom-3 after Gruppe 3
-        if (group.name === 'Gruppe 3') {
+        // Add border-bottom-3 after Gruppentherapie B
+        if (group.name === 'Gruppentherapie B' || group.name === 'Gruppe 3') {
             row.className = 'border-bottom-3';
         }
         
@@ -141,70 +231,54 @@ function fillGroupWorkloadTable() {
         weeks.forEach(week => {
             const thursday = getThursdayOfWeek(currentYear, week);
             const counts = countPatientsByGroup(thursday);
-            const count = counts[group.id] || 0;
+            const countData = counts[group.id] || { count: 0, patients: [] };
             
             const td = document.createElement('td');
             td.className = 'text-center';
             
             // Add warning/danger classes based on patient count
-            if (count > group.maxPatients) {
+            if (countData.count > group.maxPatients) {
                 td.classList.add('text-danger');
-            } else if (count === group.maxPatients) {
+            } else if (countData.count === group.maxPatients) {
                 td.classList.add('text-warning');
-            } else if (count < group.maxPatients * 0.8) {
+            } else if (countData.count < group.maxPatients * 0.8) {
                 td.classList.add('text-success');
             }
             
-            td.textContent = count;
+            td.textContent = countData.count;
+            if (countData.patients.length > 0) {
+                const genderCounts = `W: ${countData.female} | M: ${countData.male}`;
+                td.title = genderCounts + '\n' + countData.patients.sort().join('\n');
+            }
             row.appendChild(td);
         });
         
         tbody.appendChild(row);
     });
-}
 
-// Count patients assigned to employee for a specific date
-function countPatientsForEmployee(employee, date) {
-    const patients = getPatientsForDate(date);
-    let count = 0;
-    
-    patients.forEach(patient => {
-        if (patient.employees) {
-            const isAssigned = patient.employees.some(assignment => 
-                assignment.employee === employee &&
-                (!assignment.end || parseGermanDate(assignment.end) >= date) &&
-                parseGermanDate(assignment.start) <= date
-            );
-            if (isAssigned) count++;
-        }
+    // Add total row
+    const totalRow = document.createElement('tr');
+    const totalTh = document.createElement('th');
+    totalTh.className = 'text-nowrap border-end-3';
+    totalTh.style.position = 'sticky';
+    totalTh.style.left = '0';
+    totalTh.style.zIndex = '1';
+    totalTh.textContent = 'Gesamt';
+    totalRow.appendChild(totalTh);
+
+    // Fill total counts for each week
+    weeks.forEach(week => {
+        const thursday = getThursdayOfWeek(currentYear, week);
+        const counts = countPatientsByGroup(thursday);
+        const totalCount = (counts['A']?.count || 0) + (counts['B']?.count || 0);
+        
+        const td = document.createElement('td');
+        td.className = 'text-center fw-bold';
+        td.textContent = totalCount;
+        totalRow.appendChild(td);
     });
     
-    return count;
-}
-
-// Check if employee is absent for more than 2 days in a week
-function isEmployeeAbsentMajority(employeeId, weekStart) {
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    
-    let absenceDays = 0;
-    const employeeData = employees[employeeId];
-    
-    if (employeeData && employeeData.absences) {
-        employeeData.absences.forEach(absence => {
-            const startDate = parseGermanDate(absence.start);
-            const endDate = absence.end ? parseGermanDate(absence.end) : startDate;
-            
-            // Count overlapping days
-            for (let day = new Date(weekStart); day <= weekEnd; day.setDate(day.getDate() + 1)) {
-                if (day >= startDate && day <= endDate) {
-                    absenceDays++;
-                }
-            }
-        });
-    }
-
-    return absenceDays >= 3;
+    tbody.appendChild(totalRow);
 }
 
 // Fill the employee workload table
@@ -233,7 +307,7 @@ function fillEmployeeWorkloadTable() {
     weeks.forEach(week => {
         const th = document.createElement('th');
         th.className = 'text-center border-bottom-3';
-        th.textContent = `KW${week}`;
+        th.innerHTML = `KW${week}<br><small class='fw-normal'>${getWeekDateRange(currentYear, week)}</small>`;
         thead.rows[0].appendChild(th);
     });
     
@@ -243,65 +317,67 @@ function fillEmployeeWorkloadTable() {
     }
     
     // Create rows for each employee
-    Object.entries(employees)
-        .filter(([_, employee]) => !employee.inactive) // Only show active employees
-        .sort(([a], [b]) => a.localeCompare(b))
-        .forEach(([shortname, employee]) => {
-            const row = document.createElement('tr');
-            const th = document.createElement('th');
-            th.className = 'text-nowrap border-end-3';
-            th.style.position = 'sticky';
-            th.style.left = '0';
-            th.style.zIndex = '1';
-            
-            // Add employee name and patient count
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = shortname;
-            th.appendChild(nameSpan);
-            
-            const patientCountSpan = document.createElement('small');
-            patientCountSpan.className = 'float-end text-muted fw-normal';
-            patientCountSpan.textContent = (employee.patients || 0) + " P.";
-            th.appendChild(patientCountSpan);
-            
-            row.appendChild(th);
-            
-            // Fill counts for each week
-            weeks.forEach(week => {
-                const thursday = getThursdayOfWeek(currentYear, week);
-                const mondayOfWeek = new Date(thursday);
-                mondayOfWeek.setDate(thursday.getDate() - 3); // Go back to Monday
-                
-                const count = countPatientsForEmployee(shortname, thursday);
-                const isAbsent = isEmployeeAbsentMajority(shortname, mondayOfWeek);
-                
-                const td = document.createElement('td');
-                td.className = 'text-center';
-                
-                // Absence
-                if (isAbsent) {
-                    td.classList.add('bg-secondary-striped');
-                }
+    Object.entries(employees).forEach(([shortname, employee]) => {
+        // Skip employees without a patients value or with patients < 0
+        if (typeof employee.patients !== 'number' || employee.patients < 0) return;
 
-                // Add warning/danger classes based on patient count
-                const maxPatients = employee.patients || 0;
-                const warningThreshold = maxPatients < 6 ? maxPatients + 1 : maxPatients + 2;
-                const dangerThreshold = warningThreshold + 1;
-                
-                if (count >= dangerThreshold) {
-                    td.classList.add('text-danger');
-                } else if (count >= warningThreshold) {
-                    td.classList.add('text-warning');
-                } else if (count < maxPatients) {
-                    td.classList.add('text-success');
-                }
-                
-                td.textContent = count;
-                row.appendChild(td);
-            });
+        const row = document.createElement('tr');
+        const th = document.createElement('th');
+        th.className = 'text-nowrap border-end-3';
+        th.style.position = 'sticky';
+        th.style.left = '0';
+        th.style.zIndex = '1';
+        
+        // Add employee name and patient count
+        const nameSpan = document.createElement('span');
+        nameSpan.textContent = shortname;
+        th.appendChild(nameSpan);
+        
+        const patientCountSpan = document.createElement('small');
+        patientCountSpan.className = 'float-end text-muted fw-normal';
+        patientCountSpan.textContent = (employee.patients || 0) + " P.";
+        th.appendChild(patientCountSpan);
+        
+        row.appendChild(th);
+        
+        // Fill counts for each week
+        weeks.forEach(week => {
+            const thursday = getThursdayOfWeek(currentYear, week);
+            const mondayOfWeek = new Date(thursday);
+            mondayOfWeek.setDate(thursday.getDate() - 3); // Go back to Monday
             
-            tbody.appendChild(row);
+            const countData = countPatientsForEmployee(shortname, thursday);
+            
+            const td = document.createElement('td');
+            td.className = 'text-center';
+            
+            // Absence
+            if (isEmployeeAbsentMajority(shortname, mondayOfWeek)) {
+                td.classList.add('bg-secondary-striped');
+            }
+
+            // Add warning/danger classes based on patient count
+            const maxPatients = employee.patients || 0;
+            const warningThreshold = maxPatients < 6 ? maxPatients + 1 : maxPatients + 2;
+            const dangerThreshold = warningThreshold + 1;
+            
+            if (countData.count >= dangerThreshold) {
+                td.classList.add('text-danger');
+            } else if (countData.count >= warningThreshold) {
+                td.classList.add('text-warning');
+            } else if (countData.count < maxPatients) {
+                td.classList.add('text-success');
+            }
+            
+            td.textContent = countData.count;
+            if (countData.patients.length > 0) {
+                td.title = countData.patients.sort().join('\n');
+            }
+            row.appendChild(td);
         });
+        
+        tbody.appendChild(row);
+    });
 }
 
 // Update both tables
