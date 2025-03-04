@@ -441,6 +441,8 @@
     function confirmSave() {
         setOriginalData();
         checkData();
+        // Set a flag to indicate the modal is being closed programmatically
+        document.getElementById('saveDataModal')._programmaticClose = true;
         const modal = bootstrap.Modal.getInstance(document.getElementById('saveDataModal'));
         modal.hide();
     }
@@ -450,6 +452,16 @@
 
     // Add click handler to select all code when clicking anywhere in the code block
     document.getElementById('saveDataContent').addEventListener('click', selectCodeContent);
+
+    // Handle save confirmation when clicking outside the modal
+    document.getElementById('saveDataModal').addEventListener('hide.bs.modal', function(event) {
+        // Only trigger save if it's a backdrop click and not a programmatic close
+        if (!this._programmaticClose && event.target === this && event.target.classList.contains('modal')) {
+            confirmSave();
+        }
+        // Reset the flag
+        this._programmaticClose = false;
+    });
 </script>
 <!-- Edit Patient Modal -->
 <div class="modal fade" id="editPatientModal" tabindex="-1" aria-labelledby="editPatientModalLabel" aria-hidden="true">

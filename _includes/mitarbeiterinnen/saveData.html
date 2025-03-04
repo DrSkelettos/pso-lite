@@ -8,11 +8,13 @@
             </div>
             <div class="modal-body">
                 <p>Speichern Sie den folgenden Code als <code>_DATA/Mitarbeiter_innen.js</code>:</p>
-                <pre class="bg-light p-3 cursor-pointer" onclick="selectCodeContent()"><code id="saveDataContent"></code></pre>
+                <pre class="bg-light p-3 cursor-pointer"
+                    onclick="selectCodeContent()"><code id="saveDataContent"></code></pre>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
-                <button type="button" class="btn btn-primary" onclick="copyToClipboard()">In Zwischenablage kopieren</button>
+                <button type="button" class="btn btn-primary" onclick="copyToClipboard()">In Zwischenablage
+                    kopieren</button>
                 <button type="button" class="btn btn-success" onclick="confirmSave()">Bestätigen</button>
             </div>
         </div>
@@ -29,7 +31,7 @@
             output += `${indent}${key}: {\n`;
             output += `${indent}${indent}name: "${employee.name}",\n`;
             output += `${indent}${indent}patients: ${employee.patients}`;
-            
+
             if (employee.absences) {
                 const absences = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
                 if (absences.length > 0) {
@@ -37,7 +39,7 @@
                     output += `${indent}${indent}absences: ${JSON.stringify(absences, null, 4).replace(/\n/g, '\n' + indent + indent)}`;
                 }
             }
-            
+
             output += '\n';
             output += `${indent}},\n`;
         }
@@ -72,11 +74,27 @@
     }
 
     function confirmSave() {
+        setOriginalData();
+        checkData();
+        // Set a flag to indicate the modal is being closed programmatically
+        document.getElementById('saveDataModal')._programmaticClose = true;
         const modal = bootstrap.Modal.getInstance(document.getElementById('saveDataModal'));
         modal.hide();
-        document.getElementById('data-changed').classList.add('d-none');
     }
 
     // Update and select content when modal is shown
     document.getElementById('saveDataModal').addEventListener('show.bs.modal', updateSaveDataContent);
+
+    // Add click handler to select all code when clicking anywhere in the code block
+    document.getElementById('saveDataContent').addEventListener('click', selectCodeContent);
+
+    // Handle save confirmation when clicking outside the modal
+    document.getElementById('saveDataModal').addEventListener('hide.bs.modal', function (event) {
+        // Only trigger save if it's a backdrop click and not a programmatic close
+        if (!this._programmaticClose && event.target === this && event.target.classList.contains('modal')) {
+            confirmSave();
+        }
+        // Reset the flag
+        this._programmaticClose = false;
+    });
 </script>
