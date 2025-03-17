@@ -695,6 +695,23 @@
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('editPatientModal'));
         modal.show();
+        
+        // Add event listener to admission date input to update first room and employee start dates
+        document.getElementById('editPatientAdmission').addEventListener('change', function() {
+            const newAdmissionDate = this.value;
+            
+            // Update first employee's start date if exists
+            const employeeEntries = document.querySelectorAll('#editEmployeesList .list-group-item');
+            if (employeeEntries.length > 0) {
+                employeeEntries[0].querySelector('.start-date').value = newAdmissionDate;
+            }
+            
+            // Update first room's start date if exists
+            const roomEntries = document.querySelectorAll('#editRoomsList .list-group-item');
+            if (roomEntries.length > 0) {
+                roomEntries[0].querySelector('.start-date').value = newAdmissionDate;
+            }
+        });
     }
 
     function deletePatient() {
