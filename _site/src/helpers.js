@@ -135,3 +135,47 @@ function isDateInCurrentWeek(dateStr) {
     
     return dateWeek === currentWeek;
 }
+
+/**
+ * Calculates the week number for a patient based on admission date and a reference date.
+ * A new week always begins on Monday.
+ * 
+ * @param {string} admissionDateStr - Admission date in German format (DD.MM.YYYY)
+ * @param {Date} referenceDate - Date to compare against (defaults to current date)
+ * @returns {string} - Week number as a string, or empty string if admission is in the future
+ */
+function calculatePatientWeek(admissionDateStr, referenceDate = new Date()) {
+    if (!admissionDateStr) return '';
+    
+    // Parse the German date format DD.MM.YYYY
+    const admission = parseGermanDate(admissionDateStr);
+    
+    // If admission is in the future, return empty
+    if (admission > referenceDate) return '';
+    
+    // Get the day of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+    const admissionDayOfWeek = admission.getDay();
+    
+    // Find the Monday of the admission week
+    // If admission is on Monday (1), offset is 0
+    // If admission is on Sunday (0), offset is -6 (previous Monday)
+    // For other days, we go back to the most recent Monday
+    const mondayOffset = admissionDayOfWeek === 0 ? -6 : -(admissionDayOfWeek - 1);
+    
+    const admissionWeekMonday = new Date(admission);
+    admissionWeekMonday.setDate(admission.getDate() + mondayOffset);
+    
+    // Set both dates to midnight for accurate day calculation
+    const normalizedReference = normalizeToMidnight(new Date(referenceDate));
+    const normalizedAdmissionMonday = normalizeToMidnight(admissionWeekMonday);
+    
+    // Calculate the number of days between the Monday of admission week and reference date
+    const daysDifference = Math.floor((normalizedReference - normalizedAdmissionMonday) / (24 * 60 * 60 * 1000));
+    
+    // Calculate the week number (1-based)
+    // Week 1 is the week containing the admission date
+    // Week 2 starts on the first Monday after admission week, and so on
+    const weekNumber = Math.floor(daysDifference / 7) + 1;
+    
+    return weekNumber.toString();
+}

@@ -58,9 +58,8 @@ function fillTherapyTable() {
         // Week
         const tdWeek = document.createElement('td');
         tdWeek.className = 'border-end-3';
-        const admissionDate = parseGermanDate(patient.admission);
-        const weeksSinceAdmission = Math.floor((now - admissionDate) / (7 * 24 * 60 * 60 * 1000)) + 1;
-        tdWeek.textContent = weeksSinceAdmission;
+        const admissionDate = patient.admission;
+        tdWeek.textContent = calculatePatientWeek(admissionDate, now);
         row.appendChild(tdWeek);
 
         // Column 1: Current Employee

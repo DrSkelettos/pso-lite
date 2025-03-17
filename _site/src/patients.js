@@ -110,6 +110,8 @@ function fillPatientData(row, patient) {
 
     cells.group.textContent = patient.group || '';
     cells.admission.textContent = patient.admission || '';
+    cells.week.textContent = calculatePatientWeek(patient.admission, currentTableDate);
+    cells.discharge.textContent = patient.discharge || '';
 
     // Make discharge date clickable if present
     if (patient.discharge) {
@@ -131,11 +133,6 @@ function fillPatientData(row, patient) {
     if (patient.discharge_mode)
         cells.discharge_mode.textContent = patient.discharge_mode;
     
-    // Calculate and display week number
-    if (patient.admission) {
-        cells.week.textContent = calculateWeek(patient.admission);
-    }
-
     // Fill in employee data
     if (patient.employees && patient.employees.length > 0) {
         cells.employee1.textContent = patient.employees[0].employee;
@@ -374,35 +371,14 @@ function getPatientsByRooms() {
 let currentTableDate = new Date();
 
 function updateTableDate(dateString) {
-    currentTableDate = new Date(dateString);
+    // The date picker returns a date in ISO format (YYYY-MM-DD)
+    // We need to convert it to a JavaScript Date object
+    if (dateString) {
+        currentTableDate = new Date(dateString);
+    } else {
+        currentTableDate = new Date();
+    }
     fillPatientsTable();
-}
-
-function calculateWeek(admissionDate) {
-    if (!admissionDate) return '';
-
-    // Parse the German date format DD.MM.YYYY
-    const [day, month, year] = admissionDate.split('.');
-    const admission = new Date(year, month - 1, day);
-
-    // If admission is in the future, return empty
-    if (admission > currentTableDate)
-        return '';
-
-    // Find the first Monday after admission
-    const firstMonday = new Date(admission);
-    const daysUntilMonday = (8 - admission.getDay()) % 7;
-    firstMonday.setDate(admission.getDate() + daysUntilMonday);
-
-    // If we haven't reached the first Monday yet, return week 1
-    if (currentTableDate < firstMonday)
-        return '1';
-
-    // Calculate weeks since first Monday
-    const weeksSinceMonday = Math.floor((currentTableDate - firstMonday) / (7 * 24 * 60 * 60 * 1000));
-    const totalWeeks = weeksSinceMonday + 1; // Add 1 for the first week
-
-    return totalWeeks.toString();
 }
 
 function preFillAddPatientModal(patientData) {
