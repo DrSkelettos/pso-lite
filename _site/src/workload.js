@@ -10,6 +10,13 @@ function getThursdayOfWeek(year, week) {
     const thursday = new Date(firstThursday);
     thursday.setDate(firstThursday.getDate() + (week - 1) * 7);
     
+    // Ensure it's actually a Thursday (day 4)
+    if (thursday.getDay() !== 4) {
+        console.warn('Calculated day is not a Thursday:', thursday.toDateString());
+        // Adjust to the nearest Thursday
+        thursday.setDate(thursday.getDate() + (4 - thursday.getDay() + 7) % 7);
+    }
+    
     return thursday;
 }
 
@@ -53,10 +60,12 @@ function parseGroup(groupStr) {
 // Get patients for a specific Thursday
 function getPatientsForDate(date) {
     const patients = [];
+    
+    // Calculate the start and end of the week containing the given date
     const mondayOfWeek = new Date(date);
-    mondayOfWeek.setDate(date.getDate() - date.getDay() + 1); // Get Monday of the week
-    const fridayOfWeek = new Date(mondayOfWeek);
-    fridayOfWeek.setDate(mondayOfWeek.getDate() + 4); // Get Friday of the week
+    mondayOfWeek.setDate(date.getDate() - (date.getDay() || 7) + 1); // Get Monday of the week
+    const sundayOfWeek = new Date(mondayOfWeek);
+    sundayOfWeek.setDate(mondayOfWeek.getDate() + 6); // Get Sunday of the week
     
     const { current, planned } = filterPatients();
     const allPatients = { ...current, ...planned };
@@ -65,8 +74,11 @@ function getPatientsForDate(date) {
         const admissionDate = parseGermanDate(patient.admission);
         const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;
         
-        // Check if patient is present during the week
-        if ((!dischargeDate || dischargeDate >= mondayOfWeek) && admissionDate <= fridayOfWeek) {
+        // Check if patient is active in the given week:
+        // 1. Admitted in the week or before the week
+        // 2. AND discharged after the week (not in the week) or not discharged
+        if (admissionDate <= sundayOfWeek && 
+            (!dischargeDate || dischargeDate > sundayOfWeek)) {
             patients.push(patient);
         }
     });
