@@ -3,6 +3,8 @@ layout: layout.html
 active_poststationaer: active
 title: Poststationär
 dir: ../../
+save_data: poststationaer
+save_file: Poststationaer.js
 ---
 
 <script src="{{ dir }}src/poststationaer.js"></script>
@@ -40,7 +42,6 @@ dir: ../../
 </div>
 
 {% include "poststationaer/addPatient.html" %}
-{% include "poststationaer/saveData.html" %}
 
 <script>
     fillPoststationaerTable();

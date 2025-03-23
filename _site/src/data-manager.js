@@ -32,7 +32,7 @@ function checkData() {
 
 function downloadString(text, fileType, fileName) {
     var blob = new Blob([text], { type: fileType });
-  
+
     var a = document.createElement('a');
     a.download = fileName;
     a.href = URL.createObjectURL(blob);
@@ -41,12 +41,14 @@ function downloadString(text, fileType, fileName) {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    setTimeout(function() { URL.revokeObjectURL(a.href); }, 1500);
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
 }
 
 function downloadDataAsJS(dataObject, objectName, fileName) {
     const jsContent = `const ${objectName} = ${JSON.stringify(dataObject, null, 2)};`;
-    
-    // Download as a JavaScript file
+
     downloadString(jsContent, 'application/javascript', fileName);
+
+    setOriginalData();
+    checkData();
 }

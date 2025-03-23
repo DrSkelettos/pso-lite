@@ -3,6 +3,8 @@ layout: layout.html
 active_belegung: active
 title: Belegung
 dir: ../../
+save_data: patients
+save_file: Belegung.js
 ---
 
 <script src="{{ dir }}src/patients.js"></script>
@@ -90,7 +92,6 @@ dir: ../../
 </div>
 
 {% include "belegung/addPatient.html" %}
-{% include "belegung/saveData.html" %}
 {% include "belegung/editPatient.html" %}
 
 <script>

@@ -3,6 +3,8 @@ layout: layout.html
 title: Mitarbeiter:innen
 active_mitarbeiterinnen: active
 dir: ../../
+save_data: employees
+save_file: Mitarbeiter_innen.js
 ---
 
 <script src="{{ dir }}src/employees.js"></script>
@@ -39,7 +41,6 @@ dir: ../../
 
 {% include "mitarbeiterinnen/addEmployee.html" %}
 {% include "mitarbeiterinnen/editEmployee.html" %}
-{% include "mitarbeiterinnen/saveData.html" %}
 
 <script>
     fillEmployeesTable();
