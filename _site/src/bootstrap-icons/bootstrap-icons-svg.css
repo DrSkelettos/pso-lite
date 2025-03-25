@@ -77,6 +77,14 @@
   background-image: url("./svg/trash.svg"); 
 }
 
+.bi-cash-coin::before { 
+  background-image: url("./svg/cash-coin.svg"); 
+}
+
+.bi-coin::before { 
+  background-image: url("./svg/coin.svg"); 
+}
+
 /* Bootstrap theme color classes */
 .text-primary .bi::before,
 .text-primary[class^="bi-"]::before,

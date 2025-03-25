@@ -1,0 +1,51 @@
+---
+layout: layout.html
+active_kosi: active
+title: KoSi
+dir: ../../
+save_data: kosi
+save_file: Kostensicherung.js
+---
+
+<script src="{{ dir }}src/kosi.js"></script>
+
+<style>
+    .table-bordered tr.border-bottom-3 {
+        border-bottom-width: 3px !important;
+    }
+    
+    /* Unset background color for table cells to make borders visible */
+    .table>:not(caption)>*>* {
+        background-color: transparent !important;
+    }
+
+    /* Preserve background color for specific classes */
+    .table>:not(caption)>.table-light>*,
+    .table>:not(caption)>* .bg-secondary-striped {
+        background-color: var(--bs-table-bg) !important;
+    }
+</style>
+
+
+<table id="kosiTable" class="table table-sm table-bordered table-hover align-middle">
+    <thead>
+        <tr class="text-center table-light">
+            <th class="text-start">Patient:in</th>
+            <th width="100">Aufnahme</th>
+            <th width="50">AD</th>
+            <th width="100">Entlassung</th>
+            <th width="100">KOÜB</th>
+            <th width="100">Verlängerung</th>
+            <th width="50">ED</th>
+            <th width="50">FA</th>
+            <th width="50">Aktion</th>
+        </tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+
+<script>
+    fillKosiTable();
+</script>
