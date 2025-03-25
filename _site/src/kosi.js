@@ -287,3 +287,130 @@ function fillKosiTable() {
         }
     });
 }
+
+/**
+ * Counts patients that need AD to be checked (AD is not set)
+ * @returns {number} Number of patients that need AD to be checked
+ */
+function countPatientsNeedingAD() {
+    const today = new Date('2025-03-25');
+    let count = 0;
+    
+    Object.keys(patients).forEach(patientId => {
+        const patient = patients[patientId];
+        const kosiData = kosi[patientId] || {};
+        const admissionDate = parseGermanDate(patient.admission);
+        
+        // Only count patients who are admitted and don't have AD checked
+        if (admissionDate && admissionDate <= today && kosiData.ad !== 1) {
+            count++;
+        }
+    });
+    
+    return count;
+}
+
+/**
+ * Counts patients that need a Verlängerung (KOÜB is set and not 31.12.4000,
+ * and is in the next 2 weeks or in the past, and verl2 is not checked)
+ * @returns {number} Number of patients that need a Verlängerung
+ */
+function countPatientsNeedingVerlaengerung() {
+    const today = new Date('2025-03-25');
+    const twoWeeksFromNow = new Date(today);
+    twoWeeksFromNow.setDate(today.getDate() + 14);
+    let count = 0;
+    
+    Object.keys(patients).forEach(patientId => {
+        const patient = patients[patientId];
+        const kosiData = kosi[patientId] || {};
+        const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;
+        const isDischargedPatient = dischargeDate && dischargeDate <= today;
+        
+        // Skip discharged patients
+        if (isDischargedPatient) return;
+        
+        // Check if KOÜB is set, not 31.12.4000, and is in the next 2 weeks or in the past
+        if (kosiData.koueb && kosiData.koueb !== '31.12.4000') {
+            const kouebDate = parseGermanDate(kosiData.koueb);
+            
+            if (kouebDate && kouebDate <= twoWeeksFromNow && kosiData.verl2 !== 1) {
+                count++;
+            }
+        }
+    });
+    
+    return count;
+}
+
+/**
+ * Counts patients that need FA (discharged and FA not checked)
+ * @returns {number} Number of patients that need FA
+ */
+function countPatientsNeedingFA() {
+    const today = new Date('2025-03-25');
+    let count = 0;
+    
+    Object.keys(patients).forEach(patientId => {
+        const patient = patients[patientId];
+        const kosiData = kosi[patientId] || {};
+        const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;
+        
+        // Only count discharged patients who don't have FA checked
+        if (dischargeDate && dischargeDate <= today && kosiData.fa !== 1) {
+            count++;
+        }
+    });
+    
+    return count;
+}
+
+/**
+ * Updates the KOSI counts on the main page
+ */
+function updateKosiCounts() {
+    // Get the count elements if they exist
+    const adCountElement = document.getElementById('kosiCount-ad');
+    const kouebCountElement = document.getElementById('kosiCount-koueb');
+    const faCountElement = document.getElementById('kosiCount-fa');
+    
+    if (!adCountElement || !kouebCountElement || !faCountElement) return;
+    
+    // Get the counts
+    const adCount = countPatientsNeedingAD();
+    const kouebCount = countPatientsNeedingVerlaengerung();
+    const faCount = countPatientsNeedingFA();
+    
+    // Update the count elements
+    adCountElement.textContent = adCount;
+    kouebCountElement.textContent = kouebCount;
+    faCountElement.textContent = faCount;
+    
+    // Update button classes based on counts
+    updateButtonClass(adCountElement, adCount);
+    updateButtonClass(kouebCountElement, kouebCount);
+    updateButtonClass(faCountElement, faCount);
+}
+
+/**
+ * Updates the button class based on the count
+ * @param {HTMLElement} countElement - The count element
+ * @param {number} count - The count value
+ */
+function updateButtonClass(countElement, count) {
+    const button = countElement.closest('.btn');
+    if (!button) return;
+    
+    if (count === 0) {
+        button.classList.remove('btn-outline-primary');
+        button.classList.add('btn-outline-secondary');
+        button.setAttribute('disabled', 'disabled');
+    } else {
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-outline-primary');
+        button.removeAttribute('disabled');
+    }
+}
+
+// Export functions for use in other files
+window.updateKosiCounts = updateKosiCounts;

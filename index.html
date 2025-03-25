@@ -5,8 +5,11 @@ title: Startseite
 dir: ./
 ---
 
+<script src="{{ dir }}src/kosi.js"></script>
+
 <div class="container my-5">
 
+    <!-- LINKS -->
     <div class="row">
 
         <!-- Belegung -->
@@ -49,4 +52,45 @@ dir: ./
         </div>
 
     </div>
+
+
+    <!-- KOSTENSICHERUNG -->
+     <div class="card mt-5 cursor-pointer" onclick="window.location.href='sites/kosi/index.html';">
+        <div class="card-header">
+            <h4 class="card-title mb-0">Kostensicherung</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Aufnahmedaten -->
+                <div class="col">
+                    <button class="btn btn-outline-primary w-100 h-100 d-flex align-items-center">
+                        <span id="kosiCount-ad" class="fw-bold me-2 fs-4">0</span>
+                        <span class="pt-1">Aufnahmedaten zu überprüfen</span>
+                    </button>
+                </div>
+                <!-- KV-Anträge -->
+                <div class="col">
+                    <button class="btn btn-outline-primary w-100 h-100 d-flex align-items-center">
+                        <span id="kosiCount-koueb" class="fw-bold me-2 fs-4">0</span>
+                        <span class="pt-1">KV-Anträge offen</span>
+                    </button>
+                </div>
+                <!-- Fallabschlüsse -->
+                <div class="col">
+                    <button class="btn btn-outline-primary w-100 h-100 d-flex align-items-center">
+                        <span id="kosiCount-fa" class="fw-bold me-2 fs-4">0</span>
+                        <span class="pt-1">Fälle abzuschließen</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+     </div>
 </div>
+<script>
+    // Update KOSI counts when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        updateKosiCounts();
+    });
+</script>
+</body>
+</html>
