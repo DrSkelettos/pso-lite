@@ -259,7 +259,31 @@ function fillKosiTable() {
             
             // Action (empty)
             const actionCell = row.insertCell();
-            actionCell.textContent = '';
+            if (isDischargedPatient && kosiData.fa === 1) {
+                // Create "Abschließen" button
+                const finishButton = document.createElement('button');
+                finishButton.type = 'button';
+                finishButton.className = 'btn btn-sm btn-outline-danger';
+                finishButton.textContent = 'Abschließen';
+                
+                // Add click handler to remove patient and update data
+                finishButton.addEventListener('click', function() {
+                    if (confirm(`Möchten Sie ${patient.name} wirklich abschließen und aus der Belegung entfernen?`)) {
+                        // Remove patient from patients object
+                        delete patients[patientId];
+                        
+                        // Save updated patients data
+                        downloadDataAsJS(patients, 'patients', 'Belegung.js');
+                        
+                        // Refresh the table
+                        fillKosiTable();
+                    }
+                });
+                
+                actionCell.appendChild(finishButton);
+            } else {
+                actionCell.textContent = '';
+            }
         }
     });
 }
