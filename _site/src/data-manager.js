@@ -5,6 +5,7 @@ function setOriginalData() {
     original.therapies = JSON.stringify(therapies);
     original.patients = JSON.stringify(patients);
     original.poststationaer = JSON.stringify(poststationaer);
+    original.kosi = JSON.stringify(kosi);
 }
 setOriginalData();
 
@@ -14,7 +15,8 @@ function checkData() {
         employees: JSON.stringify(employees),
         therapies: JSON.stringify(therapies),
         patients: JSON.stringify(patients),
-        poststationaer: JSON.stringify(poststationaer)
+        poststationaer: JSON.stringify(poststationaer),
+        kosi: JSON.stringify(kosi)
     };
 
     for (const key in original) {

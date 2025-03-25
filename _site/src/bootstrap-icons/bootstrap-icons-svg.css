@@ -85,6 +85,14 @@
   background-image: url("./svg/coin.svg"); 
 }
 
+.bi-info-square::before { 
+  background-image: url("./svg/info-square.svg"); 
+}
+
+.bi-info-square-fill::before { 
+  background-image: url("./svg/info-square-fill.svg"); 
+}
+
 /* Bootstrap theme color classes */
 .text-primary .bi::before,
 .text-primary[class^="bi-"]::before,
