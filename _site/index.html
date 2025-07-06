@@ -207,9 +207,11 @@
         </div>
      </div>
 </div>
+
 <script>
-    // Update KOSI counts when the page loads
-    document.addEventListener('DOMContentLoaded', function() {
+    window.addEventListener('baseDataLoaded', async function () {
+        await loadData('patients-station', 'belegung-station');
+        await loadData('kosi-station', 'kostensicherung-station');
         updateKosiCounts();
     });
 </script>
