@@ -26,12 +26,12 @@ dir: ../../
     .table tr {
         font-size: inherit !important;
     }
-    
+
     /* Unset background color for table cells to make borders visible */
     .table>:not(caption)>*>* {
         background-color: transparent !important;
     }
-    
+
     /* Preserve background color for specific classes */
     .table>:not(caption)>.table-light>*,
     .table>:not(caption)>* .bg-secondary-striped {
@@ -80,7 +80,8 @@ dir: ../../
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    window.addEventListener('baseDataLoaded', async function () {
+        await loadData('patients-station', 'belegung-station');
         fillGroupWorkloadTable();
         fillEmployeeWorkloadTable();
     });

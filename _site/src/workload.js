@@ -150,7 +150,7 @@ function isEmployeeAbsentMajority(employeeId, weekStart) {
     weekEnd.setDate(weekStart.getDate() + 6);
     
     let absenceDays = 0;
-    const employeeData = employees[employeeId];
+    const employeeData = window['employees'][employeeId];
     
     if (employeeData && employeeData.absences) {
         employeeData.absences.forEach(absence => {
@@ -329,7 +329,7 @@ function fillEmployeeWorkloadTable() {
     }
     
     // Create rows for each employee
-    Object.entries(employees).forEach(([shortname, employee]) => {
+    Object.entries(window['employees'] || {}).forEach(([shortname, employee]) => {
         // Skip employees without a patients value or with patients < 0
         if (typeof employee.patients !== 'number' || employee.patients < 0) return;
 
@@ -391,9 +391,3 @@ function fillEmployeeWorkloadTable() {
         tbody.appendChild(row);
     });
 }
-
-// Update both tables
-document.addEventListener('DOMContentLoaded', function() {
-    fillGroupWorkloadTable();
-    fillEmployeeWorkloadTable();
-});
