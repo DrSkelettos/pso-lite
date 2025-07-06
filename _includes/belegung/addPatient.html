@@ -77,7 +77,7 @@
         employeeSelect.appendChild(emptyEmployeeOption);
 
         // Add employee options
-        for (let empKey in employees) {
+        for (let empKey in window['employees']) {
             const option = document.createElement('option');
             option.value = empKey;
             option.textContent = empKey;

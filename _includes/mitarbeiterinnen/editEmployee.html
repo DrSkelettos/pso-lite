@@ -10,6 +10,14 @@
                 <form id="editEmployeeForm">
                     <input type="hidden" id="editEmployeeId">
                     <div class="mb-3">
+                        <label for="editEmployeeKey" class="form-label">Kürzel</label>
+                        <input type="text" class="form-control" id="editEmployeeKey" maxlength="10" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmployeeName" class="form-label">Vollständiger Name</label>
+                        <input type="text" class="form-control" id="editEmployeeName" required>
+                    </div>
+                    <div class="mb-3">
                         <label for="editEmployeePatients" class="form-label">Einzelpat.</label>
                         <input type="number" class="form-control" id="editEmployeePatients" min="0" required>
                     </div>

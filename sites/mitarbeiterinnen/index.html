@@ -5,7 +5,7 @@ active_mitarbeiterinnen: active
 include_navigation: true
 dir: ../../
 save_data: employees
-save_file: Mitarbeiter_innen.js
+save_file: mitarbeiter_innen
 ---
 
 <script src="{{ dir }}src/employees.js"></script>
@@ -44,5 +44,7 @@ save_file: Mitarbeiter_innen.js
 {% include "mitarbeiterinnen/editEmployee.html" %}
 
 <script>
-    fillEmployeesTable();
+    window.addEventListener('baseDataLoaded', () => {
+        fillEmployeesTable();
+    });
 </script>

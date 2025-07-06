@@ -16,7 +16,6 @@
     <link href="../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
 
     <script src="../../_DATA/Zimmer.js"></script>
-    <script src="../../_DATA/Mitarbeiter_innen.js"></script>
     <script src="../../_DATA/Therapiezuordnung.js"></script>
     <script src="../../_DATA/Poststationaer.js"></script>
     <script src="../../_DATA/Kostensicherung.js"></script>
@@ -41,7 +40,7 @@
         init('Mitarbeiter:innen', '../../');
 
         window.addEventListener('directoryHandleInitialized', async function () {
-            await loadData('patients-station', 'belegung-station');
+            await loadData('employees', 'mitarbeiter_innen');
             window.dispatchEvent(new Event('baseDataLoaded'));
         });
     </script>
@@ -92,7 +91,7 @@
             </ul>
 
             <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer"
-                onclick="saveData('employees', 'Mitarbeiter_innen.js')">
+                onclick="saveData('employees', 'mitarbeiter_innen')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
@@ -203,6 +202,14 @@
                 <form id="editEmployeeForm">
                     <input type="hidden" id="editEmployeeId">
                     <div class="mb-3">
+                        <label for="editEmployeeKey" class="form-label">Kürzel</label>
+                        <input type="text" class="form-control" id="editEmployeeKey" maxlength="10" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEmployeeName" class="form-label">Vollständiger Name</label>
+                        <input type="text" class="form-control" id="editEmployeeName" required>
+                    </div>
+                    <div class="mb-3">
                         <label for="editEmployeePatients" class="form-label">Einzelpat.</label>
                         <input type="number" class="form-control" id="editEmployeePatients" min="0" required>
                     </div>
@@ -259,7 +266,9 @@
 
 
 <script>
-    fillEmployeesTable();
+    window.addEventListener('baseDataLoaded', () => {
+        fillEmployeesTable();
+    });
 </script>
     </div>
 

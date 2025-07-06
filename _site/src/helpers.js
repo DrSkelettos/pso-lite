@@ -78,7 +78,7 @@ function formatAnnouncementDate(date) {
 function getEmployeeAbsences(filterDate = new Date()) {
     const allAbsences = [];
     
-    Object.entries(employees).forEach(([empKey, employee]) => {
+    Object.entries(window['employees']).forEach(([empKey, employee]) => {
         if (!employee.absences) return;
         
         employee.absences.forEach(absence => {

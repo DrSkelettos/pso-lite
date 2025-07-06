@@ -18,7 +18,6 @@
     <link href="{{ dir }}src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
 
     <script src="{{ dir }}_DATA/Zimmer.js"></script>
-    <script src="{{ dir }}_DATA/Mitarbeiter_innen.js"></script>
     <script src="{{ dir }}_DATA/Therapiezuordnung.js"></script>
     <script src="{{ dir }}_DATA/Poststationaer.js"></script>
     <script src="{{ dir }}_DATA/Kostensicherung.js"></script>
@@ -43,7 +42,7 @@
         init('{{ title }}', '{{ dir }}');
 
         window.addEventListener('directoryHandleInitialized', async function () {
-            await loadData('patients-station', 'belegung-station');
+            await loadData('employees', 'mitarbeiter_innen');
             window.dispatchEvent(new Event('baseDataLoaded'));
         });
     </script>

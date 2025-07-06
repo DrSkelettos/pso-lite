@@ -232,7 +232,7 @@ async function loadFile(fileName) {
  * @returns {Promise<void>}
  * @throws {Error} If file operations or stringifying fails
  */
-async function saveFile(fileName, data) {
+async function saveFile(fileName, data, ignoreBackup = false) {
     if (!fileName || typeof fileName !== 'string') {
         throw new Error('Ungültiger Dateiname');
     }
@@ -271,6 +271,9 @@ async function saveFile(fileName, data) {
         try {
             await file.write(jsonString);
             await file.close();
+
+            if (!ignoreBackup)
+                await backupFile(fileName);
         } catch (error) {
             // Try to close the file even if write fails
             try { await file.close(); } catch (e) { }

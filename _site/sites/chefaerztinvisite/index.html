@@ -16,7 +16,6 @@
     <link href="../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
 
     <script src="../../_DATA/Zimmer.js"></script>
-    <script src="../../_DATA/Mitarbeiter_innen.js"></script>
     <script src="../../_DATA/Therapiezuordnung.js"></script>
     <script src="../../_DATA/Poststationaer.js"></script>
     <script src="../../_DATA/Kostensicherung.js"></script>
@@ -41,7 +40,7 @@
         init('Chefärztinvisite', '../../');
 
         window.addEventListener('directoryHandleInitialized', async function () {
-            await loadData('patients-station', 'belegung-station');
+            await loadData('employees', 'mitarbeiter_innen');
             window.dispatchEvent(new Event('baseDataLoaded'));
         });
     </script>

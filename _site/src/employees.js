@@ -37,13 +37,13 @@ function addEmployee() {
     const patients = parseInt(document.getElementById('employeePatients').value);
 
     // Check if employee already exists
-    if (key in employees) {
+    if (key in window['employees']) {
         alert('Eine:r Mitarbeiter:in mit diesem Kürzel existiert bereits.');
         return;
     }
 
     // Add new employee
-    employees[key] = {
+    window['employees'][key] = {
         name: name,
         patients: patients
     };
@@ -59,10 +59,11 @@ function addEmployee() {
 
 function editEmployee(empKey) {
     currentEmployeeKey = empKey;
-    const employee = employees[empKey];
+    const employee = window['employees'][empKey];
 
-    const nameInput = document.getElementById('employeeName');
-    nameInput.value = employee.name;
+    // Set current key and name
+    document.getElementById('editEmployeeKey').value = empKey;
+    document.getElementById('editEmployeeName').value = employee.name;
 
     const patientsInput = document.getElementById('editEmployeePatients');
     patientsInput.value = employee.patients || 0;
@@ -151,8 +152,10 @@ function addAbsenceEntry() {
 }
 
 function saveEmployeeEdit() {
-    const nameInput = document.getElementById('employeeName');
-    const patientsInput = document.getElementById('editEmployeePatients');
+    const oldKey = currentEmployeeKey;
+    const newKey = document.getElementById('editEmployeeKey').value.trim().toUpperCase();
+    const name = document.getElementById('editEmployeeName').value.trim();
+    const patients = parseInt(document.getElementById('editEmployeePatients').value) || 0;
 
     // Get all absences
     const absencesList = document.getElementById('absences');
@@ -187,12 +190,30 @@ function saveEmployeeEdit() {
         return dateA - dateB;
     });
 
-    // Update employee data
-    employees[currentEmployeeKey] = {
-        name: nameInput.value,
-        patients: parseInt(patientsInput.value) || 0,
-        absences: absences
+    // Create updated employee data
+    const updatedEmployee = {
+        name: name,
+        patients: patients,
+        absences: absences.length > 0 ? absences : undefined
     };
+
+    // If key changed, create new entry and delete old one
+    if (oldKey !== newKey) {
+        // Check if new key already exists
+        if (window['employees'][newKey] && oldKey !== newKey) {
+            alert('Ein:e Mitarbeiter:in mit diesem Kürzel existiert bereits.');
+            return;
+        }
+        // Create new entry and delete old one
+        window['employees'][newKey] = updatedEmployee;
+        if (oldKey !== newKey) {
+            delete window['employees'][oldKey];
+        }
+        currentEmployeeKey = newKey;
+    } else {
+        // Just update the existing entry
+        window['employees'][oldKey] = updatedEmployee;
+    }
 
     checkData();
     fillEmployeesTable();
@@ -203,8 +224,8 @@ function fillEmployeesTable() {
     const tbody = document.getElementById('employeesTableBody');
     tbody.innerHTML = '';
 
-    for (let empKey in employees) {
-        const employee = employees[empKey];
+    for (let empKey in window['employees']) {
+        const employee = window['employees'][empKey];
         const row = document.createElement('tr');
 
         // Name cell
@@ -273,7 +294,7 @@ function fillEmployeesTable() {
 
 function deleteEmployee() {
     if (confirm('Möchten Sie diese:n Mitarbeiter:in wirklich löschen?')) {
-        delete employees[currentEmployeeKey];
+        delete window['employees'][currentEmployeeKey];
         checkData();
         fillEmployeesTable();
         bootstrap.Modal.getInstance(document.getElementById('editEmployeeModal')).hide();
