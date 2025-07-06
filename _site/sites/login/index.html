@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PSOrga - Login</title>
+
+    
+    <link href="../../src/style-sign-in.css" rel="stylesheet">
+    
+
+    <script src="../../src/popperjs/popper.min.js"></script>
+    <link href="../../src/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="../../src/bootstrap/bootstrap.min.js"></script>
+    <link href="../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+
+    <script src="../../_DATA/Zimmer.js"></script>
+    <script src="../../_DATA/Mitarbeiter_innen.js"></script>
+    <script src="../../_DATA/Belegung.js"></script>
+    <script src="../../_DATA/Therapiezuordnung.js"></script>
+    <script src="../../_DATA/Poststationaer.js"></script>
+    <script src="../../_DATA/Kostensicherung.js"></script>
+
+    <script src="../../src/data-directory.js"></script>
+    <script src="../../src/data-manager.js"></script>
+    <script src="../../src/helpers.js"></script>
+
+    <script>
+        // Add warning when user tries to close page with unsaved data
+        window.addEventListener('beforeunload', function (e) {
+            // Check if the data-changed element is visible (not having the d-none class)
+            if (!document.getElementById('data-changed').classList.contains('d-none')) {
+                // Standard way to show a confirmation dialog when closing the page
+                e.preventDefault();
+                e.returnValue = 'Es gibt ungespeicherte Änderungen. Möchten Sie die Seite wirklich verlassen?';
+                return e.returnValue;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => init('Login', '../../'));
+    </script>
+</head>
+
+
+
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
+    <main class="form-signin w-100 m-auto text-center">
+        <form>
+            <h1 class="h3 mb-3 fw-normal">Bitte loggen Sie sich ein</h1>
+            <div class="form-floating">
+                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                <label for="floatingInput">Benutzer:innen-Name</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                <label for="floatingPassword">Passwort</label>
+            </div>
+            <button class="btn btn-primary w-100 py-2" type="submit">Einloggen</button>
+        </form>
+    </main>
+</body>
+
+
+</html>

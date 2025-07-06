@@ -1,0 +1,25 @@
+---
+layout: layout.html
+active_login: active
+title: Login
+include_navigation: false
+include_signInStyle: true
+dir: ../../
+---
+
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
+    <main class="form-signin w-100 m-auto text-center">
+        <form>
+            <h1 class="h3 mb-3 fw-normal">Bitte loggen Sie sich ein</h1>
+            <div class="form-floating">
+                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+                <label for="floatingInput">Benutzer:innen-Name</label>
+            </div>
+            <div class="form-floating">
+                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+                <label for="floatingPassword">Passwort</label>
+            </div>
+            <button class="btn btn-primary w-100 py-2" type="submit">Einloggen</button>
+        </form>
+    </main>
+</body>

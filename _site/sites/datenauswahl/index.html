@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PSOrga - Datenauswahl</title>
+
+    
+    <link href="../../src/style-sign-in.css" rel="stylesheet">
+    
+
+    <script src="../../src/popperjs/popper.min.js"></script>
+    <link href="../../src/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="../../src/bootstrap/bootstrap.min.js"></script>
+    <link href="../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+
+    <script src="../../_DATA/Zimmer.js"></script>
+    <script src="../../_DATA/Mitarbeiter_innen.js"></script>
+    <script src="../../_DATA/Belegung.js"></script>
+    <script src="../../_DATA/Therapiezuordnung.js"></script>
+    <script src="../../_DATA/Poststationaer.js"></script>
+    <script src="../../_DATA/Kostensicherung.js"></script>
+
+    <script src="../../src/data-directory.js"></script>
+    <script src="../../src/data-manager.js"></script>
+    <script src="../../src/helpers.js"></script>
+
+    <script>
+        // Add warning when user tries to close page with unsaved data
+        window.addEventListener('beforeunload', function (e) {
+            // Check if the data-changed element is visible (not having the d-none class)
+            if (!document.getElementById('data-changed').classList.contains('d-none')) {
+                // Standard way to show a confirmation dialog when closing the page
+                e.preventDefault();
+                e.returnValue = 'Es gibt ungespeicherte Änderungen. Möchten Sie die Seite wirklich verlassen?';
+                return e.returnValue;
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => init('Datenauswahl', '../../'));
+    </script>
+</head>
+
+
+
+<script>
+    // Update UI with directory info
+    function updateDirectoryUI(directoryName) {
+        const infoElement = document.getElementById('directoryInfo');
+        const pathElement = document.getElementById('directoryPath');
+        const noDirElement = document.getElementById('noDirectorySelected');
+
+        if (directoryName) {
+            pathElement.textContent = directoryName;
+            infoElement.style.display = 'block';
+            noDirElement.style.display = 'none';
+
+            const button = document.getElementById('selectDirectory');
+            button.textContent = 'Ordner ändern';
+        } else {
+            infoElement.style.display = 'none';
+            noDirElement.style.display = 'block';
+        }
+    }
+</script>
+
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
+    <main class="form-signin w-100 m-auto text-center">
+        <form>
+            <h1 class="h3 mb-3 fw-normal">Datenauswahl</h1>
+            <div class="alert alert-secondary">
+                <div id="directoryInfo" style="display: none;">
+                    Ausgewählter Ordner:<br /><br />
+                    <code id="directoryPath">Kein Ordner ausgewählt</code>
+                </div>
+                <div id="noDirectorySelected" style="display: block;">
+                    Bitte wählen Sie folgenden Ordner aus:<br /> <br />
+                    <code>G:/Daten/Programm/...</code>
+
+                </div>
+            </div>
+            <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;" role="alert">
+                <!-- Error messages will be shown here -->
+            </div>
+            <button id="selectDirectory" class="btn btn-primary w-100 mt-4 py-2" type="button"
+                onclick="requestDirectory().catch(console.error)">
+                Ordner auswählen
+            </button>
+        </form>
+    </main>
+</body>
+
+
+</html>

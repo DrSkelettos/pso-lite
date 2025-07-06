@@ -4,10 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PSO - {{ title }}</title>
+    <title>PSOrga - {{ title }}</title>
 
-
+    {% if include_signInStyle %}
+    <link href="{{ dir }}src/style-sign-in.css" rel="stylesheet">
+    {% else %}
     <link href="{{ dir }}src/style.css" rel="stylesheet">
+    {% endif %}
 
     <script src="{{ dir }}src/popperjs/popper.min.js"></script>
     <link href="{{ dir }}src/bootstrap/bootstrap.min.css" rel="stylesheet">
@@ -21,12 +24,13 @@
     <script src="{{ dir }}_DATA/Poststationaer.js"></script>
     <script src="{{ dir }}_DATA/Kostensicherung.js"></script>
 
+    <script src="{{ dir }}src/data-directory.js"></script>
     <script src="{{ dir }}src/data-manager.js"></script>
     <script src="{{ dir }}src/helpers.js"></script>
-    
+
     <script>
         // Add warning when user tries to close page with unsaved data
-        window.addEventListener('beforeunload', function(e) {
+        window.addEventListener('beforeunload', function (e) {
             // Check if the data-changed element is visible (not having the d-none class)
             if (!document.getElementById('data-changed').classList.contains('d-none')) {
                 // Standard way to show a confirmation dialog when closing the page
@@ -35,13 +39,17 @@
                 return e.returnValue;
             }
         });
+
+        document.addEventListener('DOMContentLoaded', () => init('{{ title }}', '{{ dir }}'));
     </script>
 </head>
+
+{% if include_navigation %}
 
 <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">PSO</a>
+            <a class="navbar-brand" href="#">PSOrga</a>
 
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item me-2">
@@ -78,7 +86,8 @@
                 </li>
             </ul>
 
-            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="downloadDataAsJS({{ save_data }}, '{{ save_data }}', '{{ save_file }}')">
+            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer"
+                onclick="downloadDataAsJS({{ save_data }}, '{{ save_data }}', '{{ save_file }}')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
@@ -111,11 +120,13 @@
             </ul>
         </div>
     </nav>
-
     <div class="container-fluid pb-3">
         {{ content }}
     </div>
 
 </body>
+{% else %}
+{{ content }}
+{% endif %}
 
 </html>
