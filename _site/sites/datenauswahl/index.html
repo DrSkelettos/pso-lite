@@ -65,29 +65,41 @@
     }
 </script>
 
-<body class="d-flex align-items-center py-4 bg-body-tertiary">
+<body class="d-flex align-items-center py-4">
     <main class="form-signin w-100 m-auto text-center">
-        <form>
-            <h1 class="h3 mb-3 fw-normal">Datenauswahl</h1>
-            <div class="alert alert-secondary">
-                <div id="directoryInfo" style="display: none;">
-                    Ausgewählter Ordner:<br /><br />
-                    <code id="directoryPath">Kein Ordner ausgewählt</code>
-                </div>
-                <div id="noDirectorySelected" style="display: block;">
-                    Bitte wählen Sie folgenden Ordner aus:<br /> <br />
-                    <code>G:/Daten/Programm/...</code>
 
+        <div class="mb-5">
+            <a href="../../index.html">
+                <img src="../../src/images/psorga.svg" alt="PSOrga" width="460">
+            </a>
+        </div>
+        <form>
+            <div class="card">
+                <div class="card-header">
+                    <h1 class="card-title">Datenauswahl</h1>
+                </div>
+                <div class="card-body">
+                    <div>
+                        <div id="directoryInfo" style="display: none;">
+                            Ausgewählter Ordner:
+                            <code id="directoryPath">Kein Ordner ausgewählt</code>
+                        </div>
+                        <div id="noDirectorySelected" style="display: block;">
+                            Bitte wählen Sie folgenden Ordner aus:
+                            <code>G:/Daten/Programm/...</code>
+                        </div>
+                    </div>
+                    <div id="errorMessage" class="alert alert-danger mt-3 mb-0" style="display: none;" role="alert">
+                        <!-- Error messages will be shown here -->
+                    </div>
+                </div>
+                <div class="card-footer p-3">
+                    <button id="selectDirectory" class="btn btn-primary w-100 py-2" type="button"
+                        onclick="requestDirectory().catch(console.error)">
+                        Ordner auswählen
+                    </button>
                 </div>
             </div>
-            <div id="errorMessage" class="alert alert-danger mt-3" style="display: none;" role="alert">
-                <!-- Error messages will be shown here -->
-            </div>
-            <button id="selectDirectory" class="btn btn-primary w-100 mt-4 py-2" type="button"
-                onclick="requestDirectory().catch(console.error)">
-                Ordner auswählen
-            </button>
-        </form>
     </main>
 </body>
 
