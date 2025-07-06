@@ -17,14 +17,14 @@
 
     <script src="../../_DATA/Zimmer.js"></script>
     <script src="../../_DATA/Mitarbeiter_innen.js"></script>
-    <script src="../../_DATA/Belegung.js"></script>
     <script src="../../_DATA/Therapiezuordnung.js"></script>
     <script src="../../_DATA/Poststationaer.js"></script>
     <script src="../../_DATA/Kostensicherung.js"></script>
 
-    <script src="../../src/data-directory.js"></script>
     <script src="../../src/data-manager.js"></script>
+    <script src="../../src/data-directory.js"></script>
     <script src="../../src/helpers.js"></script>
+    <script src="../../src/init.js"></script>
 
     <script>
         // Add warning when user tries to close page with unsaved data
@@ -38,7 +38,12 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => init('Belegung', '../../'));
+        init('Belegung', '../../');
+
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('patients-station', 'belegung-station');
+            window.dispatchEvent(new Event('baseDataLoaded'));
+        });
     </script>
 </head>
 
@@ -87,7 +92,7 @@
             </ul>
 
             <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer"
-                onclick="downloadDataAsJS(patients, 'patients', 'Belegung.js')">
+                onclick="saveData('patients-station', 'belegung-station')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
@@ -134,7 +139,7 @@
         border-right: 3px solid #dee2e6 !important;
     }
 
-    .table th, 
+    .table th,
     .table td,
     .table tr {
         font-size: inherit !important;
@@ -183,7 +188,8 @@
 
 <div class="d-flex justify-content-between align-items-center my-4">
     <div>
-        <button type="button" class="btn btn-outline-primary me-2" onclick="downloadDataAsJS(patients, 'patients', 'Belegung.js')">
+        <button type="button" class="btn btn-outline-primary me-2"
+            onclick="saveData('patients-station', 'belegung-station')">
             <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
         </button>
         <a href="../../sites/belegung/ausdruck/index.html" class="btn btn-outline-primary me-2">
@@ -331,10 +337,10 @@
         const admissionDate = `${day}.${month}.${year}`;
 
         // Find next available patient ID
-        const nextId = Math.max(...Object.keys(patients).map(Number)) + 1;
+        const nextId = Math.max(...Object.keys(window['patients-station']).map(Number)) + 1;
 
         // Create new patient object
-        patients[nextId] = {
+        window['patients-station'][nextId] = {
             name: name,
             group: group,
             admission: admissionDate,
@@ -549,7 +555,7 @@
     }
 
     function editPatient(patientId) {
-        const patient = patients[patientId];
+        const patient = window['patients-station'][patientId];
         if (!patient) return;
 
         // Set basic info
@@ -606,7 +612,7 @@
 
         if (confirm('Möchten Sie diese:n Patient:in wirklich löschen?')) {
             // Delete the patient
-            delete patients[patientId];
+            delete window['patients-station'][patientId];
 
             // Hide modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
@@ -681,7 +687,7 @@
         });
 
         // Update patient data
-        patients[patientId] = updatedPatient;
+        window['patients-station'][patientId] = updatedPatient;
 
         // Update UI
         fillPatientsTable();
@@ -697,10 +703,18 @@
     // Set default date to today
     const today = new Date();
     document.getElementById('tableDate').value = today.toISOString().split('T')[0];
-    
+
+    // Load Data
+    window.addEventListener('directoryHandleInitialized', async function () {
+        await loadData('patients-station', 'belegung-station');
+        window.dispatchEvent(new Event('dataLoaded'));
+    });
+
     // Initialize form dropdowns and table
-    initializeAddPatientForm();
-    fillPatientsTable();
+    window.addEventListener('dataLoaded', function () {
+        initializeAddPatientForm();
+        fillPatientsTable();
+    });
 </script>
     </div>
 

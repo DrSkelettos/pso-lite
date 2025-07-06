@@ -4,8 +4,8 @@ active_belegung: active
 title: Belegung
 include_navigation: true
 dir: ../../
-save_data: patients
-save_file: Belegung.js
+save_data: patients-station
+save_file: belegung-station
 ---
 
 <script src="{{ dir }}src/patients.js"></script>
@@ -20,7 +20,7 @@ save_file: Belegung.js
         border-right: 3px solid #dee2e6 !important;
     }
 
-    .table th, 
+    .table th,
     .table td,
     .table tr {
         font-size: inherit !important;
@@ -69,7 +69,8 @@ save_file: Belegung.js
 
 <div class="d-flex justify-content-between align-items-center my-4">
     <div>
-        <button type="button" class="btn btn-outline-primary me-2" onclick="downloadDataAsJS(patients, 'patients', 'Belegung.js')">
+        <button type="button" class="btn btn-outline-primary me-2"
+            onclick="saveData('patients-station', 'belegung-station')">
             <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
         </button>
         <a href="{{ dir }}sites/belegung/ausdruck/index.html" class="btn btn-outline-primary me-2">
@@ -96,8 +97,16 @@ save_file: Belegung.js
     // Set default date to today
     const today = new Date();
     document.getElementById('tableDate').value = today.toISOString().split('T')[0];
-    
+
+    // Load Data
+    window.addEventListener('directoryHandleInitialized', async function () {
+        await loadData('patients-station', 'belegung-station');
+        window.dispatchEvent(new Event('dataLoaded'));
+    });
+
     // Initialize form dropdowns and table
-    initializeAddPatientForm();
-    fillPatientsTable();
+    window.addEventListener('dataLoaded', function () {
+        initializeAddPatientForm();
+        fillPatientsTable();
+    });
 </script>

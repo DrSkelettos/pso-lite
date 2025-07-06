@@ -176,30 +176,200 @@ async function verifyPermission(handle, readWrite) {
     throw new Error('Keine Berechtigung erteilt');
 }
 
-// Initialize the application
-async function init(pageName = null, dir = './') {
-    if (!('showDirectoryPicker' in window)) {
-        alert('Ihr Browser unterstützt die Verzeichnisauswahl nicht. Bitte verwenden Sie einen modernen Browser wie Chrome oder Edge.');
-        return;
+/**
+ * Loads and parses JSON data from a file in the directory
+ * @param {string} fileName - Name of the file to load
+ * @returns {Promise<Object>} Parsed JSON data
+ * @throws {Error} If file operations or parsing fails
+ */
+async function loadFile(fileName) {
+    if (!fileName || typeof fileName !== 'string') {
+        throw new Error('Ungültiger Dateiname');
     }
-
-    if (pageName == 'Datenauswahl') return;
 
     try {
-        await initDB();
-        const savedHandle = await getDirectoryHandle();
-
-        if (savedHandle) {
-            // Verify we still have permission
-            if (await verifyPermission(savedHandle, false)) {
-                directoryHandle = savedHandle;
-            }
+        fileName += ".json";
+        // Check if directory handle is available
+        if (!directoryHandle) {
+            throw new Error('Kein Verzeichnis ausgewählt');
         }
-        else {
-            location.href = dir + "sites/datenauswahl/index.html";
+
+        // Check read permission
+        if (!(await verifyPermission(directoryHandle, true))) {
+            throw new Error('Keine Leseberechtigung für das Verzeichnis');
+        }
+
+        const fileHandle = await directoryHandle.getFileHandle(fileName);
+        const file = await fileHandle.getFile();
+
+        // Check file size (prevent loading huge files)
+        if (file.size > 10 * 1024 * 1024) { // 10MB limit
+            throw new Error('Datei ist zu groß (max. 10MB)');
+        }
+
+        const contents = await file.text();
+
+        // Check if file is empty
+        if (!contents.trim()) {
+            return null;
+        }
+
+        return JSON.parse(contents);
+    } catch (error) {
+        if (error.name === 'NotFoundError') {
+            throw new Error(`Datei nicht gefunden: ${fileName}`);
+        } else if (error instanceof SyntaxError) {
+            throw new Error(`Ungültiges JSON-Format in Datei: ${fileName}`);
+        }
+        throw new Error(`Fehler beim Laden der Datei: ${error.message}`);
+    }
+}
+
+/**
+ * Saves data as JSON to a file in the directory
+ * @param {string} fileName - Name of the file to save to
+ * @param {any} data - Data to be saved (will be stringified to JSON)
+ * @returns {Promise<void>}
+ * @throws {Error} If file operations or stringifying fails
+ */
+async function saveFile(fileName, data) {
+    if (!fileName || typeof fileName !== 'string') {
+        throw new Error('Ungültiger Dateiname');
+    }
+
+    if (data === undefined || data === null) {
+        throw new Error('Keine Daten zum Speichern angegeben');
+    }
+
+    try {
+        fileName += ".json";
+        // Check if directory handle is available
+        if (!directoryHandle) {
+            throw new Error('Kein Verzeichnis ausgewählt');
+        }
+
+        // Check write permission
+        if (!(await verifyPermission(directoryHandle, true))) {
+            throw new Error('Keine Schreibberechtigung für das Verzeichnis');
+        }
+
+        let jsonString;
+        try {
+            jsonString = JSON.stringify(data, null, 2);
+        } catch (error) {
+            throw new Error('Daten können nicht in JSON umgewandelt werden');
+        }
+
+        const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
+
+        // Check if we have write permission for the file
+        if (!(await verifyPermission(fileHandle, true))) {
+            throw new Error('Keine Schreibberechtigung für die Datei');
+        }
+
+        const file = await fileHandle.createWritable();
+        try {
+            await file.write(jsonString);
+            await file.close();
+        } catch (error) {
+            // Try to close the file even if write fails
+            try { await file.close(); } catch (e) { }
+            throw error;
         }
     } catch (error) {
-        console.error('Initialization error:', error);
-        alert('Fehler beim Initialisieren: ' + error.message);
+        throw new Error(`Fehler beim Speichern der Datei: ${error.message}`);
     }
+}
+
+/**
+ * Creates a timestamped backup of a JSON file in a date-based directory
+ * @param {string} fileName - Name of the file to backup (without .json extension)
+ * @returns {Promise<string>} Path to the created backup file
+ * @throws {Error} If backup creation fails
+ */
+async function backupFile(fileName) {
+    if (!fileName || typeof fileName !== 'string') {
+        throw new Error('Ungültiger Dateiname');
+    }
+
+    // Ensure fileName has .json extension
+    const sourceFileName = fileName.endsWith('.json') ? fileName : `${fileName}.json`;
+
+    try {
+        // Check if directory handle is available
+        if (!directoryHandle) {
+            throw new Error('Kein Verzeichnis ausgewählt');
+        }
+
+        // Check read permission for source file
+        if (!(await verifyPermission(directoryHandle, true))) {
+            throw new Error('Keine Leseberechtigung für das Verzeichnis');
+        }
+
+        // Get current date and time for backup naming
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+        const timeStr = [
+            String(now.getHours()).padStart(2, '0'),
+            String(now.getMinutes()).padStart(2, '0'),
+            String(now.getSeconds()).padStart(2, '0')
+        ].join(''); // HHMMSS
+
+        // Create backup directory path
+        const backupDirName = 'backups';
+        const dateDirName = dateStr;
+        const baseName = sourceFileName.replace(/\.json$/i, '');
+        const backupFileName = `${baseName}-${timeStr}.json`;
+
+        // Create or get the backups directory
+        let backupDirHandle;
+        try {
+            backupDirHandle = await directoryHandle.getDirectoryHandle(backupDirName, { create: true });
+        } catch (error) {
+            throw new Error(`Backup-Verzeichnis konnte nicht erstellt werden: ${error.message}`);
+        }
+
+        // Create or get the date-specific subdirectory
+        let dateDirHandle;
+        try {
+            dateDirHandle = await backupDirHandle.getDirectoryHandle(dateDirName, { create: true });
+        } catch (error) {
+            throw new Error(`Datumsspezifisches Backup-Verzeichnis konnte nicht erstellt werden: ${error.message}`);
+        }
+
+        // Read the source file
+        let sourceFileHandle;
+        try {
+            sourceFileHandle = await directoryHandle.getFileHandle(sourceFileName);
+            const sourceFile = await sourceFileHandle.getFile();
+            const contents = await sourceFile.text();
+
+            // Create the backup file
+            const backupFileHandle = await dateDirHandle.getFileHandle(backupFileName, { create: true });
+            const writable = await backupFileHandle.createWritable();
+
+            try {
+                await writable.write(contents);
+                await writable.close();
+                return `${backupDirName}/${dateDirName}/${backupFileName}`;
+            } catch (error) {
+                await writable.close().catch(() => { });
+                throw new Error(`Fehler beim Schreiben der Backup-Datei: ${error.message}`);
+            }
+        } catch (error) {
+            if (error.name === 'NotFoundError') {
+                throw new Error(`Quelldatei nicht gefunden: ${sourceFileName}`);
+            }
+            throw new Error(`Fehler beim Lesen der Quelldatei: ${error.message}`);
+        }
+    } catch (error) {
+        throw new Error(`Backup fehlgeschlagen: ${error.message}`);
+    }
+}
+
+async function loadData(dataName, fileName) {
+    if (!fileName) fileName = dataName;
+
+    window[dataName] = await loadFile(fileName);
+    setOriginalData(dataName);
 }

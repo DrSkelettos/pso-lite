@@ -195,7 +195,7 @@
     }
 
     function editPatient(patientId) {
-        const patient = patients[patientId];
+        const patient = window['patients-station'][patientId];
         if (!patient) return;
 
         // Set basic info
@@ -252,7 +252,7 @@
 
         if (confirm('Möchten Sie diese:n Patient:in wirklich löschen?')) {
             // Delete the patient
-            delete patients[patientId];
+            delete window['patients-station'][patientId];
 
             // Hide modal
             const modal = bootstrap.Modal.getInstance(document.getElementById('editPatientModal'));
@@ -327,7 +327,7 @@
         });
 
         // Update patient data
-        patients[patientId] = updatedPatient;
+        window['patients-station'][patientId] = updatedPatient;
 
         // Update UI
         fillPatientsTable();

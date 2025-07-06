@@ -1,26 +1,22 @@
 let original = {};
 
-function setOriginalData() {
-    original.employees = JSON.stringify(employees);
-    original.therapies = JSON.stringify(therapies);
-    original.patients = JSON.stringify(patients);
-    original.poststationaer = JSON.stringify(poststationaer);
-    original.kosi = JSON.stringify(kosi);
+function setOriginalData(dataName) {
+    original[dataName] = JSON.stringify(window[dataName]);
 }
-setOriginalData();
 
 function checkData() {
     let changed = false;
-    const currentData = {
-        employees: JSON.stringify(employees),
-        therapies: JSON.stringify(therapies),
-        patients: JSON.stringify(patients),
-        poststationaer: JSON.stringify(poststationaer),
-        kosi: JSON.stringify(kosi)
-    };
 
     for (const key in original) {
-        if (original[key] !== currentData[key]) {
+        // Skip if the key doesn't exist in window
+        if (window[key] === undefined) {
+            console.warn(`Data key '${key}' not found in window`);
+            continue;
+        }
+
+        // Compare stringified versions
+        const currentValue = JSON.stringify(window[key]);
+        if (original[key] !== currentValue) {
             changed = true;
             break;
         }
@@ -46,11 +42,18 @@ function downloadString(text, fileType, fileName) {
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1500);
 }
 
-function downloadDataAsJS(dataObject, objectName, fileName) {
-    const jsContent = `const ${objectName} = ${JSON.stringify(dataObject, null, 2)};`;
+async function saveData(objectName, fileName) {
+    await saveFile(fileName, window[objectName]);
 
-    downloadString(jsContent, 'application/javascript', fileName);
-
-    setOriginalData();
+    setOriginalData(objectName);
     checkData();
 }
+
+// function downloadDataAsJS(dataObject, objectName, fileName) {
+//     const jsContent = `const ${objectName} = ${JSON.stringify(dataObject, null, 2)};`;
+
+//     downloadString(jsContent, 'application/javascript', fileName);
+
+//     setOriginalData();
+//     checkData();
+// }

@@ -32,8 +32,8 @@ function addPatient() {
     }
 
     // Add to patients object with new key
-    let lastKey = Object.keys(patients).length === 0 ? 0 : Math.max(...Object.keys(patients).map(Number));
-    patients[lastKey + 1] = newPatient;
+    let lastKey = Object.keys(window['patients-station']).length === 0 ? 0 : Math.max(...Object.keys(window['patients-station']).map(Number));
+    window['patients-station'][lastKey + 1] = newPatient;
 
     // Update data and table
     checkData();
@@ -284,8 +284,8 @@ function filterPatients() {
     const dismissed = {};
     const planned = {};
 
-    for (let id in patients) {
-        const patient = patients[id];
+    for (let id in window['patients-station']) {
+        const patient = window['patients-station'][id];
 
         // Convert dates to Date objects for comparison
         const admissionDate = parseGermanDate(patient.admission);

@@ -17,14 +17,14 @@
 
     <script src="../../_DATA/Zimmer.js"></script>
     <script src="../../_DATA/Mitarbeiter_innen.js"></script>
-    <script src="../../_DATA/Belegung.js"></script>
     <script src="../../_DATA/Therapiezuordnung.js"></script>
     <script src="../../_DATA/Poststationaer.js"></script>
     <script src="../../_DATA/Kostensicherung.js"></script>
 
-    <script src="../../src/data-directory.js"></script>
     <script src="../../src/data-manager.js"></script>
+    <script src="../../src/data-directory.js"></script>
     <script src="../../src/helpers.js"></script>
+    <script src="../../src/init.js"></script>
 
     <script>
         // Add warning when user tries to close page with unsaved data
@@ -38,7 +38,12 @@
             }
         });
 
-        document.addEventListener('DOMContentLoaded', () => init('Auslastung', '../../'));
+        init('Auslastung', '../../');
+
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('patients-station', 'belegung-station');
+            window.dispatchEvent(new Event('baseDataLoaded'));
+        });
     </script>
 </head>
 
@@ -87,7 +92,7 @@
             </ul>
 
             <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer"
-                onclick="downloadDataAsJS(, '', '')">
+                onclick="saveData('', '')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>

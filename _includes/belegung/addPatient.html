@@ -126,10 +126,10 @@
         const admissionDate = `${day}.${month}.${year}`;
 
         // Find next available patient ID
-        const nextId = Math.max(...Object.keys(patients).map(Number)) + 1;
+        const nextId = Math.max(...Object.keys(window['patients-station']).map(Number)) + 1;
 
         // Create new patient object
-        patients[nextId] = {
+        window['patients-station'][nextId] = {
             name: name,
             group: group,
             admission: admissionDate,
