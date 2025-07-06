@@ -2,7 +2,7 @@
  * Fills the KOSI table with patients who have been admitted today or in the past
  */
 function fillKosiTable() {
-    const today = new Date('2025-03-25');
+    const today = new Date();
     const table = document.getElementById('kosiTable');
     const tbody = table.querySelector('tbody');
     
@@ -293,7 +293,7 @@ function fillKosiTable() {
  * @returns {number} Number of patients that need AD to be checked
  */
 function countPatientsNeedingAD() {
-    const today = new Date('2025-03-25');
+    const today = new Date();
     let count = 0;
     
     Object.keys(patients).forEach(patientId => {
@@ -316,7 +316,7 @@ function countPatientsNeedingAD() {
  * @returns {number} Number of patients that need a Verlängerung
  */
 function countPatientsNeedingVerlaengerung() {
-    const today = new Date('2025-03-25');
+    const today = new Date();
     const twoWeeksFromNow = new Date(today);
     twoWeeksFromNow.setDate(today.getDate() + 14);
     let count = 0;
@@ -348,7 +348,7 @@ function countPatientsNeedingVerlaengerung() {
  * @returns {number} Number of patients that need FA
  */
 function countPatientsNeedingFA() {
-    const today = new Date('2025-03-25');
+    const today = new Date();
     let count = 0;
     
     Object.keys(patients).forEach(patientId => {
