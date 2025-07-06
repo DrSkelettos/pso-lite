@@ -4,8 +4,8 @@ active_kosi: active
 title: KoSi
 include_navigation: true
 dir: ../../
-save_data: kosi
-save_file: Kostensicherung.js
+save_data: kosi-station
+save_file: kostensicherung-station
 ---
 
 <script src="{{ dir }}src/kosi.js"></script>
@@ -48,5 +48,9 @@ save_file: Kostensicherung.js
 </table>
 
 <script>
-    fillKosiTable();
+    window.addEventListener('baseDataLoaded', async function () {
+        await loadData('patients-station', 'belegung-station');
+        await loadData('kosi-station', 'kostensicherung-station');
+        fillKosiTable();
+    });
 </script>

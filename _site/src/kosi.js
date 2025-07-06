@@ -10,10 +10,10 @@ function fillKosiTable() {
     tbody.innerHTML = '';
     
     // Filter and add patients
-    Object.values(patients).forEach(patient => {
+    Object.values(window['patients-station']).forEach(patient => {
         const admissionDate = parseGermanDate(patient.admission);
-        const patientId = Object.keys(patients).find(key => patients[key] === patient);
-        const kosiData = kosi[patientId] || {};
+        const patientId = Object.keys(window['patients-station']).find(key => window['patients-station'][key] === patient);
+        const kosiData = window['kosi-station'][patientId] || {};
         const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;
         const isDischargedPatient = dischargeDate && dischargeDate <= today;
         
@@ -44,10 +44,10 @@ function fillKosiTable() {
             adCheckbox.checked = kosiData.ad === 1;
             adCheckbox.addEventListener('change', function() {
                 // Ensure patient exists in kosi object
-                if (!kosi[patientId]) kosi[patientId] = {};
+                if (!window['kosi-station'][patientId]) window['kosi-station'][patientId] = {};
                 
                 // Update kosi data
-                kosi[patientId].ad = this.checked ? 1 : 0;
+                window['kosi-station'][patientId].ad = this.checked ? 1 : 0;
                 checkData();
             });
             adCell.appendChild(adCheckbox);
@@ -76,12 +76,12 @@ function fillKosiTable() {
                 
                 // Save the change to the kosi data structure
                 const patId = this.dataset.patientId;
-                if (!kosi[patId]) kosi[patId] = {};
-                kosi[patId].koueb = '31.12.4000';
+                if (!window['kosi-station'][patId]) window['kosi-station'][patId] = {};
+                window['kosi-station'][patId].koueb = '31.12.4000';
                 
                 // Reset Verlängerung checkboxes
-                if (kosi[patId].verl1) delete kosi[patId].verl1;
-                if (kosi[patId].verl2) delete kosi[patId].verl2;
+                if (window['kosi-station'][patId].verl1) delete window['kosi-station'][patId].verl1;
+                if (window['kosi-station'][patId].verl2) delete window['kosi-station'][patId].verl2;
                 
                 checkData();
                 
@@ -102,15 +102,15 @@ function fillKosiTable() {
                     
                     // Save to kosi data
                     const patId = this.dataset.patientId;
-                    if (!kosi[patId]) kosi[patId] = {};
+                    if (!window['kosi-station'][patId]) window['kosi-station'][patId] = {};
                     
                     // Reset Verlängerung checkboxes when KOÜB date changes
-                    if (kosi[patId].koueb !== germanDate) {
-                        if (kosi[patId].verl1) delete kosi[patId].verl1;
-                        if (kosi[patId].verl2) delete kosi[patId].verl2;
+                    if (window['kosi-station'][patId].koueb !== germanDate) {
+                        if (window['kosi-station'][patId].verl1) delete window['kosi-station'][patId].verl1;
+                        if (window['kosi-station'][patId].verl2) delete window['kosi-station'][patId].verl2;
                     }
                     
-                    kosi[patId].koueb = germanDate;
+                    window['kosi-station'][patId].koueb = germanDate;
                     
                     // Refresh the row to update styling and Verlängerung checkboxes
                     fillKosiTable();
@@ -154,8 +154,8 @@ function fillKosiTable() {
                 checkbox1.className = 'form-check-input';
                 checkbox1.checked = kosiData.verl1 === 1;
                 checkbox1.addEventListener('change', function() {
-                    if (!kosi[patientId]) kosi[patientId] = {};
-                    kosi[patientId].verl1 = this.checked ? 1 : 0;
+                    if (!window['kosi-station'][patientId]) window['kosi-station'][patientId] = {};
+                    window['kosi-station'][patientId].verl1 = this.checked ? 1 : 0;
                     checkData();
                 });
                 
@@ -165,8 +165,8 @@ function fillKosiTable() {
                 checkbox2.className = 'form-check-input';
                 checkbox2.checked = kosiData.verl2 === 1;
                 checkbox2.addEventListener('change', function() {
-                    if (!kosi[patientId]) kosi[patientId] = {};
-                    kosi[patientId].verl2 = this.checked ? 1 : 0;
+                    if (!window['kosi-station'][patientId]) window['kosi-station'][patientId] = {};
+                    window['kosi-station'][patientId].verl2 = this.checked ? 1 : 0;
                     checkData();
                 });
                 
@@ -188,8 +188,8 @@ function fillKosiTable() {
                 edCheckbox.className = 'form-check-input';
                 edCheckbox.checked = kosiData.ed === 1;
                 edCheckbox.addEventListener('change', function() {
-                    if (!kosi[patientId]) kosi[patientId] = {};
-                    kosi[patientId].ed = this.checked ? 1 : 0;
+                    if (!window['kosi-station'][patientId]) window['kosi-station'][patientId] = {};
+                    window['kosi-station'][patientId].ed = this.checked ? 1 : 0;
                     checkData();
                 });
                 edCell.appendChild(edCheckbox);
@@ -208,8 +208,8 @@ function fillKosiTable() {
                 faCheckbox.className = 'form-check-input';
                 faCheckbox.checked = kosiData.fa === 1;
                 faCheckbox.addEventListener('change', function() {
-                    if (!kosi[patientId]) kosi[patientId] = {};
-                    kosi[patientId].fa = this.checked ? 1 : 0;
+                    if (!window['kosi-station'][patientId]) window['kosi-station'][patientId] = {};
+                    window['kosi-station'][patientId].fa = this.checked ? 1 : 0;
                     checkData();
                 });
                 
@@ -233,15 +233,15 @@ function fillKosiTable() {
                     if (newComment !== null) { // User didn't cancel
                         if (newComment.trim() === '') {
                             // Remove comment if empty
-                            if (kosi[patientId] && kosi[patientId].fa_comment) {
-                                delete kosi[patientId].fa_comment;
+                            if (window['kosi-station'][patientId] && window['kosi-station'][patientId].fa_comment) {
+                                delete window['kosi-station'][patientId].fa_comment;
                             }
                             infoIcon.className = 'bi bi-info-square text-secondary';
                             infoIcon.removeAttribute('title');
                         } else {
                             // Save new comment
-                            if (!kosi[patientId]) kosi[patientId] = {};
-                            kosi[patientId].fa_comment = newComment.trim();
+                            if (!window['kosi-station'][patientId]) window['kosi-station'][patientId] = {};
+                            window['kosi-station'][patientId].fa_comment = newComment.trim();
                             infoIcon.className = 'bi bi-info-square-fill text-primary';
                             infoIcon.title = newComment.trim();
                         }
@@ -270,10 +270,10 @@ function fillKosiTable() {
                 finishButton.addEventListener('click', function() {
                     if (confirm(`Möchten Sie ${patient.name} wirklich abschließen und aus der Belegung entfernen?`)) {
                         // Remove patient from patients object
-                        delete patients[patientId];
+                        delete window['patients-station'][patientId];
                         
                         // Save updated patients data
-                        downloadDataAsJS(patients, 'patients', 'Belegung.js');
+                        saveData('patients-station', 'belegung-station');
                         
                         // Refresh the table
                         fillKosiTable();
@@ -296,9 +296,9 @@ function countPatientsNeedingAD() {
     const today = new Date();
     let count = 0;
     
-    Object.keys(patients).forEach(patientId => {
-        const patient = patients[patientId];
-        const kosiData = kosi[patientId] || {};
+    Object.keys(window['patients-station']).forEach(patientId => {
+        const patient = window['patients-station'][patientId];
+        const kosiData = window['kosi-station'][patientId] || {};
         const admissionDate = parseGermanDate(patient.admission);
         
         // Only count patients who are admitted and don't have AD checked
@@ -321,9 +321,9 @@ function countPatientsNeedingVerlaengerung() {
     twoWeeksFromNow.setDate(today.getDate() + 14);
     let count = 0;
     
-    Object.keys(patients).forEach(patientId => {
-        const patient = patients[patientId];
-        const kosiData = kosi[patientId] || {};
+    Object.keys(window['patients-station']).forEach(patientId => {
+        const patient = window['patients-station'][patientId];
+        const kosiData = window['kosi-station'][patientId] || {};
         const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;
         const isDischargedPatient = dischargeDate && dischargeDate <= today;
         
@@ -351,9 +351,9 @@ function countPatientsNeedingFA() {
     const today = new Date();
     let count = 0;
     
-    Object.keys(patients).forEach(patientId => {
-        const patient = patients[patientId];
-        const kosiData = kosi[patientId] || {};
+    Object.keys(window['patients-station']).forEach(patientId => {
+        const patient = window['patients-station'][patientId];
+        const kosiData = window['kosi-station'][patientId] || {};
         const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;
         
         // Only count discharged patients who don't have FA checked

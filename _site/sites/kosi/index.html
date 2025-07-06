@@ -91,7 +91,7 @@
             </ul>
 
             <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer"
-                onclick="saveData('kosi', 'Kostensicherung.js')">
+                onclick="saveData('kosi-station', 'kostensicherung-station')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
@@ -166,7 +166,11 @@
 </table>
 
 <script>
-    fillKosiTable();
+    window.addEventListener('baseDataLoaded', async function () {
+        await loadData('patients-station', 'belegung-station');
+        await loadData('kosi-station', 'kostensicherung-station');
+        fillKosiTable();
+    });
 </script>
     </div>
 
