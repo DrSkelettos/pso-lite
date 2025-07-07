@@ -65,6 +65,12 @@ function editEmployee(empKey) {
     document.getElementById('editEmployeeKey').value = empKey;
     document.getElementById('editEmployeeName').value = employee.name;
     document.getElementById('editEmployeeUsername').value = employee.username || '';
+    document.getElementById('editEmployeeRightsViewPatientsStation').checked = employee.rights?.viewPatientsStation || false;
+    document.getElementById('editEmployeeRightsEditPatientsStation').checked = employee.rights?.editPatientsStation || false;
+    document.getElementById('editEmployeeRightsViewTherapiesStation').checked = employee.rights?.viewTherapiesStation || false;
+    document.getElementById('editEmployeeRightsEditTherapiesStation').checked = employee.rights?.editTherapiesStation || false;
+    document.getElementById('editEmployeeRightsKosiStation').checked = employee.rights?.kosiStation || false;
+    document.getElementById('editEmployeeRightsEditEmployees').checked = employee.rights?.editEmployees || false;
 
     const patientsInput = document.getElementById('editEmployeePatients');
     patientsInput.value = employee.patients || 0;
@@ -154,12 +160,21 @@ function addAbsenceEntry() {
 
 async function saveEmployeeEdit() {
     const oldKey = currentEmployeeKey;
+    const oldEmployee = window['employees'][oldKey];
     const newKey = document.getElementById('editEmployeeKey').value.trim();
     const name = document.getElementById('editEmployeeName').value.trim();
     const username = document.getElementById('editEmployeeUsername').value.trim();
     const password = document.getElementById('editEmployeePassword').value.trim();
     const passwordCheckbox = document.getElementById('editEmployeePasswordCheckbox').checked;
     const patients = parseInt(document.getElementById('editEmployeePatients').value) || 0;
+
+    const rights = {};
+    rights.editEmployees = document.getElementById('editEmployeeRightsEditEmployees').checked;
+    rights.viewPatientsStation = document.getElementById('editEmployeeRightsViewPatientsStation').checked;
+    rights.editPatientsStation = document.getElementById('editEmployeeRightsEditPatientsStation').checked;
+    rights.viewTherapiesStation = document.getElementById('editEmployeeRightsViewTherapiesStation').checked;
+    rights.editTherapiesStation = document.getElementById('editEmployeeRightsEditTherapiesStation').checked;
+    rights.kosiStation = document.getElementById('editEmployeeRightsKosiStation').checked;
 
     // Get all absences
     const absencesList = document.getElementById('absences');
@@ -199,7 +214,10 @@ async function saveEmployeeEdit() {
         name: name,
         username: username,
         patients: patients,
-        absences: absences.length > 0 ? absences : undefined
+        absences: absences.length > 0 ? absences : undefined,
+        rights: rights,
+        passwordHash: oldEmployee.passwordHash,
+        needsToChangePassword: oldEmployee.needsToChangePassword,
     };
 
     // If password is set, hash it
@@ -298,7 +316,7 @@ function fillEmployeesTable() {
         const actionsCell = document.createElement('td');
         actionsCell.className = 'text-end';
         const editButton = document.createElement('button');
-        editButton.className = 'btn btn-sm btn-outline-primary';
+        editButton.className = 'btn btn-sm btn-outline-primary hidden editEmployeeButton';
         editButton.innerHTML = '<i class="bi bi-pencil text-primary"></i>';
         editButton.onclick = () => editEmployee(empKey);
         actionsCell.appendChild(editButton);

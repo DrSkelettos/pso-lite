@@ -147,7 +147,7 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Mitarbeiter:innen</h5>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                    <button type="button" id="addEmployeeButton" class="btn btn-primary btn-sm hidden" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
                         <i class="bi bi-plus-lg me-1 text-light"></i>Mitarbeiter:in hinzufügen
                     </button>
                 </div>
@@ -223,75 +223,143 @@
             <div class="modal-body">
                 <form id="editEmployeeForm">
                     <input type="hidden" id="editEmployeeId">
-                    <div class="mb-3">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label for="editEmployeeKey" class="form-label">Kürzel</label>
-                                <input type="text" class="form-control" id="editEmployeeKey" maxlength="10" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="editEmployeeName" class="form-label">Vollständiger Name</label>
-                                <input type="text" class="form-control" id="editEmployeeName" required>
-                            </div>
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Allgemeine Daten</h5>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label for="editEmployeeUsername" class="form-label">Login-Name</label>
-                                <input type="text" class="form-control" id="editEmployeeUsername" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="editEmployeePassword" class="form-label">Passwort</label>
-                                <input type="password" class="form-control" id="editEmployeePassword">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="editEmployeePasswordCheckbox">
-                                    <label class="form-check-label" for="editEmployeePasswordCheckbox">Passwortänderung erzwingen</label>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="editEmployeeKey" class="form-label">Kürzel</label>
+                                        <input type="text" class="form-control" id="editEmployeeKey" maxlength="10"
+                                            required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="editEmployeeName" class="form-label">Vollständiger Name</label>
+                                        <input type="text" class="form-control" id="editEmployeeName" required>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="editEmployeePatients" class="form-label">Einzelpat.</label>
-                        <input type="number" class="form-control" id="editEmployeePatients" min="0" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Abwesenheiten</label>
-                        <div id="absences" class="list-group mb-3">
-                            <!-- Absences will be added here dynamically -->
-                        </div>
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addAbsenceEntry()">
-                            <i class="bi bi-plus-lg me-1 text-primary"></i>Abwesenheit hinzufügen
-                        </button>
-                        <template id="absenceTemplate">
-                            <div class="list-group-item">
-                                <div class="row g-3 align-items-center">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Von</label>
-                                        <input type="date" class="form-control form-control-sm absence-start" required>
+                            <div class="mb-3">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="editEmployeeUsername" class="form-label">Login-Name</label>
+                                        <input type="text" class="form-control" id="editEmployeeUsername" required>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Bis</label>
-                                        <input type="date" class="form-control form-control-sm absence-end" required>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Ankündigung</label>
-                                        <input type="date" class="form-control form-control-sm absence-announcement">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-check mt-4">
-                                            <input class="form-check-input absence-planned" type="checkbox" id="absence-planned-template">
-                                            <label class="form-check-label cursor-pointer" for="absence-planned-template">Geplant</label>
+                                    <div class="col-md-6">
+                                        <label for="editEmployeePassword" class="form-label">Passwort</label>
+                                        <input type="password" class="form-control" id="editEmployeePassword">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox"
+                                                id="editEmployeePasswordCheckbox">
+                                            <label class="form-check-label"
+                                                for="editEmployeePasswordCheckbox">Passwortänderung erzwingen</label>
                                         </div>
                                     </div>
-                                    <div class="col-md-1">
-                                        <button type="button" class="btn btn-outline-danger btn-sm mt-4">
-                                            <i class="bi bi-trash text-danger"></i>
-                                        </button>
-                                    </div>
                                 </div>
                             </div>
-                        </template>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Behandlungsdaten</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="">
+                                <label for="editEmployeePatients" class="form-label">Einzelpat.</label>
+                                <input type="number" class="form-control" id="editEmployeePatients" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Berechtigungen</h5>
+                        </div>
+                        <div class="card-body" id="editEmployeePermissions-link">
+                            <a href="javascript:void(0);"
+                                onclick="document.getElementById('editEmployeePermissions').style.display = 'block'; document.getElementById('editEmployeePermissions-link').style.display = 'none';">
+                                Hier klicken, um Berechtigungen anzuzeigen.
+                            </a>
+                        </div>
+                        <div class="card-body" id="editEmployeePermissions" style="display: none;">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsViewPatientsStation">
+                                <label class="form-check-label" for="editEmployeeRightsViewPatientsStation">Station: Belegung anzeigen</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditPatientsStation">
+                                <label class="form-check-label" for="editEmployeeRightsEditPatientsStation">Station: Belegung bearbeiten</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsViewTherapiesStation">
+                                <label class="form-check-label" for="editEmployeeRightsViewTherapiesStation">Station: Therapiezuordnung anzeigen</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditTherapiesStation">
+                                <label class="form-check-label" for="editEmployeeRightsEditTherapiesStation">Station: Therapiezuordnung bearbeiten</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsKosiStation">
+                                <label class="form-check-label" for="editEmployeeRightsKosiStation">Station: Kostensicherung</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditEmployees">
+                                <label class="form-check-label" for="editEmployeeRightsEditEmployees">Mitarbeiter:innen bearbeiten</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-5">
+                        <div class="card-header">
+                            <button type="button" class="btn btn-outline-primary btn-sm float-end"
+                                onclick="addAbsenceEntry()">
+                                <i class="bi bi-plus-lg me-1 text-primary"></i>Abwesenheit hinzufügen
+                            </button>
+                            <h5 class="card-title mb-0">Abwesenheiten</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="absences" class="list-group">
+                                <!-- Absences will be added here dynamically -->
+                            </div>
+
+                            <template id="absenceTemplate">
+                                <div class="list-group-item">
+                                    <div class="row g-3 align-items-center">
+                                        <div class="col-md-3">
+                                            <label class="form-label">Von</label>
+                                            <input type="date" class="form-control form-control-sm absence-start"
+                                                required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Bis</label>
+                                            <input type="date" class="form-control form-control-sm absence-end"
+                                                required>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <label class="form-label">Ankündigung</label>
+                                            <input type="date"
+                                                class="form-control form-control-sm absence-announcement">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-check mt-4">
+                                                <input class="form-check-input absence-planned" type="checkbox"
+                                                    id="absence-planned-template">
+                                                <label class="form-check-label cursor-pointer"
+                                                    for="absence-planned-template">Geplant</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-1">
+                                            <button type="button" class="btn btn-outline-danger btn-sm mt-4">
+                                                <i class="bi bi-trash text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -306,12 +374,12 @@
     </div>
 </div>
 
-<script>        
+<script>
     // Handle Enter key press in form inputs
-    document.getElementById('editEmployeeForm').addEventListener('keydown', function(e) {
+    document.getElementById('editEmployeeForm').addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
-            e.preventDefault(); 
-            saveEmployeeEdit(); 
+            e.preventDefault();
+            saveEmployeeEdit();
         }
     });
 </script>
@@ -319,6 +387,9 @@
 <script>
     window.addEventListener('baseDataLoaded', () => {
         fillEmployeesTable();
+
+        showIfAuthorized('#addEmployeeButton', 'editEmployees');
+        showIfAuthorized('.editEmployeeButton', 'editEmployees');
     });
 </script>
     </div>

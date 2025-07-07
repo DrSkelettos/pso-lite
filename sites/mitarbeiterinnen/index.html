@@ -16,7 +16,7 @@ save_file: mitarbeiter_innen
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Mitarbeiter:innen</h5>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
+                    <button type="button" id="addEmployeeButton" class="btn btn-primary btn-sm hidden" data-bs-toggle="modal" data-bs-target="#addEmployeeModal">
                         <i class="bi bi-plus-lg me-1 text-light"></i>Mitarbeiter:in hinzufügen
                     </button>
                 </div>
@@ -46,5 +46,8 @@ save_file: mitarbeiter_innen
 <script>
     window.addEventListener('baseDataLoaded', () => {
         fillEmployeesTable();
+
+        showIfAuthorized('#addEmployeeButton', 'editEmployees');
+        showIfAuthorized('.editEmployeeButton', 'editEmployees');
     });
 </script>

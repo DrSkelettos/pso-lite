@@ -179,3 +179,16 @@ function calculatePatientWeek(admissionDateStr, referenceDate = new Date()) {
 
     return weekNumber.toString();
 }
+
+function showIfAuthorized(elementSelector, right) {
+    const elements = document.querySelectorAll(elementSelector);
+    if (!elements) return;
+
+    elements.forEach(element => {
+        element.classList.toggle('hidden', !authorize(right));
+    });
+}
+
+function authorize(right) {
+    return window['user']?.['rights']?.[right] ?? false;
+}

@@ -52,5 +52,5 @@ tr.no-hover:hover {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
