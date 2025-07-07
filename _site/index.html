@@ -134,9 +134,6 @@
 
     <!-- Kalender -->
     <div class="card mb-5">
-        <div class="card-header">
-            <h4 class="card-title mb-0">Kalender</h4>
-        </div>
         <div id="calendar">
         </div>
     </div>
@@ -225,7 +222,7 @@
         await loadData('patients-station', 'belegung-station');
         await loadData('kosi-station', 'kostensicherung-station');
         updateKosiCounts();
-        initCalendar();
+        initCalendarDashboard();
         updateCalendar();
     });
 

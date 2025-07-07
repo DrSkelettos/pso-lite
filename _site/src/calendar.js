@@ -1,4 +1,4 @@
-function initCalendar() {
+function initCalendarDashboard() {
     var calendarEl = document.getElementById('calendar');
     window['calendar'] = new FullCalendar.Calendar(calendarEl, {
         // View setup
@@ -16,6 +16,8 @@ function initCalendar() {
 
         // Start weeks on Monday
         firstDay: 1,
+
+        weekends: false,
 
         // Show week numbers
         weekNumbers: true,
@@ -45,8 +47,8 @@ const colors = {
     admission_text: '#000',
     discharge: '#198754',
     discharge_text: '#fff',
-    absence: '#6c757d',
-    absence_text: '#fff'
+    absence: '#ced4da',
+    absence_text: '#000'
 }
 
 function updateCalendar() {
@@ -106,7 +108,7 @@ function updateCalendar() {
                             allDay: true,
                             backgroundColor: backgroundColor,
                             borderColor: backgroundColor,
-                            textColor: '#fff',
+                            textColor: colors.absence_text,
                             extendedProps: {
                                 type: 'absence',
                                 employee: employee.name,
