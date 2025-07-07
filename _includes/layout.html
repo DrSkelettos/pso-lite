@@ -25,6 +25,7 @@
     <script src="{{ dir }}src/data-manager.js"></script>
     <script src="{{ dir }}src/data-directory.js"></script>
     <script src="{{ dir }}src/helpers.js"></script>
+    <script src="{{ dir }}src/user.js"></script>
     <script src="{{ dir }}src/init.js"></script>
 
     <script>
@@ -43,6 +44,7 @@
 
         window.addEventListener('directoryHandleInitialized', async function () {
             await loadData('employees', 'mitarbeiter_innen');
+            await checkLogin('{{ title }}', '{{ dir }}');
             window.dispatchEvent(new Event('baseDataLoaded'));
         });
     </script>
@@ -122,6 +124,11 @@
                             </a>
                         </li>
                     </ul>
+                </li>
+                <li class="nav-item" title="Ausloggen">
+                    <a class="nav-link" href="javascript:void(0);"  style="margin-top:-3px; margin-bottom:-10px;" onclick="logout('{{ dir }}')">
+                        <i class="bi bi-x-circle text-light fs-5"></i>
+                    </a>
                 </li>
             </ul>
         </div>

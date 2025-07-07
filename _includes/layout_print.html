@@ -5,60 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ title }}</title>
-    <style>
-        @page {
-            size: {{ page_size }};
-            margin: 8mm;
-        }
-
-        html {
-            font-size: 12px !important;
-            color: black !important;
-        }
-
-        body {
-            font-size: 12px !important;
-            color: black !important;
-            background: none !important;
-        }
-
-        a {
-            text-decoration: none;
-            color: black !important;
-            cursor: default !important;
-        }
-
-        @media print {
-            a {
-                text-decoration: none;
-                color: black !important;
-            }
-
-            .table {
-                font-size: inherit !important;
-            }
-
-            .table th,
-            .table td {
-                font-size: inherit !important;
-            }
-
-            .no-print {
-                display: none !important;
-            }
-        }
-
-        /* Preview styles (when viewing in browser) */
-        @media screen {
-            body {
-                max-width: {{ page_width }};
-                margin: 0 auto;
-                padding: 1rem;
-            }
-        }
-    </style>
 
     <link href="{{ dir }}src/style.css" rel="stylesheet">
+    <link href="{{ dir }}src/style-print.css" rel="stylesheet">
 
     <link href="{{ dir }}src/bootstrap/bootstrap.min.css" rel="stylesheet">
     <script src="{{ dir }}src/bootstrap/bootstrap.min.js"></script>
@@ -67,6 +16,7 @@
     <script src="{{ dir }}src/data-directory.js"></script>
     <script src="{{ dir }}src/data-manager.js"></script>
     <script src="{{ dir }}src/helpers.js"></script>
+    <script src="{{ dir }}src/user.js"></script>
     <script src="{{ dir }}src/init.js"></script>
 
     <script>
@@ -74,8 +24,10 @@
 
         window.addEventListener('directoryHandleInitialized', async function () {
             await loadData('employees', 'mitarbeiter_innen');
+            await checkLogin('{{ title }}', '{{ dir }}');
             window.dispatchEvent(new Event('baseDataLoaded'));
-        });</script>
+        });
+    </script>
 </head>
 
 <body>

@@ -16,7 +16,7 @@ async function init(pageName = null, dir = './') {
             try {
                 // Check if we already have permission
                 const permission = await savedHandle.queryPermission({ mode: 'read' });
-                
+
                 if (permission === 'granted') {
                     directoryHandle = savedHandle;
                     window.dispatchEvent(new Event('directoryHandleInitialized'));
@@ -28,7 +28,7 @@ async function init(pageName = null, dir = './') {
                 // Continue to redirect to data selection
             }
         }
-        
+
         // If we get here, either no handle was saved or we don't have permission
         location.href = dir + "sites/datenauswahl/index.html";
     } catch (error) {

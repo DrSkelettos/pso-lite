@@ -17,20 +17,20 @@ function parseGermanDate(dateStr) {
 function getCalendarWeek(date) {
     // Copy date to avoid modifying the original
     const target = normalizeToMidnight(new Date(date.valueOf()));
-    
+
     // Find Thursday of this week starting on Monday
     const dayNr = (date.getDay() + 6) % 7;
     target.setDate(target.getDate() - dayNr + 3);
-    
+
     // Get first Thursday of the year
     const firstThursday = new Date(target.getFullYear(), 0, 1);
     if (firstThursday.getDay() !== 4) {
         firstThursday.setMonth(0, 1 + ((4 - firstThursday.getDay()) + 7) % 7);
     }
-    
+
     // Get week number
     const weekNr = 1 + Math.ceil((target - firstThursday) / (7 * 24 * 60 * 60 * 1000));
-    
+
     return weekNr;
 }
 
@@ -48,9 +48,9 @@ function formatDateWithWeekday(date) {
 
 function formatDuration(startDate, endDate) {
     if (!startDate || !endDate) return '';
-    
+
     const days = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-    
+
     if (days < 7) return `${days} Tag${days > 1 ? 'e' : ''}`;
     if (days === 7) return '1 Woche';
     if (days < 14) return `1 Woche ${days - 7} Tag${days - 7 > 1 ? 'e' : ''}`;
@@ -59,12 +59,12 @@ function formatDuration(startDate, endDate) {
 
 function formatWeekSpan(startDate, endDate) {
     if (!startDate || !endDate) return '';
-    
+
     const startWeek = getCalendarWeek(startDate);
     const endWeek = getCalendarWeek(endDate);
-    
-    return startWeek === endWeek ? 
-        `${startWeek}` : 
+
+    return startWeek === endWeek ?
+        `${startWeek}` :
         `${startWeek} bis ${endWeek}`;
 }
 
@@ -77,15 +77,15 @@ function formatAnnouncementDate(date) {
 
 function getEmployeeAbsences(filterDate = new Date()) {
     const allAbsences = [];
-    
+
     Object.entries(window['employees']).forEach(([empKey, employee]) => {
         if (!employee.absences) return;
-        
+
         employee.absences.forEach(absence => {
             const startDate = parseGermanDate(absence.start);
             const endDate = parseGermanDate(absence.end);
             const announcementDate = absence.announcement ? parseGermanDate(absence.announcement) : null;
-            
+
             // Only include absences that haven't ended yet
             if (endDate >= filterDate) {
                 allAbsences.push({
@@ -99,7 +99,7 @@ function getEmployeeAbsences(filterDate = new Date()) {
             }
         });
     });
-    
+
     // Sort by start date
     return allAbsences.sort((a, b) => a.startDate - b.startDate);
 }
@@ -125,14 +125,14 @@ function normalizeToMidnight(date) {
 
 function isDateInCurrentWeek(dateStr) {
     if (!dateStr) return false;
-    
+
     const date = parseGermanDate(dateStr);
     const now = normalizeToMidnight(new Date());
-    
+
     // Get calendar weeks
     const dateWeek = getCalendarWeek(date);
     const currentWeek = getCalendarWeek(now);
-    
+
     return dateWeek === currentWeek;
 }
 
@@ -146,36 +146,36 @@ function isDateInCurrentWeek(dateStr) {
  */
 function calculatePatientWeek(admissionDateStr, referenceDate = new Date()) {
     if (!admissionDateStr) return '';
-    
+
     // Parse the German date format DD.MM.YYYY
     const admission = parseGermanDate(admissionDateStr);
-    
+
     // If admission is in the future, return empty
     if (admission > referenceDate) return '';
-    
+
     // Get the day of week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
     const admissionDayOfWeek = admission.getDay();
-    
+
     // Find the Monday of the admission week
     // If admission is on Monday (1), offset is 0
     // If admission is on Sunday (0), offset is -6 (previous Monday)
     // For other days, we go back to the most recent Monday
     const mondayOffset = admissionDayOfWeek === 0 ? -6 : -(admissionDayOfWeek - 1);
-    
+
     const admissionWeekMonday = new Date(admission);
     admissionWeekMonday.setDate(admission.getDate() + mondayOffset);
-    
+
     // Set both dates to midnight for accurate day calculation
     const normalizedReference = normalizeToMidnight(new Date(referenceDate));
     const normalizedAdmissionMonday = normalizeToMidnight(admissionWeekMonday);
-    
+
     // Calculate the number of days between the Monday of admission week and reference date
     const daysDifference = Math.floor((normalizedReference - normalizedAdmissionMonday) / (24 * 60 * 60 * 1000));
-    
+
     // Calculate the week number (1-based)
     // Week 1 is the week containing the admission date
     // Week 2 starts on the first Monday after admission week, and so on
     const weekNumber = Math.floor(daysDifference / 7) + 1;
-    
+
     return weekNumber.toString();
 }

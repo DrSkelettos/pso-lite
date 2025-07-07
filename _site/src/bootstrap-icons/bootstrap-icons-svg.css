@@ -93,6 +93,26 @@
   background-image: url("./svg/info-square-fill.svg"); 
 }
 
+.bi-box-arrow-left::before { 
+  background-image: url("./svg/box-arrow-left.svg"); 
+}
+
+.bi-x-lg::before { 
+  background-image: url("./svg/x-lg.svg"); 
+}
+
+.bi-x::before { 
+  background-image: url("./svg/x.svg"); 
+}
+
+.bi-x-circle::before { 
+  background-image: url("./svg/x-circle.svg"); 
+}
+
+.bi-x-circle-fill::before { 
+  background-image: url("./svg/x-circle-fill.svg"); 
+}
+
 /* Bootstrap theme color classes */
 .text-primary .bi::before,
 .text-primary[class^="bi-"]::before,

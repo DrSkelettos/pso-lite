@@ -23,6 +23,7 @@
     <script src="../../src/data-manager.js"></script>
     <script src="../../src/data-directory.js"></script>
     <script src="../../src/helpers.js"></script>
+    <script src="../../src/user.js"></script>
     <script src="../../src/init.js"></script>
 
     <script>
@@ -41,6 +42,7 @@
 
         window.addEventListener('directoryHandleInitialized', async function () {
             await loadData('employees', 'mitarbeiter_innen');
+            await checkLogin('Login', '../../');
             window.dispatchEvent(new Event('baseDataLoaded'));
         });
     </script>
@@ -50,20 +52,43 @@
 
 <body class="d-flex align-items-center py-4 bg-body-tertiary">
     <main class="form-signin w-100 m-auto text-center">
-        <form>
-            <h1 class="h3 mb-3 fw-normal">Bitte loggen Sie sich ein</h1>
-            <div class="form-floating">
-                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                <label for="floatingInput">Benutzer:innen-Name</label>
-            </div>
-            <div class="form-floating">
-                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                <label for="floatingPassword">Passwort</label>
-            </div>
-            <button class="btn btn-primary w-100 py-2" type="submit">Einloggen</button>
-        </form>
+
+        <div class="mb-5">
+            <a href="../../index.html">
+                <img src="../../src/images/psorga.svg" alt="PSOrga" width="460">
+            </a>
+        </div>
+        <h1 class="h3 mb-3 fw-normal">Bitte loggen Sie sich ein</h1>
+        <div class="form-floating">
+            <input type="text" class="form-control" id="username" placeholder="Login-Name">
+            <label for="username">Login-Name</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="password" placeholder="Passwort">
+            <label for="password">Passwort</label>
+        </div>
+        <div id="errorAlert" class="alert alert-danger mt-3" style="display: none;">
+            Login-Name oder Passwort sind nicht korrekt.
+        </div>
+        <button id="submitButton" class="btn btn-primary w-100 py-2" type="button">Einloggen</button>
     </main>
 </body>
+
+<script>
+    // Add click event listener for the login button
+    document.getElementById('submitButton').addEventListener('click', login);
+
+    // Add keydown event listeners for the input fields
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    });
+
+</script>
 
 
 </html>
