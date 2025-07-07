@@ -113,6 +113,14 @@
   background-image: url("./svg/x-circle-fill.svg"); 
 }
 
+.bi-key::before { 
+  background-image: url("./svg/key.svg"); 
+}
+
+.bi-key-fill::before { 
+  background-image: url("./svg/key-fill.svg"); 
+}
+
 /* Bootstrap theme color classes */
 .text-primary .bi::before,
 .text-primary[class^="bi-"]::before,

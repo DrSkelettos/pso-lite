@@ -121,6 +121,12 @@
                                 Mitarbeiter:innen
                             </a>
                         </li>
+                        <li>
+                            <a class="dropdown-item" href="./sites/passwort-aendern/index.html">
+                                <i class="bi bi-key me-1"></i>
+                                Passwort ändern
+                            </a>
+                        </li>
                     </ul>
                 </li>
                 <li class="nav-item" title="Ausloggen">
@@ -138,6 +144,12 @@
 <script src="./src/calendar.js"></script>
 
 <div class="container my-5">
+
+    <!-- Passwort ändern -->
+    <div id="passwordChangeAlert" class="alert alert-danger h4 mb-5 text-center hidden">
+        <h2>Ihr Passwort muss geändert werden!</h2>
+        <a class="alert-link" href="sites/passwort-aendern/index.html">Hier klicken, um das Passwort zu ändern</a>
+    </div>
 
     <!-- Kalender -->
     <div class="card mb-5">
@@ -231,6 +243,10 @@
         updateKosiCounts();
         initCalendarDashboard();
         updateCalendar();
+
+        if (window['user'].needsToChangePassword) {
+            document.getElementById('passwordChangeAlert').classList.remove('hidden');
+        }
     });
 
 </script>
@@ -240,6 +256,7 @@
         color: var(--bs-card-title-color) !important;
         text-decoration: none !important;
     }
+
     #calendar .absence-event {
         opacity: 0.75;
     }

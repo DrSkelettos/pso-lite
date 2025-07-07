@@ -1,0 +1,86 @@
+---
+layout: layout.html
+title: Passwort ändern
+include_navigation: false
+include_signInStyle: true
+dir: ../../
+---
+
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
+    <main class="form-signin w-100 m-auto text-center">
+
+        <div class="mb-5">
+            <a href="{{ dir }}index.html">
+                <img src="{{ dir }}src/images/psorga.svg" alt="PSOrga" width="460">
+            </a>
+        </div>
+        <h1 class="h3 mb-3 fw-normal">Passwort ändern</h1>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="password" placeholder="Aktuelles Passwort">
+            <label for="password">Aktuelles Passwort</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="newPassword" placeholder="Neues Passwort">
+            <label for="newPassword">Neues Passwort</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="newPasswordConfirm"
+                placeholder="Neues Passwort wiederholen">
+            <label for="newPasswordConfirm">Neues Passwort wiederholen</label>
+        </div>
+        <div id="errorAlert" class="alert alert-danger mt-3" style="display: none;">
+            Das aktuelle Passwort ist nicht korrekt<br />
+            oder die Passwörter stimmen nicht überein.
+        </div>
+        <div id="errorAlert2" class="alert alert-danger mt-3" style="display: none;">
+            Das neue Passwort muss mindestens 5 Zeichen lang sein.
+        </div>
+        <button id="submitButton" class="btn btn-primary w-100 py-2" type="button">Passwort ändern</button>
+    </main>
+</body>
+
+<script>
+    // Add click event listener for the login button
+    document.getElementById('submitButton').addEventListener('click', changePassword);
+
+    // Add keydown event listeners for the input fields
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                changePassword();
+            }
+        });
+    });
+
+    async function changePassword() {
+        const password = document.getElementById('password').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const newPasswordConfirm = document.getElementById('newPasswordConfirm').value;
+
+        if (password === '' || newPassword === '' || newPasswordConfirm === '' || newPassword !== newPasswordConfirm) {
+            document.getElementById('errorAlert').style.display = 'block';
+            return;
+        }
+
+        const passwordHash = await hashPassword(password);
+
+        if (passwordHash !== window['user'].passwordHash) {
+            document.getElementById('errorAlert').style.display = 'block';
+            return;
+        }
+
+        if (newPassword.length < 5) {
+            document.getElementById('errorAlert2').style.display = 'block';
+            return;
+        }
+
+        const newPasswordHash = await hashPassword(newPassword);
+        const employeeKey = window['user'].key;
+        window['employees'][employeeKey].passwordHash = newPasswordHash;
+        delete window['employees'][employeeKey].needsToChangePassword;
+        await saveData('employees', 'mitarbeiter_innen');
+        location.href = "../login/index.html";
+    }
+
+</script>

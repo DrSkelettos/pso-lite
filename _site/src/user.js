@@ -37,6 +37,7 @@ async function getUser(username, passwordHash) {
     if (!window['employees']) return null;
     for (const [key, value] of Object.entries(window['employees'])) {
         if (value.username === username && value.passwordHash === passwordHash) {
+            value.key = key;
             return value;
         }
     }
@@ -58,6 +59,7 @@ async function getActiveUser() {
 // Check the current Login
 async function checkLogin(pageName = null, dir = './') {
     const user = await getActiveUser();
+    window['user'] = user;
     if (!user && pageName !== 'Login') {
         location.href = dir + "sites/login/index.html";
     }

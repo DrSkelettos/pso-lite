@@ -12,6 +12,12 @@ dir: ./
 
 <div class="container my-5">
 
+    <!-- Passwort ändern -->
+    <div id="passwordChangeAlert" class="alert alert-danger h4 mb-5 text-center hidden">
+        <h2>Ihr Passwort muss geändert werden!</h2>
+        <a class="alert-link" href="sites/passwort-aendern/index.html">Hier klicken, um das Passwort zu ändern</a>
+    </div>
+
     <!-- Kalender -->
     <div class="card mb-5">
         <div id="calendar">
@@ -104,6 +110,10 @@ dir: ./
         updateKosiCounts();
         initCalendarDashboard();
         updateCalendar();
+
+        if (window['user'].needsToChangePassword) {
+            document.getElementById('passwordChangeAlert').classList.remove('hidden');
+        }
     });
 
 </script>
@@ -113,6 +123,7 @@ dir: ./
         color: var(--bs-card-title-color) !important;
         text-decoration: none !important;
     }
+
     #calendar .absence-event {
         opacity: 0.75;
     }

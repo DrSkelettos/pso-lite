@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PSOrga - Passwort ändern</title>
+
+    
+    <link href="../../src/style-sign-in.css" rel="stylesheet">
+    
+
+    <script src="../../src/popperjs/popper.min.js"></script>
+    <link href="../../src/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="../../src/bootstrap/bootstrap.min.js"></script>
+    <link href="../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+
+    <script src="../../_DATA/Zimmer.js"></script>
+    <script src="../../_DATA/Therapiezuordnung.js"></script>
+    <script src="../../_DATA/Poststationaer.js"></script>
+    <script src="../../_DATA/Kostensicherung.js"></script>
+
+    <script src="../../src/data-manager.js"></script>
+    <script src="../../src/data-directory.js"></script>
+    <script src="../../src/helpers.js"></script>
+    <script src="../../src/user.js"></script>
+    <script src="../../src/init.js"></script>
+
+    <script>
+        // Add warning when user tries to close page with unsaved data
+        window.addEventListener('beforeunload', function (e) {
+            // Check if the data-changed element is visible (not having the d-none class)
+            if (!document.getElementById('data-changed').classList.contains('d-none')) {
+                // Standard way to show a confirmation dialog when closing the page
+                e.preventDefault();
+                e.returnValue = 'Es gibt ungespeicherte Änderungen. Möchten Sie die Seite wirklich verlassen?';
+                return e.returnValue;
+            }
+        });
+
+        init('Passwort ändern', '../../');
+
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('employees', 'mitarbeiter_innen');
+            await checkLogin('Passwort ändern', '../../');
+            window.dispatchEvent(new Event('baseDataLoaded'));
+        });
+    </script>
+</head>
+
+
+
+<body class="d-flex align-items-center py-4 bg-body-tertiary">
+    <main class="form-signin w-100 m-auto text-center">
+
+        <div class="mb-5">
+            <a href="../../index.html">
+                <img src="../../src/images/psorga.svg" alt="PSOrga" width="460">
+            </a>
+        </div>
+        <h1 class="h3 mb-3 fw-normal">Passwort ändern</h1>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="password" placeholder="Aktuelles Passwort">
+            <label for="password">Aktuelles Passwort</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="newPassword" placeholder="Neues Passwort">
+            <label for="newPassword">Neues Passwort</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="newPasswordConfirm"
+                placeholder="Neues Passwort wiederholen">
+            <label for="newPasswordConfirm">Neues Passwort wiederholen</label>
+        </div>
+        <div id="errorAlert" class="alert alert-danger mt-3" style="display: none;">
+            Das aktuelle Passwort ist nicht korrekt<br />
+            oder die Passwörter stimmen nicht überein.
+        </div>
+        <div id="errorAlert2" class="alert alert-danger mt-3" style="display: none;">
+            Das neue Passwort muss mindestens 5 Zeichen lang sein.
+        </div>
+        <button id="submitButton" class="btn btn-primary w-100 py-2" type="button">Passwort ändern</button>
+    </main>
+</body>
+
+<script>
+    // Add click event listener for the login button
+    document.getElementById('submitButton').addEventListener('click', changePassword);
+
+    // Add keydown event listeners for the input fields
+    const inputs = document.querySelectorAll('input');
+    inputs.forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                changePassword();
+            }
+        });
+    });
+
+    async function changePassword() {
+        const password = document.getElementById('password').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const newPasswordConfirm = document.getElementById('newPasswordConfirm').value;
+
+        if (password === '' || newPassword === '' || newPasswordConfirm === '' || newPassword !== newPasswordConfirm) {
+            document.getElementById('errorAlert').style.display = 'block';
+            return;
+        }
+
+        const passwordHash = await hashPassword(password);
+
+        if (passwordHash !== window['user'].passwordHash) {
+            document.getElementById('errorAlert').style.display = 'block';
+            return;
+        }
+
+        if (newPassword.length < 5) {
+            document.getElementById('errorAlert2').style.display = 'block';
+            return;
+        }
+
+        const newPasswordHash = await hashPassword(newPassword);
+        const employeeKey = window['user'].key;
+        window['employees'][employeeKey].passwordHash = newPasswordHash;
+        delete window['employees'][employeeKey].needsToChangePassword;
+        await saveData('employees', 'mitarbeiter_innen');
+        location.href = "../login/index.html";
+    }
+
+</script>
+
+
+</html>

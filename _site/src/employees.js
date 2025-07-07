@@ -203,7 +203,7 @@ async function saveEmployeeEdit() {
     };
 
     // If password is set, hash it
-    if (password) {
+    if (password && password.length > 0) {
         updatedEmployee.passwordHash = await hashPassword(password);
         document.getElementById('editEmployeePassword').value = '';
     }

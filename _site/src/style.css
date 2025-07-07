@@ -50,3 +50,7 @@ tr.no-hover:hover {
 .form-check-input, .form-check-label {
     cursor: pointer !important;
 }
+
+.hidden {
+    display: none;
+}
