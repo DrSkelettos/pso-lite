@@ -1,5 +1,3 @@
-
-
 // Initialize the application
 async function init(pageName = null, dir = './') {
     if (!('showDirectoryPicker' in window)) {
@@ -7,24 +5,34 @@ async function init(pageName = null, dir = './') {
         return;
     }
 
-    if (pageName == 'Datenauswahl') return;
+    if (pageName === 'Datenauswahl') return;
 
     try {
         await initDB();
         const savedHandle = await getDirectoryHandle();
 
         if (savedHandle) {
-            // Verify we still have permission
-            if (await verifyPermission(savedHandle, false)) {
-                directoryHandle = savedHandle;
-                window.dispatchEvent(new Event('directoryHandleInitialized'));
+            // Try to use the saved handle without immediately requesting permission
+            try {
+                // Check if we already have permission
+                const permission = await savedHandle.queryPermission({ mode: 'read' });
+                
+                if (permission === 'granted') {
+                    directoryHandle = savedHandle;
+                    window.dispatchEvent(new Event('directoryHandleInitialized'));
+                    return;
+                }
+                // If we don't have permission, we'll need the user to explicitly request it
+            } catch (error) {
+                console.log('Error checking permission:', error);
+                // Continue to redirect to data selection
             }
         }
-        else {
-            location.href = dir + "sites/datenauswahl/index.html";
-        }
+        
+        // If we get here, either no handle was saved or we don't have permission
+        location.href = dir + "sites/datenauswahl/index.html";
     } catch (error) {
         console.error('Initialization error:', error);
-        alert('Fehler beim Initialisieren: ' + error.message);
+        // Don't show an alert here as it might be shown on page load
     }
 }
