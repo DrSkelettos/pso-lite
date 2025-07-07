@@ -128,6 +128,14 @@
 </template>
 
 <script>
+    // Handle Enter key press in form inputs
+    document.getElementById('editPatientForm').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            saveEditPatient(); 
+        }
+    });
+
     function addEmployeeEntry(employee = null) {
         const template = document.getElementById('employeeEntryTemplate');
         const entry = template.content.cloneNode(true);

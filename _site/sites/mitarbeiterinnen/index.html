@@ -197,6 +197,15 @@
     </div>
 </div>
 
+<script>    
+    // Handle Enter key press in form inputs
+    document.getElementById('addEmployeeForm').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            addEmployee(); 
+        }
+    });
+</script>
 <!-- Edit Employee Modal -->
 <div class="modal fade" id="editEmployeeModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -271,6 +280,15 @@
     </div>
 </div>
 
+<script>        
+    // Handle Enter key press in form inputs
+    document.getElementById('editEmployeeForm').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            saveEmployeeEdit(); 
+        }
+    });
+</script>
 
 <script>
     window.addEventListener('baseDataLoaded', () => {

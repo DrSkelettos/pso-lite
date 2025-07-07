@@ -71,3 +71,13 @@
         </div>
     </div>
 </div>
+
+<script>        
+    // Handle Enter key press in form inputs
+    document.getElementById('editEmployeeForm').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            saveEmployeeEdit(); 
+        }
+    });
+</script>

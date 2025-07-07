@@ -231,6 +231,15 @@
 </div>
 
 <script>
+    
+    // Handle Enter key press in form inputs
+    document.getElementById('addPatientForm').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            addPatient(); 
+        }
+    });
+
     // Reset form when modal is hidden
     document.getElementById('addPatientModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('addPatientForm').reset();

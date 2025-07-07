@@ -29,3 +29,13 @@
         </div>
     </div>
 </div>
+
+<script>    
+    // Handle Enter key press in form inputs
+    document.getElementById('addEmployeeForm').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); 
+            addEmployee(); 
+        }
+    });
+</script>

@@ -65,6 +65,14 @@
         initializeAddPatientForm();
     });
 
+    // Handle Enter key press in form inputs
+    document.getElementById('addPatientForm').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent form submission
+            addPatient(); // Call the addPatient function
+        }
+    });
+
     function initializeAddPatientForm() {
         // Initialize employee select
         const employeeSelect = document.getElementById('patientEmployee');
