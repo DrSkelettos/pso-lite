@@ -6,9 +6,20 @@ include_navigation: true
 dir: ./
 ---
 
+<script src="{{ dir }}src/fullcalendar/index.global.min.js"></script>
 <script src="{{ dir }}src/kosi.js"></script>
+<script src="{{ dir }}src/calendar.js"></script>
 
 <div class="container my-5">
+
+    <!-- Kalender -->
+    <div class="card mb-5">
+        <div class="card-header">
+            <h4 class="card-title mb-0">Kalender</h4>
+        </div>
+        <div id="calendar">
+        </div>
+    </div>
 
     <!-- LINKS -->
     <div class="row">
@@ -28,7 +39,8 @@ dir: ./
 
         <!-- Therapiezuordnung -->
         <div class="col">
-            <div class="card text-center cursor-pointer" onclick="window.location.href='sites/therapiezuordnung/index.html';">
+            <div class="card text-center cursor-pointer"
+                onclick="window.location.href='sites/therapiezuordnung/index.html';">
                 <div class="card-header">
                     <i class="bi bi-list-columns" style="font-size: 5rem;"></i>
                 </div>
@@ -40,7 +52,7 @@ dir: ./
         </div>
 
         <!-- Chefärztinvisite -->
-        <div class="col">
+        <!-- <div class="col">
             <div class="card text-center cursor-pointer" onclick="window.location.href='sites/chefaerztinvisite/index.html';">
                 <div class="card-header">
                     <i class="bi bi-people" style="font-size: 5rem;"></i>
@@ -50,13 +62,13 @@ dir: ./
                     <p class="card-text">Planung für die Chefärztinvisite</p>
                 </div>
             </div>
-        </div>
+        </div> -->
 
     </div>
 
 
     <!-- KOSTENSICHERUNG -->
-     <div class="card mt-5 cursor-pointer" onclick="window.location.href='sites/kosi/index.html';">
+    <div class="card mt-5 cursor-pointer" onclick="window.location.href='sites/kosi/index.html';">
         <div class="card-header">
             <h4 class="card-title mb-0">Kostensicherung</h4>
         </div>
@@ -85,7 +97,7 @@ dir: ./
                 </div>
             </div>
         </div>
-     </div>
+    </div>
 </div>
 
 <script>
@@ -93,7 +105,21 @@ dir: ./
         await loadData('patients-station', 'belegung-station');
         await loadData('kosi-station', 'kostensicherung-station');
         updateKosiCounts();
+        initCalendar();
+        updateCalendar();
     });
+
 </script>
+
+<style>
+    #calendar a {
+        color: var(--bs-card-title-color) !important;
+        text-decoration: none !important;
+    }
+    #calendar .absence-event {
+        opacity: 0.75;
+    }
+</style>
 </body>
+
 </html>
