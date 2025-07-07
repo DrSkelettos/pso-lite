@@ -101,11 +101,7 @@ save_file: belegung-station
     // Load Data
     window.addEventListener('directoryHandleInitialized', async function () {
         await loadData('patients-station', 'belegung-station');
-        window.dispatchEvent(new Event('dataLoaded'));
-    });
 
-    // Initialize form dropdowns and table
-    window.addEventListener('dataLoaded', function () {
         initializeAddPatientForm();
         fillPatientsTable();
     });
