@@ -10,12 +10,32 @@
                 <form id="editEmployeeForm">
                     <input type="hidden" id="editEmployeeId">
                     <div class="mb-3">
-                        <label for="editEmployeeKey" class="form-label">Kürzel</label>
-                        <input type="text" class="form-control" id="editEmployeeKey" maxlength="10" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="editEmployeeKey" class="form-label">Kürzel</label>
+                                <input type="text" class="form-control" id="editEmployeeKey" maxlength="10" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editEmployeeName" class="form-label">Vollständiger Name</label>
+                                <input type="text" class="form-control" id="editEmployeeName" required>
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-3">
-                        <label for="editEmployeeName" class="form-label">Vollständiger Name</label>
-                        <input type="text" class="form-control" id="editEmployeeName" required>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="editEmployeeUsername" class="form-label">Login-Name</label>
+                                <input type="text" class="form-control" id="editEmployeeUsername" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="editEmployeePassword" class="form-label">Passwort</label>
+                                <input type="password" class="form-control" id="editEmployeePassword">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="editEmployeePasswordCheckbox">
+                                    <label class="form-check-label" for="editEmployeePasswordCheckbox">Passwortänderung erzwingen</label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label for="editEmployeePatients" class="form-label">Einzelpat.</label>

@@ -64,6 +64,7 @@ function editEmployee(empKey) {
     // Set current key and name
     document.getElementById('editEmployeeKey').value = empKey;
     document.getElementById('editEmployeeName').value = employee.name;
+    document.getElementById('editEmployeeUsername').value = employee.username || '';
 
     const patientsInput = document.getElementById('editEmployeePatients');
     patientsInput.value = employee.patients || 0;
@@ -151,10 +152,13 @@ function addAbsenceEntry() {
     document.getElementById('absences').appendChild(absenceDiv);
 }
 
-function saveEmployeeEdit() {
+async function saveEmployeeEdit() {
     const oldKey = currentEmployeeKey;
-    const newKey = document.getElementById('editEmployeeKey').value.trim().toUpperCase();
+    const newKey = document.getElementById('editEmployeeKey').value.trim();
     const name = document.getElementById('editEmployeeName').value.trim();
+    const username = document.getElementById('editEmployeeUsername').value.trim();
+    const password = document.getElementById('editEmployeePassword').value.trim();
+    const passwordCheckbox = document.getElementById('editEmployeePasswordCheckbox').checked;
     const patients = parseInt(document.getElementById('editEmployeePatients').value) || 0;
 
     // Get all absences
@@ -193,9 +197,21 @@ function saveEmployeeEdit() {
     // Create updated employee data
     const updatedEmployee = {
         name: name,
+        username: username,
         patients: patients,
         absences: absences.length > 0 ? absences : undefined
     };
+
+    // If password is set, hash it
+    if (password) {
+        updatedEmployee.passwordHash = await hashPassword(password);
+        document.getElementById('editEmployeePassword').value = '';
+    }
+
+    // If password checkbox is checked, set needsToChangePassword to true
+    if (passwordCheckbox) {
+        updatedEmployee.needsToChangePassword = true;
+    }
 
     // If key changed, create new entry and delete old one
     if (oldKey !== newKey) {
