@@ -211,8 +211,8 @@
     let therapiesModal;
 
     function editTherapies(patientId) {
-        const therapyData = therapies[patientId] || {};
-        const patient = patients[patientId];
+        const therapyData = window['therapies-station'][patientId] || {};
+        const patient = window['patients-station'][patientId];
         
         // Set patient info
         document.getElementById('editTherapiesPatientId').value = patientId;
@@ -272,7 +272,7 @@
         };
 
         // Update therapies
-        therapies[patientId] = therapyData;
+        window['therapies-station'][patientId] = therapyData;
 
         // Close modal and refresh table
         if (therapiesModal) {

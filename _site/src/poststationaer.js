@@ -1,6 +1,6 @@
 function deletePoststationaer(id) {
     if (confirm(`Möchten Sie diese:n poststaionäre:n Patient:in wirklich löschen?`)) {
-        delete poststationaer[id];
+        delete window['poststationaer'][id];
         fillPoststationaerTable();
         checkData();
     }
@@ -14,7 +14,7 @@ function fillPoststationaerTable() {
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Set to start of day for comparison
 
-    Object.entries(poststationaer).forEach(([id, entry]) => {
+    Object.entries(window['poststationaer']).forEach(([id, entry]) => {
         // Parse the German date format DD.MM.YYYY
         const [day, month, year] = entry.end.split('.');
         const endDate = new Date(year, month - 1, day); // month is 0-based
@@ -68,7 +68,7 @@ function fillPoststationaerTherapyTable() {
 
     let counter = 1; // Initialize counter
 
-    Object.entries(poststationaer).forEach(([id, entry]) => {
+    Object.entries(window['poststationaer']).forEach(([id, entry]) => {
         // Parse the German date format DD.MM.YYYY
         const [day, month, year] = entry.end.split('.');
         const endDate = new Date(year, month - 1, day); // month is 0-based

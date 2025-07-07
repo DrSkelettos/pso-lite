@@ -86,19 +86,19 @@
         const formattedEndDate = `${day}.${month}.${year}`;
 
         // Find next available ID
-        const nextId = Math.max(...Object.keys(poststationaer).map(Number), 0) + 1;
+        const nextId = Math.max(...Object.keys(window['poststationaer']).map(Number), 0) + 1;
 
         // Create new poststationaer entry
-        poststationaer[nextId] = {
+        window['poststationaer'][nextId] = {
             name: name,
             end: formattedEndDate
         };
 
         // Add optional therapy groups if selected
-        if (gr) poststationaer[nextId].gr = gr;
-        if (mt) poststationaer[nextId].mt = mt;
-        if (gt) poststationaer[nextId].gt = gt;
-        if (kt) poststationaer[nextId].kt = kt;
+        if (gr) window['poststationaer'][nextId].gr = gr;
+        if (mt) window['poststationaer'][nextId].mt = mt;
+        if (gt) window['poststationaer'][nextId].gt = gt;
+        if (kt) window['poststationaer'][nextId].kt = kt;
 
         // Close modal
         bootstrap.Modal.getInstance(document.getElementById('addPatientModal')).hide();

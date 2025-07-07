@@ -91,7 +91,7 @@
             </ul>
 
             <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer"
-                onclick="saveData('therapies', 'Therapiezuordnung.js')">
+                onclick="saveData('therapies-station', 'therapiezuordnung-station')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
@@ -269,7 +269,7 @@
 
 
 <div class="text-center mt-4">
-    <button type="button" class="btn btn-outline-primary me-2" onclick="downloadDataAsJS(therapies, 'therapies', 'Therapiezuordnung.js')">
+    <button type="button" class="btn btn-outline-primary me-2" onclick="saveData('therapies-station', 'therapiezuordnung-station')">
         <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
     </button>
     <button type="button" class="btn btn-outline-primary me-2" onclick="window.open('ausdruck/index.html')">
@@ -490,8 +490,8 @@
     let therapiesModal;
 
     function editTherapies(patientId) {
-        const therapyData = therapies[patientId] || {};
-        const patient = patients[patientId];
+        const therapyData = window['therapies-station'][patientId] || {};
+        const patient = window['patients-station'][patientId];
         
         // Set patient info
         document.getElementById('editTherapiesPatientId').value = patientId;
@@ -551,7 +551,7 @@
         };
 
         // Update therapies
-        therapies[patientId] = therapyData;
+        window['therapies-station'][patientId] = therapyData;
 
         // Close modal and refresh table
         if (therapiesModal) {
@@ -589,9 +589,12 @@
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        fillTherapyTable();
-    });
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('patients-station', 'belegung-station');
+            await loadData('rooms-station', 'zimmer-station');
+            await loadData('therapies-station', 'therapiezuordnung-station');
+            fillTherapyTable();
+        });
 </script>
     </div>
 

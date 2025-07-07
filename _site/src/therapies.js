@@ -83,7 +83,7 @@ function fillTherapyTable() {
         row.appendChild(tdGroupLetter);
 
         // Get therapy data
-        const therapyData = therapies[patient.id] || {};
+        const therapyData = window['therapies-station'][patient.id] || {};
 
         // Standard therapies
         const standardTherapies = ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'];
@@ -140,7 +140,7 @@ function fillTherapyTable() {
 
     // Helper to count therapies for a patient
     function countPatientTherapies(patient) {
-        const therapyData = therapies[patient.id] || {};
+        const therapyData = window['therapies-station'][patient.id] || {};
 
         // Count standard therapies
         ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'].forEach(therapy => {

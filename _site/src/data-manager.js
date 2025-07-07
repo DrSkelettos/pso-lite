@@ -46,7 +46,7 @@ async function saveData(objectName, fileName) {
     await saveFile(fileName, window[objectName]);
 
     setOriginalData(objectName);
-    checkData();
+    document.getElementById("data-changed").classList.add("d-none");
 }
 
 // function downloadDataAsJS(dataObject, objectName, fileName) {

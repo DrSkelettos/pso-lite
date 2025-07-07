@@ -186,7 +186,7 @@ title: Therapiezuordnung 7.1
         </tr>
     </thead>
     <tbody id="poststationaer-table-body">
-        
+
     </tbody>
 </table>
 
@@ -205,6 +205,12 @@ title: Therapiezuordnung 7.1
     // Update document title with current date
     document.title = document.title + ' - ' + dateStr;
 
-    fillTherapyTable();
-    fillPoststationaerTherapyTable();
+    window.addEventListener('directoryHandleInitialized', async function () {
+        await loadData('patients-station', 'belegung-station');
+        await loadData('rooms-station', 'zimmer-station');
+        await loadData('therapies-station', 'therapiezuordnung-station');
+        await loadData('poststationaer', 'poststationaer');
+        fillTherapyTable();
+        fillPoststationaerTherapyTable();
+    });
 </script>

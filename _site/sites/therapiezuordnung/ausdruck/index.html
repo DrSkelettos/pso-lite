@@ -74,7 +74,6 @@
 
         window.addEventListener('directoryHandleInitialized', async function () {
             await loadData('employees', 'mitarbeiter_innen');
-            await loadData('employees', 'mitarbeiter_innen');
             window.dispatchEvent(new Event('baseDataLoaded'));
         });</script>
 </head>
@@ -260,7 +259,7 @@
         </tr>
     </thead>
     <tbody id="poststationaer-table-body">
-        
+
     </tbody>
 </table>
 
@@ -279,8 +278,14 @@
     // Update document title with current date
     document.title = document.title + ' - ' + dateStr;
 
-    fillTherapyTable();
-    fillPoststationaerTherapyTable();
+    window.addEventListener('directoryHandleInitialized', async function () {
+        await loadData('patients-station', 'belegung-station');
+        await loadData('rooms-station', 'zimmer-station');
+        await loadData('therapies-station', 'therapiezuordnung-station');
+        await loadData('poststationaer', 'poststationaer');
+        fillTherapyTable();
+        fillPoststationaerTherapyTable();
+    });
 </script>
 
 </body>

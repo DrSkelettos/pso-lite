@@ -5,7 +5,7 @@ title: Poststationär
 include_navigation: true
 dir: ../../
 save_data: poststationaer
-save_file: Poststationaer.js
+save_file: poststationaer
 ---
 
 <script src="{{ dir }}src/poststationaer.js"></script>
@@ -34,7 +34,7 @@ save_file: Poststationaer.js
 </table>
 
 <div class="text-center mt-4">
-    <button type="button" class="btn btn-outline-primary me-2" data-bs-toggle="modal" data-bs-target="#saveDataModal">
+    <button type="button" class="btn btn-outline-primary me-2" onclick="saveData('poststationaer', 'poststationaer')">
         <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
     </button>
     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
@@ -45,5 +45,10 @@ save_file: Poststationaer.js
 {% include "poststationaer/addPatient.html" %}
 
 <script>
-    fillPoststationaerTable();
+    
+    window.addEventListener('directoryHandleInitialized', async function () {
+        await loadData('poststationaer', 'poststationaer');
+        fillPoststationaerTable();
+    });
+    
 </script>

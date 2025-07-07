@@ -4,8 +4,8 @@ active_therapiezuordnung: active
 title: Therapiezuordnung
 include_navigation: true
 dir: ../../
-save_data: therapies
-save_file: Therapiezuordnung.js
+save_data: therapies-station
+save_file: therapiezuordnung-station
 ---
 
 <script src="{{ dir }}src/patients.js"></script>
@@ -151,7 +151,7 @@ save_file: Therapiezuordnung.js
 
 
 <div class="text-center mt-4">
-    <button type="button" class="btn btn-outline-primary me-2" onclick="downloadDataAsJS(therapies, 'therapies', 'Therapiezuordnung.js')">
+    <button type="button" class="btn btn-outline-primary me-2" onclick="saveData('therapies-station', 'therapiezuordnung-station')">
         <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
     </button>
     <button type="button" class="btn btn-outline-primary me-2" onclick="window.open('ausdruck/index.html')">
@@ -162,7 +162,10 @@ save_file: Therapiezuordnung.js
 {% include "therapiezuordnung/editTherapies.html" %}
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        fillTherapyTable();
-    });
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('patients-station', 'belegung-station');
+            await loadData('rooms-station', 'zimmer-station');
+            await loadData('therapies-station', 'therapiezuordnung-station');
+            fillTherapyTable();
+        });
 </script>
