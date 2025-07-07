@@ -95,9 +95,9 @@
         roomSelect.appendChild(emptyRoomOption);
 
         // Add room options
-        for (let roomKey in rooms) {
+        for (let roomKey in window['rooms-station']) {
             for (let space of ['F', 'T']) {
-                if (space in rooms[roomKey]) {
+                if (space in window['rooms-station'][roomKey]) {
                     const option = document.createElement('option');
                     option.value = `${roomKey}-${space}`;
                     option.textContent = `${roomKey}-${space}`;

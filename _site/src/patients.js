@@ -232,10 +232,10 @@ function fillPatientsTable() {
     });
 
     // Create rows for each room and space
-    for (let roomKey in rooms) {
+    for (let roomKey in window['rooms-station']) {
         for (let spaceKey of ['F', 'T']) {
             // Skip if the space doesn't exist in this room
-            if (!(spaceKey in rooms[roomKey])) continue;
+            if (!(spaceKey in window['rooms-station'][roomKey])) continue;
 
             // Create new row from template
             let row = template.cloneNode(true);
@@ -337,8 +337,8 @@ function getPatientsByRooms() {
     const { current, dismissed, planned } = filterPatients();
 
     // Initialize result with empty arrays for each room-space combination
-    for (let roomKey in rooms) {
-        for (let spaceKey in rooms[roomKey]) {
+    for (let roomKey in window['rooms-station']) {
+        for (let spaceKey in window['rooms-station'][roomKey]) {
             const roomId = `${roomKey}-${spaceKey}`;
             patientsByRooms[roomId] = {
                 current: null,

@@ -64,14 +64,19 @@
     <script src="../../../src/bootstrap/bootstrap.min.js"></script>
     <link href="../../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
 
-    <script src="../../../_DATA/Zimmer.js"></script>
-    <script src="../../../_DATA/Mitarbeiter_innen.js"></script>
-    <script src="../../../_DATA/Belegung.js"></script>
-    <script src="../../../_DATA/Therapiezuordnung.js"></script>
-    <script src="../../../_DATA/Poststationaer.js"></script>
-
+    <script src="../../../src/data-directory.js"></script>
     <script src="../../../src/data-manager.js"></script>
     <script src="../../../src/helpers.js"></script>
+    <script src="../../../src/init.js"></script>
+
+    <script>
+        init('Belegungsplan 7.1', '../../../');
+
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('employees', 'mitarbeiter_innen');
+            await loadData('employees', 'mitarbeiter_innen');
+            window.dispatchEvent(new Event('baseDataLoaded'));
+        });</script>
 </head>
 
 <body>
@@ -219,8 +224,14 @@
     // Update document title with current date
     document.title = document.title + ' - ' + dateStr;
 
-    fillPatientsTable();
-    fillAbsencesTable();
+    // Load Data
+    window.addEventListener('directoryHandleInitialized', async function () {
+        await loadData('rooms-station', 'zimmer-station');
+        await loadData('patients-station', 'belegung-station');
+
+        fillPatientsTable();
+        fillAbsencesTable();
+    });
 </script>
 
 </body>

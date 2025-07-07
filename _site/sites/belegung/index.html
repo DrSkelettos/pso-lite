@@ -305,9 +305,9 @@
         roomSelect.appendChild(emptyRoomOption);
 
         // Add room options
-        for (let roomKey in rooms) {
+        for (let roomKey in window['rooms-station']) {
             for (let space of ['F', 'T']) {
-                if (space in rooms[roomKey]) {
+                if (space in window['rooms-station'][roomKey]) {
                     const option = document.createElement('option');
                     option.value = `${roomKey}-${space}`;
                     option.textContent = `${roomKey}-${space}`;
@@ -518,9 +518,9 @@
         const select = entry.querySelector('.room-select');
 
         // Populate room options
-        for (let roomId in rooms) {
+        for (let roomId in window['rooms-station']) {
             for (let space of ['F', 'T']) {
-                if (space in rooms[roomId]) {
+                if (space in window['rooms-station'][roomId]) {
                     const option = document.createElement('option');
                     option.value = `${roomId}-${space}`;
                     option.textContent = `${roomId}-${space}`;
@@ -705,6 +705,7 @@
 
     // Load Data
     window.addEventListener('directoryHandleInitialized', async function () {
+        await loadData('rooms-station', 'zimmer-station');
         await loadData('patients-station', 'belegung-station');
 
         initializeAddPatientForm();

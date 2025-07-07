@@ -159,9 +159,9 @@
         const select = entry.querySelector('.room-select');
 
         // Populate room options
-        for (let roomId in rooms) {
+        for (let roomId in window['rooms-station']) {
             for (let space of ['F', 'T']) {
-                if (space in rooms[roomId]) {
+                if (space in window['rooms-station'][roomId]) {
                     const option = document.createElement('option');
                     option.value = `${roomId}-${space}`;
                     option.textContent = `${roomId}-${space}`;

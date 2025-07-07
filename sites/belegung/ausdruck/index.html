@@ -150,6 +150,12 @@ title: Belegungsplan 7.1
     // Update document title with current date
     document.title = document.title + ' - ' + dateStr;
 
-    fillPatientsTable();
-    fillAbsencesTable();
+    // Load Data
+    window.addEventListener('directoryHandleInitialized', async function () {
+        await loadData('rooms-station', 'zimmer-station');
+        await loadData('patients-station', 'belegung-station');
+
+        fillPatientsTable();
+        fillAbsencesTable();
+    });
 </script>

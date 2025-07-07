@@ -100,6 +100,7 @@ save_file: belegung-station
 
     // Load Data
     window.addEventListener('directoryHandleInitialized', async function () {
+        await loadData('rooms-station', 'zimmer-station');
         await loadData('patients-station', 'belegung-station');
 
         initializeAddPatientForm();
