@@ -192,3 +192,9 @@ function showIfAuthorized(elementSelector, right) {
 function authorize(right) {
     return window['user']?.['rights']?.[right] ?? false;
 }
+
+
+function formatDateForCalendar(date) {
+    const [day, month, year] = date.split('.').map(Number);
+    return year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+}

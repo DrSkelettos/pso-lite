@@ -30,7 +30,7 @@ function initCalendarDashboard() {
         // Styling
         themeSystem: 'bootstrap5',
 
-        height: 300, // sets the height in pixels
+        height: 'auto', // sets the height in pixels
 
         // Set range to current + next week
         visibleRange: function (currentDate) {
@@ -103,8 +103,8 @@ function updateCalendar() {
 
                         window['calendar'].addEvent({
                             title: title,
-                            start: startDate.toISOString().split('T')[0],
-                            end: endDate.toISOString().split('T')[0],
+                            start: formatDateForCalendar(absence.start),
+                            end: formatDateForCalendar(absence.end),
                             allDay: true,
                             backgroundColor: backgroundColor,
                             borderColor: backgroundColor,
@@ -130,18 +130,14 @@ function updateCalendar() {
 
     // Process each patient
     for (const [id, patient] of Object.entries(patients)) {
+        if(patient.name === '' || patient.name === null || patient.name === undefined || patient.name === 'X') continue;
 
         // AUFNAHME
         if (patient.admission) {
-            // Parse admission date (format: DD.MM.YYYY)
-            const [day, month, year] = patient.admission.split('.').map(Number);
-            const admissionDate = new Date(year, month - 1, day);
-
             const employee = patient.employees[0].employee;
-
             window['calendar'].addEvent({
                 title: `A: ${patient.name || 'Unbekannt'} (${patient.group} / ${employee})`,
-                start: admissionDate.toISOString().split('T')[0],
+                start: formatDateForCalendar(patient.admission),
                 allDay: true,
                 backgroundColor: colors.admission,
                 borderColor: colors.admission,
@@ -154,15 +150,9 @@ function updateCalendar() {
 
         // ENTLASSUNG
         if (patient.discharge) {
-            // Parse admission date (format: DD.MM.YYYY)
-            const [day, month, year] = patient.discharge.split('.').map(Number);
-            const admissionDate = new Date(year, month - 1, day);
-
-            const employee = patient.employees[0].employee;
-
             window['calendar'].addEvent({
                 title: `E: ${patient.name || 'Unbekannt'}`,
-                start: admissionDate.toISOString().split('T')[0],
+                start: formatDateForCalendar(patient.discharge),
                 allDay: true,
                 backgroundColor: colors.discharge,
                 borderColor: colors.discharge,
@@ -174,3 +164,4 @@ function updateCalendar() {
         }
     }
 }
+    

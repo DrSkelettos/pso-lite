@@ -324,6 +324,9 @@ function fillEmployeesTable() {
 
         tbody.appendChild(row);
     }
+    
+    showIfAuthorized('#addEmployeeButton', 'editEmployees');
+    showIfAuthorized('.editEmployeeButton', 'editEmployees');
 }
 
 function deleteEmployee() {
