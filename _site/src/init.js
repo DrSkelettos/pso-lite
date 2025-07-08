@@ -8,9 +8,7 @@ async function init(pageName = null, dir = './') {
     if (pageName === 'Datenauswahl') return;
 
     try {
-        await initDB();
         const savedHandle = await getDirectoryHandle();
-
         if (savedHandle) {
             // Try to use the saved handle without immediately requesting permission
             try {

@@ -1,68 +1,17 @@
-
-// Database name and version
-const DB_NAME = 'DirectoryAccessDB';
-const DB_VERSION = 1;
-const STORE_NAME = 'directoryHandles';
-
-let db;
 let directoryHandle;
-
-// Initialize IndexedDB
-async function initDB() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open(DB_NAME, DB_VERSION);
-
-        request.onerror = (event) => {
-            console.error('Database error:', event.target.error);
-            reject('Database error');
-        };
-
-        request.onsuccess = (event) => {
-            db = event.target.result;
-            resolve(db);
-        };
-
-        request.onupgradeneeded = (event) => {
-            const db = event.target.result;
-            if (!db.objectStoreNames.contains(STORE_NAME)) {
-                db.createObjectStore(STORE_NAME, { keyPath: 'id' });
-            }
-        };
-    });
-}
 
 // Save directory handle to IndexedDB
 async function saveDirectoryHandle(handle) {
-    const transaction = db.transaction([STORE_NAME], 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-
-    // Convert the directory handle to a serializable object
-    const handleData = {
-        id: 'directory',
-        name: handle.name,
-        handle: handle
-    };
-
-    return new Promise((resolve, reject) => {
-        const request = store.put(handleData);
-        request.onsuccess = () => resolve();
-        request.onerror = (event) => {
-            console.error('Error saving directory handle:', event.target.error);
-            reject(event.target.error);
-        };
-    });
+    idbKeyval.set('directory', handle)
+        .then(() => console.log('Saved to IndexedDB'))
+        .catch((err) => console.log('Failed to save to IndexedDB', err));
 }
 
 // Get directory handle from IndexedDB
 async function getDirectoryHandle() {
-    const transaction = db.transaction([STORE_NAME], 'readonly');
-    const store = transaction.objectStore(STORE_NAME);
-
-    return new Promise((resolve) => {
-        const request = store.get('directory');
-        request.onsuccess = () => resolve(request.result?.handle || null);
-        request.onerror = () => resolve(null);
-    });
+    return idbKeyval.get('directory')
+        .then((handle) => handle)
+        .catch((err) => console.log('Failed to get from IndexedDB', err));
 }
 
 // Check if the directory contains a valid info.json
@@ -121,11 +70,6 @@ async function requestDirectory() {
     try {
         // Hide any previous error messages
         document.getElementById('errorMessage').style.display = 'none';
-
-        // Initialize database if not already done
-        if (!db) {
-            await initDB();
-        }
 
         // Request permission to open a directory
         const dirHandle = await window.showDirectoryPicker({
