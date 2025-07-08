@@ -5,6 +5,8 @@ function fillTherapyTable() {
     let group1Count = 0;
     let group2Count = 0;
     let group3Count = 0;
+    let groupACount = 0;
+    let groupBCount = 0;
 
     // Therapy counts
     const therapyCounts = {
@@ -148,15 +150,6 @@ function fillTherapyTable() {
                 therapyCounts[therapy]++;
             }
         });
-
-        // Count group assignments (A/B)
-        if (therapyData.kreativ_einzel) therapyCounts.group_a++;
-        if (therapyData.einzel_physio) therapyCounts.group_b++;
-
-        // Count total if any therapy is active
-        if (Object.values(therapyData).some(value => value === 'X' || value)) {
-            therapyCounts.total++;
-        }
     }
 
     // Get sections
@@ -199,11 +192,14 @@ function fillTherapyTable() {
     });
 
     // Then process existing patients
+    
+    existingPatients.sort((a, b) => (a.group || '').localeCompare(b.group || ''));
     existingPatients.forEach(patient => {
         if (patient.group) {
             const row = createPatientRow(patient);
             row.firstChild.textContent = patientCounter++;
             const groupNum = patient.group.charAt(0);
+            const groupLetter = patient.group.charAt(2);
 
             switch (groupNum) {
                 case '1':
@@ -219,6 +215,12 @@ function fillTherapyTable() {
                     group3Count++;
                     break;
             }
+
+            if (groupLetter == 'A')
+                groupACount++;
+            else if (groupLetter == 'B')
+                groupBCount++;
+
             countPatientTherapies(patient);
         }
     });
@@ -239,7 +241,9 @@ function fillTherapyTable() {
         'new-count': newCount,
         'group1-count': group1Count,
         'group2-count': group2Count,
-        'group3-count': group3Count
+        'group3-count': group3Count,
+        'group-a-count': groupACount,
+        'group-b-count': groupBCount
     };
 
     Object.entries(counts).forEach(([id, count]) => {
@@ -254,9 +258,9 @@ function fillTherapyTable() {
     document.getElementById('num-asst').textContent = therapyCounts.asst;
     document.getElementById('num-skt').textContent = therapyCounts.skt;
     document.getElementById('num-biographiearbeit').textContent = therapyCounts.biographiearbeit;
-    document.getElementById('num-group-a').textContent = therapyCounts.group_a;
-    document.getElementById('num-group-b').textContent = therapyCounts.group_b;
-    document.getElementById('num-total').textContent = therapyCounts.total;
+    document.getElementById('num-group-a').textContent = groupACount;
+    document.getElementById('num-group-b').textContent = groupBCount;
+    document.getElementById('num-total').textContent = groupACount + groupBCount;
 
     // Calculate and update free slots
     document.getElementById('free-at').textContent = document.getElementById('maxNum-at').textContent - therapyCounts.at;
