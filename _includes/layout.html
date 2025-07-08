@@ -42,6 +42,12 @@
             await loadData('employees', 'mitarbeiter_innen');
             await checkLogin('{{ title }}', '{{ dir }}');
             window.dispatchEvent(new Event('baseDataLoaded'));
+
+            showIfAuthorized('#navLinkWorkload', 'workloadStation');
+            showIfAuthorized('#navLinkKosi', 'kosiStation');
+            showIfAuthorized('#navLinkPatientsStation', 'viewPatientsStation');
+            showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
+            showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
         });
     </script>
 </head>
@@ -62,20 +68,20 @@
                         Startseite
                     </a>
                 </li>
-                <li class="nav-item me-2">
+                <li class="nav-item me-2 hidden" id="navLinkPatientsStation">
                     <a class="nav-link {{ active_belegung }}" href="{{ dir }}sites/belegung/index.html">
                         <!-- <i class="bi bi-calendar-date me-1 text-light"></i> -->
                         Belegung
                     </a>
                 </li>
-                <li class="nav-item me-2">
+                <li class="nav-item me-2 hidden" id="navLinkTherapiesStation">
                     <a class="nav-link {{ active_therapiezuordnung }}"
                         href="{{ dir }}sites/therapiezuordnung/index.html">
                         <!-- <i class="bi bi-list-columns me-1 text-light"></i> -->
                         Therapiezuordnung
                     </a>
                 </li>
-                <li class="nav-item me-2">
+                <li class="nav-item me-2 hidden" id="navLinkPoststationaer">
                     <a class="nav-link {{ active_poststationaer }}" href="{{ dir }}sites/poststationaer/index.html">
                         <!-- <i class="bi bi-person-x me-1 text-light"></i> -->
                         Poststationär
@@ -101,13 +107,13 @@
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
                         aria-expanded="false">Mehr</a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
+                        <li id="navLinkWorkload">
                             <a class="dropdown-item" href="{{ dir }}sites/auslastung/index.html">
                                 <i class="bi bi-bar-chart me-1"></i>
                                 Auslastung
                             </a>
                         </li>
-                        <li>
+                        <li id="navLinkKosi">
                             <a class="dropdown-item" href="{{ dir }}sites/kosi/index.html">
                                 <i class="bi bi-coin me-1"></i>
                                 KoSi

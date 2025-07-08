@@ -40,6 +40,12 @@
             await loadData('employees', 'mitarbeiter_innen');
             await checkLogin('Login', '../../');
             window.dispatchEvent(new Event('baseDataLoaded'));
+
+            showIfAuthorized('#navLinkWorkload', 'workloadStation');
+            showIfAuthorized('#navLinkKosi', 'kosiStation');
+            showIfAuthorized('#navLinkPatientsStation', 'viewPatientsStation');
+            showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
+            showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
         });
     </script>
 </head>

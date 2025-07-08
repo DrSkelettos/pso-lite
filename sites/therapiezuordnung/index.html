@@ -151,7 +151,8 @@ save_file: therapiezuordnung-station
 
 
 <div class="text-center mt-4">
-    <button type="button" class="btn btn-outline-primary me-2" onclick="saveData('therapies-station', 'therapiezuordnung-station')">
+    <button type="button" class="btn btn-outline-primary me-2 hidden" id="saveButton"
+        onclick="saveData('therapies-station', 'therapiezuordnung-station')">
         <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
     </button>
     <button type="button" class="btn btn-outline-primary me-2" onclick="window.open('ausdruck/index.html')">
@@ -162,10 +163,12 @@ save_file: therapiezuordnung-station
 {% include "therapiezuordnung/editTherapies.html" %}
 
 <script>
-        window.addEventListener('directoryHandleInitialized', async function () {
-            await loadData('patients-station', 'belegung-station');
-            await loadData('rooms-station', 'zimmer-station');
-            await loadData('therapies-station', 'therapiezuordnung-station');
-            fillTherapyTable();
-        });
+    window.addEventListener('directoryHandleInitialized', async function () {
+        await loadData('patients-station', 'belegung-station');
+        await loadData('rooms-station', 'zimmer-station');
+        await loadData('therapies-station', 'therapiezuordnung-station');
+        fillTherapyTable();
+
+        showIfAuthorized('#saveButton', 'editTherapiesStation');
+    });
 </script>

@@ -69,17 +69,17 @@ save_file: belegung-station
 
 <div class="d-flex justify-content-between align-items-center my-4">
     <div>
-        <button type="button" class="btn btn-outline-primary me-2"
+        <button type="button" id="saveButton" class="btn btn-outline-primary me-2 hidden"
             onclick="saveData('patients-station', 'belegung-station')">
             <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
         </button>
         <a href="{{ dir }}sites/belegung/ausdruck/index.html" class="btn btn-outline-primary me-2">
             <i class="bi bi-printer text-primary me-1"></i> Ausdruck
         </a>
-        <a href="{{ dir }}sites/auslastung/index.html" class="btn btn-outline-primary me-2">
+        <a href="{{ dir }}sites/auslastung/index.html" id="workloadButton" class="btn btn-outline-primary me-2 hidden">
             <i class="bi bi-bar-chart text-primary me-1"></i> Auslastung
         </a>
-        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
+        <button type="button" id="addPatientButton" class="btn btn-outline-primary hidden" data-bs-toggle="modal" data-bs-target="#addPatientModal">
             <i class="bi bi-plus-circle text-primary me-1"></i> Patient:in hinzufügen
         </button>
     </div>
@@ -103,7 +103,11 @@ save_file: belegung-station
         await loadData('rooms-station', 'zimmer-station');
         await loadData('patients-station', 'belegung-station');
 
-        initializeAddPatientForm();
+        if(authorize('editPatientsStation')) initializeAddPatientForm();
         fillPatientsTable();
+
+        showIfAuthorized('#addPatientButton', 'editPatientsStation');
+        showIfAuthorized('#saveButton', 'editPatientsStation');
+        showIfAuthorized('#workloadButton', 'workloadStation');
     });
 </script>

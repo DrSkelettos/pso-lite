@@ -28,7 +28,7 @@ dir: ./
     <div class="row">
 
         <!-- Belegung -->
-        <div class="col">
+        <div class="col hidden" id="dashboardLinkPatientsStation">
             <div class="card text-center cursor-pointer" onclick="window.location.href='sites/belegung/index.html';">
                 <div class="card-header">
                     <i class="bi bi-calendar-date" style="font-size: 5rem;"></i>
@@ -41,7 +41,7 @@ dir: ./
         </div>
 
         <!-- Therapiezuordnung -->
-        <div class="col">
+        <div class="col hidden" id="dashboardLinkTherapiesStation">
             <div class="card text-center cursor-pointer"
                 onclick="window.location.href='sites/therapiezuordnung/index.html';">
                 <div class="card-header">
@@ -71,7 +71,7 @@ dir: ./
 
 
     <!-- KOSTENSICHERUNG -->
-    <div class="card mt-5 cursor-pointer" onclick="window.location.href='sites/kosi/index.html';">
+    <div class="card mt-5 cursor-pointer hidden" id="dashboardLinkKosiStation" onclick="window.location.href='sites/kosi/index.html';">
         <div class="card-header">
             <h4 class="card-title mb-0">Kostensicherung</h4>
         </div>
@@ -110,6 +110,11 @@ dir: ./
         updateKosiCounts();
         initCalendarDashboard();
         updateCalendar();
+
+        
+        showIfAuthorized('#dashboardLinkPatientsStation', 'viewPatientsStation');
+        showIfAuthorized('#dashboardLinkTherapiesStation', 'viewTherapiesStation');
+        showIfAuthorized('#dashboardLinkKosiStation', 'kosiStation');
 
         if (window['user'].needsToChangePassword) {
             document.getElementById('passwordChangeAlert').classList.remove('hidden');

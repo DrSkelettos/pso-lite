@@ -74,15 +74,20 @@ function fillPatientData(row, patient) {
     const nameContainer = document.createElement('div');
 
     // Add name as clickable link
-    const nameLink = document.createElement('a');
-    nameLink.href = '#';
-    nameLink.textContent = patient.name || '';
-    nameLink.classList.add('text-decoration-none');
-    nameLink.onclick = (e) => {
-        e.preventDefault();
-        editPatient(patient.id);
-    };
-    nameContainer.appendChild(nameLink);
+    if (authorize('editPatientsStation')) {
+        const nameLink = document.createElement('a');
+        nameLink.href = '#';
+        nameLink.textContent = patient.name || '';
+        nameLink.classList.add('text-decoration-none');
+        nameLink.onclick = (e) => {
+            e.preventDefault();
+            editPatient(patient.id);
+        };
+        nameContainer.appendChild(nameLink);
+    }
+    else {
+        nameContainer.textContent = patient.name || '';
+    }
 
     // Check for future room assignments
     if (patient.rooms && patient.rooms.length > 1) {
@@ -115,16 +120,21 @@ function fillPatientData(row, patient) {
 
     // Make discharge date clickable if present
     if (patient.discharge) {
-        const dischargeLink = document.createElement('a');
-        dischargeLink.href = '#';
-        dischargeLink.textContent = patient.discharge;
-        dischargeLink.classList.add('text-decoration-none');
-        dischargeLink.onclick = (e) => {
-            e.preventDefault();
-            preFillAddPatientModal(patient);
-        };
-        cells.discharge.innerHTML = '';
-        cells.discharge.appendChild(dischargeLink);
+        if (authorize('editPatientsStation')) {
+            const dischargeLink = document.createElement('a');
+            dischargeLink.href = '#';
+            dischargeLink.textContent = patient.discharge;
+            dischargeLink.classList.add('text-decoration-none');
+            dischargeLink.onclick = (e) => {
+                e.preventDefault();
+                preFillAddPatientModal(patient);
+            };
+            cells.discharge.innerHTML = '';
+            cells.discharge.appendChild(dischargeLink);
+        }
+        else {
+            cells.discharge.textContent = patient.discharge;
+        }
     } else {
         cells.discharge.textContent = '';
     }
@@ -132,7 +142,7 @@ function fillPatientData(row, patient) {
     // Show discharge mode
     if (patient.discharge_mode)
         cells.discharge_mode.textContent = patient.discharge_mode;
-    
+
     // Fill in employee data
     if (patient.employees && patient.employees.length > 0) {
         cells.employee1.textContent = patient.employees[0].employee;
@@ -153,7 +163,7 @@ function fillPatientData(row, patient) {
 
         cells.misc.textContent = miscContent.join(' | ');
     }
-    
+
     // Add bold class for dates in current week
     if (isDateInCurrentWeek(patient.admission)) {
         cells.admission.classList.add('fw-bold');
@@ -176,16 +186,21 @@ function fillPlannedPatientData(row, patient) {
     };
 
     // Fill in the planned data
-    const nameLink = document.createElement('a');
-    nameLink.href = '#';
-    nameLink.textContent = patient.name || '';
-    nameLink.classList.add('text-decoration-none');
-    nameLink.onclick = (e) => {
-        e.preventDefault();
-        editPatient(patient.id);
-    };
-    cells.name.innerHTML = '';
-    cells.name.appendChild(nameLink);
+    if (authorize('editPatientsStation')) {
+        const nameLink = document.createElement('a');
+        nameLink.href = '#';
+        nameLink.textContent = patient.name || '';
+        nameLink.classList.add('text-decoration-none');
+        nameLink.onclick = (e) => {
+            e.preventDefault();
+            editPatient(patient.id);
+        };
+        cells.name.innerHTML = '';
+        cells.name.appendChild(nameLink);
+    }
+    else {
+        cells.name.textContent = patient.name || '';
+    }
 
     cells.group.textContent = patient.group || '';
     cells.admission.textContent = patient.admission || '';
@@ -213,7 +228,7 @@ function fillPlannedPatientData(row, patient) {
         // If there are no employees but misc is present
         cells.misc.textContent = patient.misc;
     }
-    
+
     // Add bold class for admission date in current week
     if (isDateInCurrentWeek(patient.admission)) {
         cells.admission.classList.add('fw-bold');

@@ -43,8 +43,10 @@ function fillTherapyTable() {
     function createPatientRow(patient) {
         const row = document.createElement('tr');
         row.className = 'text-center';
-        row.style.cursor = 'pointer';
-        row.onclick = () => editTherapies(patient.id);
+        if (authorize('editTherapiesStation')) {
+            row.style.cursor = 'pointer';
+            row.onclick = () => editTherapies(patient.id);
+        }
 
         // Counter (will be set later)
         const tdCounter = document.createElement('td');

@@ -70,6 +70,7 @@ function editEmployee(empKey) {
     document.getElementById('editEmployeeRightsViewTherapiesStation').checked = employee.rights?.viewTherapiesStation || false;
     document.getElementById('editEmployeeRightsEditTherapiesStation').checked = employee.rights?.editTherapiesStation || false;
     document.getElementById('editEmployeeRightsKosiStation').checked = employee.rights?.kosiStation || false;
+    document.getElementById('editEmployeeRightsWorkloadStation').checked = employee.rights?.workloadStation || false;
     document.getElementById('editEmployeeRightsEditEmployees').checked = employee.rights?.editEmployees || false;
 
     const patientsInput = document.getElementById('editEmployeePatients');
@@ -174,6 +175,7 @@ async function saveEmployeeEdit() {
     rights.editPatientsStation = document.getElementById('editEmployeeRightsEditPatientsStation').checked;
     rights.viewTherapiesStation = document.getElementById('editEmployeeRightsViewTherapiesStation').checked;
     rights.editTherapiesStation = document.getElementById('editEmployeeRightsEditTherapiesStation').checked;
+    rights.workloadStation = document.getElementById('editEmployeeRightsWorkloadStation').checked;
     rights.kosiStation = document.getElementById('editEmployeeRightsKosiStation').checked;
 
     // Get all absences
