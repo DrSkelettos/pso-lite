@@ -63,10 +63,10 @@ title: Belegungsplan 7.1
     <thead class="table-light">
         <tr class="text-center">
             <th width="30">Zi.</th>
-            <th width="200" class="text-start">Patient:in</th>
+            <th width="150" class="text-start">Patient:in</th>
             <th width="30">Gr.</th>
             <th width="50">Therap.</th>
-            <th width="50">Vertr.</th>
+            <th width="80">Vertr./Bem.</th>
             <th width="75">Aufnahme</th>
             <th width="30">Wo.</th>
             <th width="75">Entlassung</th>
@@ -74,7 +74,7 @@ title: Belegungsplan 7.1
             <th width="150">Geplant</th>
             <th width="30">Gr.</th>
             <th width="50">Therap.</th>
-            <th>Bemerkung</th>
+            <th width="170">Bemerkung</th>
             <th width="75">Aufnahme</th>
         </tr>
     </thead>
@@ -144,9 +144,6 @@ title: Belegungsplan 7.1
     currentDate.textContent = `${dateStr}`;
     currentWeek.textContent = getCalendarWeek(today);
 
-    // Get current patients count
-    currentPatientCount.textContent = Object.keys(filterPatients().current).length;
-
     // Update document title with current date
     document.title = document.title + ' - ' + dateStr;
 
@@ -157,5 +154,9 @@ title: Belegungsplan 7.1
 
         fillPatientsTable();
         fillAbsencesTable();
+
+
+        // Get current patients count
+        currentPatientCount.textContent = Object.keys(filterPatients().current).length;
     });
 </script>
