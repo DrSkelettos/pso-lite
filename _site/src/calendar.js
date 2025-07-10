@@ -1,3 +1,44 @@
+
+const eventMouseEnter = function (info) {
+    const eventId = info.event.id;
+    if (eventId.startsWith('event_') && !info.event.allDay) {
+        const event = info.event;
+        const startStr = event.start.toLocaleTimeString('de-DE', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        const endStr = event.end ? event.end.toLocaleTimeString('de-DE', {
+            hour: '2-digit',
+            minute: '2-digit'
+        }) : '';
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'event-tooltip';
+        tooltip.innerHTML = `
+            <div class="tooltip-arrow"></div>
+            <div class="tooltip-inner">
+                ${startStr} - ${endStr || 'Kein Ende'}
+            </div>
+        `;
+
+        document.body.appendChild(tooltip);
+
+        const rect = info.el.getBoundingClientRect();
+        tooltip.style.top = `${rect.top - tooltip.offsetHeight - 10}px`;
+        tooltip.style.left = `${rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2)}px`;
+        info.el._tooltip = tooltip;
+    }
+};
+
+const eventMouseLeave = function (info) {
+    const eventId = info.event.id;
+    if (eventId.startsWith('event_') && info.el._tooltip) {
+        document.body.removeChild(info.el._tooltip);
+        info.el._tooltip = null;
+    }
+};
+
+
 function initCalendarDashboard() {
     var calendarEl = document.getElementById('calendar');
     window['calendar'] = new FullCalendar.Calendar(calendarEl, {
@@ -38,6 +79,9 @@ function initCalendarDashboard() {
             const end = start.clone().add(2, 'weeks');
             return { start: start, end: end };
         },
+
+        eventMouseEnter: eventMouseEnter,
+        eventMouseLeave: eventMouseLeave,
     });
     calendar.render();
 };
@@ -79,44 +123,8 @@ function initCalendar() {
             }
         },
 
-        eventMouseEnter: function (info) {
-            const eventId = info.event.id;
-            if (eventId.startsWith('event_') && !info.event.allDay) {
-                const event = info.event;
-                const startStr = event.start.toLocaleTimeString('de-DE', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
-                const endStr = event.end ? event.end.toLocaleTimeString('de-DE', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                }) : '';
-                
-                const tooltip = document.createElement('div');
-                tooltip.className = 'event-tooltip';
-                tooltip.innerHTML = `
-                    <div class="tooltip-arrow"></div>
-                    <div class="tooltip-inner">
-                        ${startStr} - ${endStr || 'Kein Ende'}
-                    </div>
-                `;
-                
-                document.body.appendChild(tooltip);
-                
-                const rect = info.el.getBoundingClientRect();
-                tooltip.style.top = `${rect.top - tooltip.offsetHeight - 10}px`;
-                tooltip.style.left = `${rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2)}px`;
-                info.el._tooltip = tooltip;
-            }
-        },
-
-        eventMouseLeave: function (info) {
-            const eventId = info.event.id;
-            if (eventId.startsWith('event_') && info.el._tooltip) {
-                document.body.removeChild(info.el._tooltip);
-                info.el._tooltip = null;
-            }
-        },
+        eventMouseEnter: eventMouseEnter,
+        eventMouseLeave: eventMouseLeave,
     });
     calendar.render();
 
