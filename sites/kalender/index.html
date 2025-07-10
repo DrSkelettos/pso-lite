@@ -1,0 +1,25 @@
+---
+layout: layout.html
+active_calendar: active
+title: Kalender
+include_navigation: true
+dir: ../../
+save_data: events
+save_file: termine
+---
+
+<script src="{{ dir }}src/fullcalendar/index.global.min.js"></script>
+<script src="{{ dir }}src/calendar.js"></script>
+
+<!-- Kalender -->
+<div id="calendar" style="min-height: 600px;">
+</div>
+
+<script>
+    window.addEventListener('baseDataLoaded', async function () {
+        await loadData('patients-station', 'belegung-station');
+        await loadData('events', 'termine');
+        initCalendar();
+        updateCalendar();
+    });
+</script>

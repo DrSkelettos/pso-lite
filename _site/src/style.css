@@ -64,3 +64,16 @@ tr.no-hover:hover {
     --bs-btn-padding-x: .5rem !important;
     --bs-btn-font-size: .75rem !important;
 }
+
+.fc .fc-daygrid-day.fc-day-today {
+   --fc-today-bg-color: #fae6e3 !important;
+}
+
+#calendar a {
+    color: var(--bs-card-title-color) !important;
+    text-decoration: none !important;
+}
+
+#calendar .absence-event {
+    opacity: 0.75;
+}

@@ -42,6 +42,35 @@ function initCalendarDashboard() {
     calendar.render();
 };
 
+function initCalendar() {
+    var calendarEl = document.getElementById('calendar');
+    window['calendar'] = new FullCalendar.Calendar(calendarEl, {
+        // View setup
+        initialView: 'dayGridMonth',
+
+        // Start weeks on Monday
+        firstDay: 1,
+        weekends: false,
+
+        // Show week numbers
+        weekNumbers: true,
+        weekNumberContent: function (arg) {
+            return { html: 'KW ' + arg.num };
+        },
+        // Localization
+        locale: 'de',
+
+        // Styling
+        themeSystem: 'bootstrap5',
+        height: 'auto',
+        buttonText: {
+            today: 'Heute',
+        }
+    });
+    calendar.render();
+};
+
+
 const colors = {
     admission: '#ffc107',
     admission_text: '#000',
@@ -130,7 +159,7 @@ function updateCalendar() {
 
     // Process each patient
     for (const [id, patient] of Object.entries(patients)) {
-        if(patient.name === '' || patient.name === null || patient.name === undefined || patient.name === 'X') continue;
+        if (patient.name === '' || patient.name === null || patient.name === undefined || patient.name === 'X') continue;
 
         // AUFNAHME
         if (patient.admission) {
@@ -164,4 +193,3 @@ function updateCalendar() {
         }
     }
 }
-    
