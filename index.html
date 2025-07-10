@@ -107,6 +107,7 @@ dir: ./
     window.addEventListener('baseDataLoaded', async function () {
         await loadData('patients-station', 'belegung-station');
         await loadData('kosi-station', 'kostensicherung-station');
+        await loadData('events', 'termine');
         updateKosiCounts();
         initCalendarDashboard();
         updateCalendar();

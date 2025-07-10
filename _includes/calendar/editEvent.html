@@ -1,0 +1,187 @@
+<!-- Edit Event Modal -->
+<div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editEventModalLabel">Termin bearbeiten</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editEventForm">
+                    <input type="hidden" id="editEventId">
+                    <div class="mb-3">
+                        <label for="editEventTitle" class="form-label">Titel</label>
+                        <input type="text" class="form-control" id="editEventTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEventColor" class="form-label">Farbe</label>
+                        <select class="form-select" id="editEventColor">
+                            <option value="blue">Blau</option>
+                            <option value="indigo">Violett</option>
+                            <option value="purple">Lila</option>
+                            <option value="pink">Pink</option>
+                            <option value="red">Rot</option>
+                            <option value="orange">Orange</option>
+                            <option value="yellow">Gelb</option>
+                            <option value="green">Grün</option>
+                            <option value="teal">Türkis</option>
+                            <option value="cyan">Cyan</option>
+                            <option value="black">Schwarz</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEventAllDay" class="form-label">Dauer</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="editEventAllDay">
+                            <label class="form-check-label" for="editEventAllDay">
+                                Ganztägig
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEventBegin" class="form-label">Beginn</label>
+                        <input type="datetime-local" class="form-control" id="editEventBegin" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEventEnd" class="form-label">Ende</label>
+                        <input type="datetime-local" class="form-control" id="editEventEnd" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-danger me-auto" id="btnDeleteEvent">
+                    <i class="bi bi-trash text-danger"></i> Löschen
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" id="btnSaveEvent">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentEventId = null;
+    const editEventModal = new bootstrap.Modal(document.getElementById('editEventModal'));
+
+    // Initialize event listeners when the document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle all-day checkbox change
+        document.getElementById('editEventAllDay').addEventListener('change', function (e) {
+            const beginInput = document.getElementById('editEventBegin');
+            const endInput = document.getElementById('editEventEnd');
+            
+            if (e.target.checked) {
+                // If switching to all-day, convert to date-only format
+                beginInput.type = 'date';
+                endInput.type = 'date';
+            } else {
+                // If switching to timed event, convert to datetime-local
+                beginInput.type = 'datetime-local';
+                endInput.type = 'datetime-local';
+            }
+        });
+
+        // Update end date when begin date changes
+        document.getElementById('editEventBegin').addEventListener('change', function (e) {
+            const endInput = document.getElementById('editEventEnd');
+            const beginValue = e.target.value;
+            const endValue = endInput.value;
+
+            // If end is not set or begin is after end, update end to match begin
+            if (!endValue || new Date(beginValue) > new Date(endValue)) {
+                endInput.value = beginValue;
+            }
+        });
+
+        // Handle form submission
+        document.getElementById('btnSaveEvent').addEventListener('click', saveEvent);
+
+        // Handle delete button click
+        document.getElementById('btnDeleteEvent').addEventListener('click', deleteEvent);
+    });
+
+    // Function to open the edit modal with event data
+    function openEditEvent(eventId) {
+        currentEventId = eventId;
+        const event = window['events'][eventId];
+        
+        if (!event) {
+            console.error('Event not found:', eventId);
+            return;
+        }
+
+        // Populate form fields
+        document.getElementById('editEventTitle').value = event.title || '';
+        document.getElementById('editEventColor').value = event.color || 'primary';
+        document.getElementById('editEventAllDay').checked = event.allDay || false;
+        
+        // Set input types based on allDay status
+        const beginInput = document.getElementById('editEventBegin');
+        const endInput = document.getElementById('editEventEnd');
+        
+        if (event.allDay) {
+            beginInput.type = 'date';
+            endInput.type = 'date';
+        } else {
+            beginInput.type = 'datetime-local';
+            endInput.type = 'datetime-local';
+        }
+        
+        // Set date values
+        beginInput.value = event.start || '';
+        endInput.value = event.end || event.start || '';
+        
+        // Show the modal
+        editEventModal.show();
+    }
+
+    // Function to save the edited event
+    function saveEvent() {
+        const form = document.getElementById('editEventForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const eventId = currentEventId || 'event_' + Date.now();
+        const title = document.getElementById('editEventTitle').value;
+        const color = document.getElementById('editEventColor').value;
+        const allDay = document.getElementById('editEventAllDay').checked;
+        const beginDate = document.getElementById('editEventBegin').value;
+        const endDate = document.getElementById('editEventEnd').value;
+
+        // Update the event in the events object
+        window['events'][eventId] = {
+            id: eventId,
+            title: title,
+            start: beginDate,
+            end: endDate,
+            allDay: allDay,
+            color: color
+        };
+
+        // Close the modal
+        editEventModal.hide();
+
+        // Refresh the calendar
+        checkData();
+        updateCalendar();
+    }
+
+    // Function to delete the current event
+    function deleteEvent() {
+        if (!currentEventId || !confirm('Möchten Sie diesen Termin wirklich löschen?')) {
+            return;
+        }
+
+        // Remove the event from the events object
+        delete window['events'][currentEventId];
+        
+        // Close the modal
+        editEventModal.hide();
+        
+        // Refresh the calendar
+        checkData();
+        updateCalendar();
+    }
+</script>

@@ -15,6 +15,9 @@ save_file: termine
 <div id="calendar" class="monthCalendar" style="min-height: 600px;">
 </div>
 
+{% include "calendar/addEvent.html" %}
+{% include "calendar/editEvent.html" %}
+
 <script>
     window.addEventListener('baseDataLoaded', async function () {
         await loadData('patients-station', 'belegung-station');

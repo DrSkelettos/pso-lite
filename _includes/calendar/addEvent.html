@@ -1,0 +1,130 @@
+<!-- Add Event Modal -->
+<div class="modal fade" id="addEventModal" tabindex="-1" aria-labelledby="addEventModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addEventModalLabel">Neuen Termin hinzufügen</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addEventForm">
+                    <div class="mb-3">
+                        <label for="eventTitle" class="form-label">Titel</label>
+                        <input type="text" class="form-control" id="eventTitle" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventColor" class="form-label">Farbe</label>
+                        <select class="form-select" id="eventColor">
+                            <option value="blue">Blau</option>
+                            <option value="indigo">Violett</option>
+                            <option value="purple">Lila</option>
+                            <option value="pink">Pink</option>
+                            <option value="red">Rot</option>
+                            <option value="orange">Orange</option>
+                            <option value="yellow">Gelb</option>
+                            <option value="green">Grün</option>
+                            <option value="teal">Türkis</option>
+                            <option value="cyan">Cyan</option>
+                            <option value="black">Schwarz</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventAllDay" class="form-label">Dauer</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="eventAllDay" checked>
+                            <label class="form-check-label" for="eventAllDay">
+                                Ganztägig
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventBegin" class="form-label">Beginn</label>
+                        <input type="date" class="form-control" id="eventBegin" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="eventEnd" class="form-label">Ende</label>
+                        <input type="date" class="form-control" id="eventEnd" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="addEvent()">Speichern</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Change input types based on all-day checkbox
+    document.getElementById('eventAllDay').addEventListener('change', function (e) {
+        const beginInput = document.getElementById('eventBegin');
+        const endInput = document.getElementById('eventEnd');
+        if (e.target.checked) {
+            beginInput.type = 'date';
+            endInput.type = 'date';
+        } else {
+            beginInput.type = 'datetime-local';
+            endInput.type = 'datetime-local';
+        }
+    });
+
+    // Update end date when begin date changes
+    document.getElementById('eventBegin').addEventListener('change', function (e) {
+        const endInput = document.getElementById('eventEnd');
+        const beginValue = e.target.value;
+        const endValue = endInput.value;
+
+        // If end is not set or begin is after end, update end to match begin
+        if (!endValue || new Date(beginValue) > new Date(endValue)) {
+            endInput.value = beginValue;
+        }
+    });
+
+    // Handle Enter key press in form inputs
+    document.getElementById('addEventForm').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            addEvent();
+        }
+    });
+
+    // Reset form when modal is hidden
+    document.getElementById('addEventModal').addEventListener('hidden.bs.modal', function () {
+        document.getElementById('addEventForm').reset();
+    });
+
+    function addEvent() {
+        const form = document.getElementById('addEventForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const title = document.getElementById('eventTitle').value;
+        const color = document.getElementById('eventColor').value;
+        const allDay = document.getElementById('eventAllDay').checked;
+        const beginDate = document.getElementById('eventBegin').value;
+        const endDate = document.getElementById('eventEnd').value;
+
+        // Generate a unique ID for the new event
+        const eventId = 'event_' + Date.now();
+        
+        // Add the event to the events object with the generated ID as key
+        window['events'][eventId] = {
+            id: eventId,
+            title: title,
+            start: beginDate,
+            end: endDate,
+            allDay: allDay,
+            color: color
+        };
+
+        // Close modal
+        bootstrap.Modal.getInstance(document.getElementById('addEventModal')).hide();
+
+        // Refresh calendar
+        checkData();
+        updateCalendar();
+    }
+</script>

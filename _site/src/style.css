@@ -67,6 +67,7 @@ tr.no-hover:hover {
 
 .fc .fc-daygrid-day.fc-day-today {
    --fc-today-bg-color: #fae6e3 !important;
+   font-weight: bold !important;
 }
 
 #calendar a {
@@ -90,4 +91,55 @@ tr.no-hover:hover {
     --fc-button-hover-text-color: #fff !important;
     --fc-button-hover-bg-color: #424649 !important;
     --fc-button-hover-border-color: #373b3e !important;
+}
+
+/* Event Tooltip Styles */
+.event-tooltip {
+    position: fixed;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    animation: tooltipFadeIn 0.2s ease-in-out forwards;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+    background-color: #333;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+@keyframes tooltipFadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tooltip-arrow {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid #333;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.tooltip-inner {
+    background-color: #333;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Make sure tooltip appears above other elements */
+.fc-event {
+    position: relative;
+    z-index: 1;
 }
