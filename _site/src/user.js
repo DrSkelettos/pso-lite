@@ -10,7 +10,7 @@ async function hashPassword(password) {
 
 // Login
 async function login() {
-    const username = document.getElementById('username').value;
+    const username = document.getElementById('username').value.toUpperCase();
     const password = document.getElementById('password').value;
     const passwordHash = await hashPassword(password);
 
