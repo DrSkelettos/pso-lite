@@ -146,12 +146,19 @@ function fillTherapyTable() {
     function countPatientTherapies(patient) {
         const therapyData = window['therapies-station'][patient.id] || {};
 
+        const groupLetter = patient.group?.charAt(2);
+        if (groupLetter == 'A')
+            groupACount++;
+        else if (groupLetter == 'B')
+            groupBCount++;
+
         // Count standard therapies
         ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'].forEach(therapy => {
             if (therapyData[therapy] === 'X') {
                 therapyCounts[therapy]++;
             }
         });
+
     }
 
     // Get sections
@@ -194,14 +201,13 @@ function fillTherapyTable() {
     });
 
     // Then process existing patients
-    
+
     existingPatients.sort((a, b) => (a.group || '').localeCompare(b.group || ''));
     existingPatients.forEach(patient => {
         if (patient.group) {
             const row = createPatientRow(patient);
             row.firstChild.textContent = patientCounter++;
             const groupNum = patient.group.charAt(0);
-            const groupLetter = patient.group.charAt(2);
 
             switch (groupNum) {
                 case '1':
@@ -217,11 +223,6 @@ function fillTherapyTable() {
                     group3Count++;
                     break;
             }
-
-            if (groupLetter == 'A')
-                groupACount++;
-            else if (groupLetter == 'B')
-                groupBCount++;
 
             countPatientTherapies(patient);
         }
