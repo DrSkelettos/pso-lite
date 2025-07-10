@@ -74,6 +74,20 @@ tr.no-hover:hover {
     text-decoration: none !important;
 }
 
+#calendar thead th {
+    font-weight: 700 !important;
+    background-color: var(--fc-button-bg-color) !important;
+    color: var(--fc-button-text-color) !important;
+}
 #calendar .absence-event {
     opacity: 0.75;
+}
+
+.fc {
+    --fc-button-text-color: #fff !important;
+    --fc-button-bg-color: #212529 !important;
+    --fc-button-border-color: #212529 !important;
+    --fc-button-hover-text-color: #fff !important;
+    --fc-button-hover-bg-color: #424649 !important;
+    --fc-button-hover-border-color: #373b3e !important;
 }
