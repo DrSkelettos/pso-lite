@@ -86,6 +86,8 @@
 
         // Add employee options
         for (let empKey in window['employees']) {
+            if(window['employees'][empKey].maxPatients === '-1') continue;
+            
             const option = document.createElement('option');
             option.value = empKey;
             option.textContent = empKey;

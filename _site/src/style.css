@@ -37,9 +37,12 @@
 }
 
 .table-text-vertical th {
-    writing-mode: vertical-lr; /* Dreht den Text von unten nach oben */
-    text-align: left; /* Zentriert den Text horizontal */
-    vertical-align: middle; /* Zentriert den Text vertikal */
+    writing-mode: vertical-lr;
+    /* Dreht den Text von unten nach oben */
+    text-align: left;
+    /* Zentriert den Text horizontal */
+    vertical-align: middle;
+    /* Zentriert den Text vertikal */
     transform: rotate(180deg);
 }
 
@@ -47,10 +50,17 @@ tr.no-hover:hover {
     --bs-table-hover-bg: transparent !important;
 }
 
-.form-check-input, .form-check-label {
+.form-check-input,
+.form-check-label {
     cursor: pointer !important;
 }
 
 .hidden {
     display: none !important;
+}
+
+.btn-xs {
+    --bs-btn-padding-y: .25rem !important;
+    --bs-btn-padding-x: .5rem !important;
+    --bs-btn-font-size: .75rem !important;
 }

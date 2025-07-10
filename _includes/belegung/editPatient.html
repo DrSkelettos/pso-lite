@@ -16,23 +16,24 @@
                     </div>
                     <!-- Zimmer -->
                     <div class="mb-3">
-                        <label class="form-label">Zimmer</label>
+                        <label class="form-label">
+                            Zimmer
+                            <a href="javascript:void(0);" class="fw-normal" onclick="addRoomEntry()">hinzufügen</a>
+                        </label>
                         <div id="editRoomsList" class="list-group mb-2">
                             <!-- Room entries will be added here dynamically -->
                         </div>
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addRoomEntry()">
-                            <i class="bi bi-plus-circle text-primary"></i> Zimmer hinzufügen
-                        </button>
+
                     </div>
                     <!-- Therapeut:innen -->
                     <div class="mb-3">
-                        <label class="form-label">Therapeut:innen</label>
+                        <label class="form-label">
+                            Therapeut:innen
+                            <a href="javascript:void(0);" class="fw-normal" onclick="addEmployeeEntry()">hinzufügen</a>
+                        </label>
                         <div id="editEmployeesList" class="list-group mb-2">
                             <!-- Employee entries will be added here dynamically -->
                         </div>
-                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="addEmployeeEntry()">
-                            <i class="bi bi-plus-circle text-primary"></i> Therapeut:in hinzufügen
-                        </button>
                     </div>
                     <!-- Gruppe -->
                     <div class="mb-3">
@@ -129,10 +130,10 @@
 
 <script>
     // Handle Enter key press in form inputs
-    document.getElementById('editPatientForm').addEventListener('keydown', function(e) {
+    document.getElementById('editPatientForm').addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
-            e.preventDefault(); 
-            saveEditPatient(); 
+            e.preventDefault();
+            saveEditPatient();
         }
     });
 
@@ -142,7 +143,9 @@
         const select = entry.querySelector('.employee-select');
 
         // Populate employee options
-        for (let id in employees) {
+        for (let id in window['employees']) {
+            if (window['employees'][id].maxPatients === '-1') continue;
+
             const option = document.createElement('option');
             option.value = id;
             option.textContent = id;
@@ -235,17 +238,17 @@
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('editPatientModal'));
         modal.show();
-        
+
         // Add event listener to admission date input to update first room and employee start dates
-        document.getElementById('editPatientAdmission').addEventListener('change', function() {
+        document.getElementById('editPatientAdmission').addEventListener('change', function () {
             const newAdmissionDate = this.value;
-            
+
             // Update first employee's start date if exists
             const employeeEntries = document.querySelectorAll('#editEmployeesList .list-group-item');
             if (employeeEntries.length > 0) {
                 employeeEntries[0].querySelector('.start-date').value = newAdmissionDate;
             }
-            
+
             // Update first room's start date if exists
             const roomEntries = document.querySelectorAll('#editRoomsList .list-group-item');
             if (roomEntries.length > 0) {
