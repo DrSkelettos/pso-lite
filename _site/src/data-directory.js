@@ -75,18 +75,20 @@ async function requestDirectory() {
         const dirHandle = await window.showDirectoryPicker({
             mode: 'readwrite',
             id: 'pso-data-dir',
-            startIn: 'documents'
+            startIn: 'desktop'
         });
 
         // Verify permission
         if (await verifyPermission(dirHandle, true)) {
+            document.getElementById('loadingOverlay').classList.remove('d-none');
+
             // Validate the directory contents
             const validation = await validateDirectory(dirHandle);
 
             if (validation.valid) {
                 directoryHandle = dirHandle;
                 await saveDirectoryHandle(dirHandle);
-                location.href = "../../index.html";
+                window.setTimeout(() => location.href = "../../index.html", 1000);
                 return true;
             } else {
                 showError(validation.message);
@@ -94,6 +96,7 @@ async function requestDirectory() {
             }
         }
     } catch (error) {
+        document.getElementById('loadingOverlay').classList.add('d-none');
         console.error('Error accessing directory:', error);
         showError('Fehler beim Zugriff auf das Verzeichnis: ' + error.message);
     }
