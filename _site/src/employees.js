@@ -71,6 +71,7 @@ function editEmployee(empKey) {
     document.getElementById('editEmployeeRightsEditTherapiesStation').checked = employee.rights?.editTherapiesStation || false;
     document.getElementById('editEmployeeRightsKosiStation').checked = employee.rights?.kosiStation || false;
     document.getElementById('editEmployeeRightsWorkloadStation').checked = employee.rights?.workloadStation || false;
+    document.getElementById('editEmployeeRightsEditEvents').checked = employee.rights?.editEvents || false;
     document.getElementById('editEmployeeRightsEditEmployees').checked = employee.rights?.editEmployees || false;
 
     const patientsInput = document.getElementById('editEmployeePatients');
@@ -170,13 +171,14 @@ async function saveEmployeeEdit() {
     const patients = parseInt(document.getElementById('editEmployeePatients').value) || 0;
 
     const rights = {};
-    rights.editEmployees = document.getElementById('editEmployeeRightsEditEmployees').checked;
     rights.viewPatientsStation = document.getElementById('editEmployeeRightsViewPatientsStation').checked;
     rights.editPatientsStation = document.getElementById('editEmployeeRightsEditPatientsStation').checked;
     rights.viewTherapiesStation = document.getElementById('editEmployeeRightsViewTherapiesStation').checked;
     rights.editTherapiesStation = document.getElementById('editEmployeeRightsEditTherapiesStation').checked;
     rights.workloadStation = document.getElementById('editEmployeeRightsWorkloadStation').checked;
     rights.kosiStation = document.getElementById('editEmployeeRightsKosiStation').checked;
+    rights.editEvents = document.getElementById('editEmployeeRightsEditEvents').checked;
+    rights.editEmployees = document.getElementById('editEmployeeRightsEditEmployees').checked;
 
     // Get all absences
     const absencesList = document.getElementById('absences');
@@ -306,7 +308,7 @@ function fillEmployeesTable() {
                 } else {
                     badgeClass = 'bg-danger';
                 }
-                
+
                 badge.className = `badge ${badgeClass} me-1`;
                 badge.textContent = formatAbsenceDates(absence.start, absence.end);
                 absencesCell.appendChild(badge);
@@ -326,7 +328,7 @@ function fillEmployeesTable() {
 
         tbody.appendChild(row);
     }
-    
+
     showIfAuthorized('#addEmployeeButton', 'editEmployees');
     showIfAuthorized('.editEmployeeButton', 'editEmployees');
 }
