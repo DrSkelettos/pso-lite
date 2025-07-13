@@ -231,10 +231,10 @@ function addPatientToEditRoundsTable(patient, index, table) {
     const activeEmployees = getActiveEmployees(patient, germanDateStr);
     empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
     
-    // Termine cell (empty for now)
+    // Termine cell with events
     const termineCell = row.insertCell();
     termineCell.classList.add('text-center');
-    termineCell.textContent = '';
+    termineCell.textContent = getPatientEvents(patient, germanDateStr);
 
     // Group cell
     const groupCell = row.insertCell();
@@ -551,10 +551,10 @@ function populateRoundsTable(rounds) {
             const activeEmployees = getActiveEmployees(patient, rounds.date);
             empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
             
-            // Termine cell (empty for now)
+            // Termine cell with events
             const termineCell = row.insertCell();
             termineCell.classList.add('text-center');
-            termineCell.textContent = '';
+            termineCell.textContent = getPatientEvents(patient, rounds.date);
 
             // Group cell
             const groupCell = row.insertCell();
@@ -604,10 +604,10 @@ function populateRoundsTable(rounds) {
         const activeEmployees = getActiveEmployees(patient, rounds.date);
         empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
         
-        // Termine cell (empty for now)
+        // Termine cell with events
         const termineCell = row.insertCell();
         termineCell.classList.add('text-center');
-        termineCell.textContent = '';
+        termineCell.textContent = getPatientEvents(patient, rounds.date);
 
         // Group cell
         const groupCell = row.insertCell();
@@ -765,10 +765,10 @@ function addPatientToEditRoundsTable(patient, index, table) {
     const activeEmployees = getActiveEmployees(patient, germanDateStr);
     empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
     
-    // Termine cell (empty for now)
+    // Termine cell with events
     const termineCell = row.insertCell();
     termineCell.classList.add('text-center');
-    termineCell.textContent = '';
+    termineCell.textContent = getPatientEvents(patient, germanDateStr);
 
     // Group cell
     const groupCell = row.insertCell();
@@ -875,16 +875,79 @@ function deleteRounds() {
  */
 function getNextThursday() {
     const today = new Date();
-    const dayOfWeek = today.getDay(); // 0 = Sunday, 4 = Thursday
-    const daysUntilThursday = (4 + 7 - dayOfWeek) % 7;
+    const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 4 = Thursday, ...
+    const daysUntilThursday = (4 - dayOfWeek + 7) % 7;
     
-    // If today is Thursday, get next Thursday (add 7 days)
-    const daysToAdd = daysUntilThursday === 0 ? 7 : daysUntilThursday;
+    // If today is Thursday and it's before noon, return today
+    if (dayOfWeek === 4 && today.getHours() < 12) {
+        return today.toISOString().split('T')[0];
+    }
     
+    // Otherwise, return the next Thursday
     const nextThursday = new Date(today);
-    nextThursday.setDate(today.getDate() + daysToAdd);
-    
+    nextThursday.setDate(today.getDate() + daysUntilThursday);
     return nextThursday.toISOString().split('T')[0];
+}
+
+/**
+ * Get patient events for a specific day
+ * @param {Object} patient - Patient object
+ * @param {string} germanDateStr - Date in German format (DD.MM.YYYY)
+ * @returns {string} - Comma-separated list of events
+ */
+function getPatientEvents(patient, germanDateStr) {
+    const events = [];
+    const date = parseGermanDate(germanDateStr);
+    const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 4 = Thursday, ...
+    
+    // Check if the day is Thursday (4)
+    if (dayOfWeek === 4) {
+        // Check for MTT for group 3 patients on Thursday
+        if (patient.group && (patient.group === '3-A' || patient.group === '3-B' || patient.group === '3')) {
+            events.push('MTT');
+        }
+        
+        // Check for SKT on Thursday
+        if (window['therapies-station'] && window['therapies-station'][patient.id] && 
+            window['therapies-station'][patient.id].skt === 'X') {
+            events.push('SKT');
+        }
+    }
+    
+    // Get German weekday short name for the date
+    const weekdayMap = {
+        0: 'So', // Sunday
+        1: 'Mo', // Monday
+        2: 'Di', // Tuesday
+        3: 'Mi', // Wednesday
+        4: 'Do', // Thursday
+        5: 'Fr', // Friday
+        6: 'Sa'  // Saturday
+    };
+    const weekdayShort = weekdayMap[dayOfWeek];
+    
+    // Check for kreativ_einzel and einzel_physio appointments
+    if (window['therapies-station'] && window['therapies-station'][patient.id]) {
+        const therapies = window['therapies-station'][patient.id];
+        
+        // Check kreativ_einzel
+        if (therapies.kreativ_einzel) {
+            const kreativMatch = therapies.kreativ_einzel.match(/([MGK])\s*([A-Za-z]{2})\.?\s*(\d{1,2}:\d{2})/i);
+            if (kreativMatch && kreativMatch[2].toLowerCase() === weekdayShort.toLowerCase()) {
+                events.push(`${kreativMatch[1]} ${kreativMatch[3]}`);
+            }
+        }
+        
+        // Check einzel_physio
+        if (therapies.einzel_physio) {
+            const physioMatch = therapies.einzel_physio.match(/([A-Za-z]{2})\.?\s*(\d{1,2}:\d{2})/i);
+            if (physioMatch && physioMatch[1].toLowerCase() === weekdayShort.toLowerCase()) {
+                events.push(`P ${physioMatch[2]}`);
+            }
+        }
+    }
+    
+    return events.join(', ');
 }
 
 /**
