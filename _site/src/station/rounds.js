@@ -52,6 +52,11 @@ function initRoundsEventListeners() {
         createNewRounds();
     });
 
+    // Copy latest rounds button
+    document.getElementById('copyRoundsBtn').addEventListener('click', function () {
+        copyLatestRounds();
+    });
+
     // Listen for data updates
     window.addEventListener('dataSaved', function () {
         if (window['rounds-station']) {
@@ -766,6 +771,115 @@ function getNextThursday() {
     nextThursday.setDate(today.getDate() + daysToAdd);
     
     return nextThursday.toISOString().split('T')[0];
+}
+
+/**
+ * Copy the latest rounds for the new date
+ */
+function copyLatestRounds() {
+    // Get the currently selected date
+    const dateInput = document.getElementById('roundsDate');
+    const targetGermanDate = formatISOToGermanDate(dateInput.value);
+    
+    // Find the latest rounds
+    let latestRounds = null;
+    let latestDate = null;
+    
+    if (window['rounds-station']) {
+        for (const id in window['rounds-station']) {
+            const rounds = window['rounds-station'][id];
+            const roundsDate = parseGermanDate(rounds.date);
+            
+            // Skip if this is for the target date
+            if (rounds.date === targetGermanDate) {
+                continue;
+            }
+            
+            if (!latestDate || roundsDate > latestDate) {
+                latestDate = roundsDate;
+                latestRounds = rounds;
+            }
+        }
+    }
+    
+    if (!latestRounds) {
+        alert('Keine vorherige Visite gefunden zum Kopieren.');
+        return;
+    }
+    
+    // Get active patients for the target date
+    const activePatients = getActivePatientsForDate(targetGermanDate);
+    const activePatientsMap = {};
+    activePatients.forEach(patient => {
+        activePatientsMap[patient.id] = patient;
+    });
+    
+    // Filter out inactive patients from the latest rounds
+    const filteredPatients = latestRounds.patients.filter(patientId => activePatientsMap[patientId]);
+    
+    // Add any new patients that weren't in the original list
+    const includedPatientIds = new Set(filteredPatients);
+    activePatients.forEach(patient => {
+        if (!includedPatientIds.has(patient.id)) {
+            filteredPatients.push(patient.id);
+        }
+    });
+    
+    // Create new rounds object with copied data
+    const newRounds = {
+        date: targetGermanDate,
+        title: latestRounds.title,
+        startTime: latestRounds.startTime,
+        patients: filteredPatients
+    };
+    
+    // Initialize window['rounds-station'] if it doesn't exist
+    if (!window['rounds-station']) {
+        window['rounds-station'] = {};
+    }
+    
+    // Find next available ID
+    const maxId = Object.keys(window['rounds-station']).reduce((max, id) => Math.max(max, parseInt(id) || 0), 0);
+    const newId = maxId + 1;
+    
+    // Add the new rounds
+    window['rounds-station'][newId] = newRounds;
+    
+    // Update our local copy of the data
+    roundsData = window['rounds-station'];
+    
+    // Save data
+    saveData('rounds-station', 'chefaerztinvisite-station');
+    
+    // Prepare the edit form
+    document.getElementById('editRoundsDate').value = dateInput.value;
+    document.getElementById('editRoundsTitle').value = newRounds.title;
+    document.getElementById('editRoundsStartTime').value = newRounds.startTime;
+    document.getElementById('editRoundsId').value = newId;
+    
+    // Hide add section, show edit section
+    document.getElementById('addRoundsSection').classList.add('d-none');
+    document.getElementById('viewRoundsSection').classList.add('d-none');
+    document.getElementById('editRoundsSection').classList.remove('d-none');
+    
+    // Fill the edit table with patients
+    const activePatientsTable = document.getElementById('editRoundsPatientsTable');
+    
+    // Clear existing rows
+    while (activePatientsTable.tBodies[0].rows.length > 0) {
+        activePatientsTable.tBodies[0].deleteRow(0);
+    }
+    
+    // Add rows for patients in the copied order
+    let index = 0;
+    filteredPatients.forEach(patientId => {
+        if (activePatientsMap[patientId]) {
+            addPatientToEditRoundsTable(activePatientsMap[patientId], index++, activePatientsTable);
+        }
+    });
+    
+    // Make the table sortable
+    makeTableSortable(activePatientsTable);
 }
 
 // Initialize rounds when data is loaded
