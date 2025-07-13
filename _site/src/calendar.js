@@ -208,14 +208,14 @@ function updateCalendar() {
                 if (absence.start && absence.end) {
                     try {
                         // Parse dates (format: DD.MM.YYYY)
-                        const [startDay, startMonth, startYear] = absence.start.split('.').map(Number);
-                        const [endDay, endMonth, endYear] = absence.end.split('.').map(Number);
-
-                        const startDate = new Date(startYear, startMonth - 1, startDay);
-                        const endDate = new Date(endYear, endMonth - 1, endDay);
-
-                        // Add one day to end date to make it inclusive
-                        endDate.setDate(endDate.getDate() + 1);
+                        const startDate = formatDateForCalendar(absence.start);
+                        let endDate = formatDateForCalendar(absence.end);
+                        // If absence is all-day and spans multiple days, increment end date by one day
+                        if (startDate && endDate && startDate !== endDate) {
+                            const end = new Date(endDate);
+                            end.setDate(end.getDate() + 1);
+                            endDate = end.toISOString().slice(0, 10);
+                        }
 
                         // Determine absence type and styling
                         let title = `${employee.name || 'Mitarbeiter'}`;
@@ -240,8 +240,8 @@ function updateCalendar() {
 
                         window['calendar'].addEvent({
                             title: title,
-                            start: formatDateForCalendar(absence.start),
-                            end: formatDateForCalendar(absence.end),
+                            start: startDate,
+                            end: endDate,
                             allDay: true,
                             backgroundColor: colors.absence,
                             borderColor: colors.absence,
@@ -303,11 +303,17 @@ function updateCalendar() {
 
     // Add events from window['events']
     for (const [id, listEvent] of Object.entries(window['events'] || {})) {
+        let eventEnd = listEvent.end;
+        if (listEvent.allDay && listEvent.start && listEvent.end && listEvent.start !== listEvent.end) {
+            const end = new Date(listEvent.end);
+            end.setDate(end.getDate() + 1);
+            eventEnd = end.toISOString().slice(0, 10);
+        }
         const event = {
             id: id,
             title: listEvent.title,
             start: listEvent.start,
-            end: listEvent.end,
+            end: eventEnd,
             allDay: listEvent.allDay,
             backgroundColor: colors[listEvent.color],
             borderColor: colors[listEvent.color],
