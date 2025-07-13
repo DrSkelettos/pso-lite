@@ -3,7 +3,7 @@ layout: layout.html
 active_kosi: active
 title: KoSi
 include_navigation: true
-dir: ../../
+dir: ../../../
 save_data: kosi-station
 save_file: kostensicherung-station
 ---
@@ -51,6 +51,10 @@ save_file: kostensicherung-station
     window.addEventListener('baseDataLoaded', async function () {
         await loadData('patients-station', 'belegung-station');
         await loadData('kosi-station', 'kostensicherung-station');
+        window.dispatchEvent(new CustomEvent('dataLoaded'));
+    });
+
+    window.addEventListener('dataLoaded', function () {
         fillKosiTable();
     });
 </script>

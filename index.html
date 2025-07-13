@@ -29,7 +29,7 @@ dir: ./
 
         <!-- Belegung -->
         <div class="col hidden" id="dashboardLinkPatientsStation">
-            <div class="card text-center cursor-pointer" onclick="window.location.href='sites/belegung/index.html';">
+            <div class="card text-center cursor-pointer" onclick="window.location.href='sites/station/belegung/index.html';">
                 <div class="card-header">
                     <i class="bi bi-calendar-date" style="font-size: 5rem;"></i>
                 </div>
@@ -43,7 +43,7 @@ dir: ./
         <!-- Therapiezuordnung -->
         <div class="col hidden" id="dashboardLinkTherapiesStation">
             <div class="card text-center cursor-pointer"
-                onclick="window.location.href='sites/therapiezuordnung/index.html';">
+                onclick="window.location.href='sites/station/therapiezuordnung/index.html';">
                 <div class="card-header">
                     <i class="bi bi-list-columns" style="font-size: 5rem;"></i>
                 </div>
@@ -55,8 +55,8 @@ dir: ./
         </div>
 
         <!-- Chefärztinvisite -->
-        <!-- <div class="col">
-            <div class="card text-center cursor-pointer" onclick="window.location.href='sites/chefaerztinvisite/index.html';">
+        <div class="col hidden" id="dashboardLinkRoundsStation">
+            <div class="card text-center cursor-pointer" onclick="window.location.href='sites/station/chefaerztinvisite/index.html';">
                 <div class="card-header">
                     <i class="bi bi-people" style="font-size: 5rem;"></i>
                 </div>
@@ -65,13 +65,13 @@ dir: ./
                     <p class="card-text">Planung für die Chefärztinvisite</p>
                 </div>
             </div>
-        </div> -->
+        </div>
 
     </div>
 
 
     <!-- KOSTENSICHERUNG -->
-    <div class="card mt-5 cursor-pointer hidden" id="dashboardLinkKosiStation" onclick="window.location.href='sites/kosi/index.html';">
+    <div class="card mt-5 cursor-pointer hidden" id="dashboardLinkKosiStation" onclick="window.location.href='sites/station/kosi/index.html';">
         <div class="card-header">
             <h4 class="card-title mb-0">Kostensicherung</h4>
         </div>
@@ -115,6 +115,7 @@ dir: ./
         
         showIfAuthorized('#dashboardLinkPatientsStation', 'viewPatientsStation');
         showIfAuthorized('#dashboardLinkTherapiesStation', 'viewTherapiesStation');
+        showIfAuthorized('#dashboardLinkRoundsStation', 'viewRoundsStation');
         showIfAuthorized('#dashboardLinkKosiStation', 'kosiStation');
 
         if (window['user'].needsToChangePassword) {

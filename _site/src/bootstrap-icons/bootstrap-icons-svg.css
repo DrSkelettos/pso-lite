@@ -121,6 +121,10 @@
   background-image: url("./svg/key-fill.svg"); 
 }
 
+.bi-hospital::before { 
+  background-image: url("./svg/hospital.svg"); 
+}
+
 /* Bootstrap theme color classes */
 .text-primary .bi::before,
 .text-primary[class^="bi-"]::before,

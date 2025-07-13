@@ -1,59 +1,36 @@
 ---
-layout: layout_print
-active_belegung: active
+layout: layout.html
+active_therapiezuordnung: active
+title: Therapiezuordnung
+include_navigation: true
 dir: ../../../
-page_size: A4 portrait
-page_width: 210mm
-title: Therapiezuordnung 7.1
+save_data: therapies-station
+save_file: therapiezuordnung-station
 ---
 
 <script src="{{ dir }}src/patients.js"></script>
 <script src="{{ dir }}src/therapies.js"></script>
-<script src="{{ dir }}src/poststationaer.js"></script>
 
 <style>
-    .print-header {
-        margin-bottom: 1rem;
-    }
-
-    .print-header h4 {
-        font-size: 18px !important;
-    }
-
-    .table-bordered>tbody>tr.border-bottom-3 {
+    .table-bordered tr.border-bottom-3 {
         border-bottom-width: 3px !important;
     }
 
     .table-bordered td.border-end-3,
     .table-bordered th.border-end-3 {
-        border-right: 3px solid #dee2e6 !important;
+        border-right-width: 3px !important;
     }
 
-    /* Override Bootstrap's default font sizes */
     .table th,
     .table td,
     .table tr {
         font-size: inherit !important;
         padding: 2px 4px !important;
     }
-
-    .font-small {
-        font-size: 70% !important;
-    }
 </style>
 
-<div class="print-header d-flex justify-content-between align-items-center">
-    <h4 class="mb-0">Therapiezuordnung Station 7.1</h4>
-    <div class="text-end">
-        <div>Stand: <span id="currentDate"></span> (KW <span id="currentWeek"></span>)</div>
-    </div>
-</div>
-
-<table class="table table-sm table-bordered mx-auto" style="width: auto;">
+<table class="table table-sm table-bordered table-hover mx-auto" style="width: auto;">
     <thead>
-        <tr class="no-hover">
-            <td colspan="15"></td>
-        </tr>
         <tr class="text-start table-text-vertical no-hover" height="200">
             <th width="30"></th>
             <th width="250"></th>
@@ -170,48 +147,36 @@ title: Therapiezuordnung 7.1
             <td></td>
         </tr>
     </tfoot>
-
-
-</table>
-
-<table id="poststationaer-table" class="table table-sm table-bordered" style="width: auto;">
-    <thead>
-        <tr class="table-secondary fw-bold text-center no-hover">
-            <td width="162" colspan="2" class="border-end-3 text-start">Poststationär</td>
-            <td width="35">GR</td>
-            <td width="35">MT</td>
-            <td width="35">GT</td>
-            <td width="35">KT</td>
-            <td width="71">Ende</td>
-        </tr>
-    </thead>
-    <tbody id="poststationaer-table-body">
-
-    </tbody>
 </table>
 
 
+<div class="text-center mt-4">
+    <button type="button" class="btn btn-outline-primary me-2 hidden" id="saveButton"
+        onclick="saveData('therapies-station', 'therapiezuordnung-station')">
+        <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
+    </button>
+    <button type="button hidden" id="poststationaerButton" class="btn btn-outline-primary me-2" onclick="location.href='{{ dir }}sites/station/poststationaer/index.html'">
+        <i class="bi bi-person-x text-primary me-1"></i> Poststationär
+    </button>
+    <button type="button" class="btn btn-outline-primary me-2" onclick="window.open('ausdruck/index.html')">
+        <i class="bi bi-printer text-primary me-1"></i> Ausdruck
+    </button>
+</div>
+
+{% include "therapiezuordnung/editTherapies.html" %}
 
 <script>
-    const currentDate = document.getElementById('currentDate');
-    const currentWeek = document.getElementById('currentWeek');
-
-    // Format current date
-    const today = new Date();
-    const dateStr = formatISOToGermanDate(today.toISOString().split('T')[0]);
-    currentDate.textContent = `${dateStr}`;
-    currentWeek.textContent = getCalendarWeek(today);
-
-    // Update document title with current date
-    document.title = document.title + ' - ' + dateStr;
-
     window.addEventListener('directoryHandleInitialized', async function () {
         await loadData('patients-station', 'belegung-station');
         await loadData('rooms-station', 'zimmer-station');
         await loadData('therapies-station', 'therapiezuordnung-station');
-        await loadData('poststationaer', 'poststationaer');
-        
+        window.dispatchEvent(new CustomEvent('dataLoaded'));
+    });
+
+    window.addEventListener('dataLoaded', function () {
         fillTherapyTable();
-        fillPoststationaerTherapyTable();
+
+        showIfAuthorized('#saveButton', 'editTherapiesStation');
+        showIfAuthorized('#poststationaerButton', 'editTherapiesStation');
     });
 </script>

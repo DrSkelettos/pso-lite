@@ -3,7 +3,7 @@ layout: layout.html
 active_belegung: active
 title: Belegung
 include_navigation: true
-dir: ../../
+dir: ../../../
 save_data: patients-station
 save_file: belegung-station
 ---
@@ -73,13 +73,14 @@ save_file: belegung-station
             onclick="saveData('patients-station', 'belegung-station')">
             <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
         </button>
-        <a href="{{ dir }}sites/belegung/ausdruck/index.html" class="btn btn-outline-primary me-2">
+        <a href="{{ dir }}sites/station/belegung/ausdruck/index.html" class="btn btn-outline-primary me-2">
             <i class="bi bi-printer text-primary me-1"></i> Ausdruck
         </a>
-        <a href="{{ dir }}sites/auslastung/index.html" id="workloadButton" class="btn btn-outline-primary me-2 hidden">
+        <a href="{{ dir }}sites/station/auslastung/index.html" id="workloadButton" class="btn btn-outline-primary me-2 hidden">
             <i class="bi bi-bar-chart text-primary me-1"></i> Auslastung
         </a>
-        <button type="button" id="addPatientButton" class="btn btn-outline-primary hidden" data-bs-toggle="modal" data-bs-target="#addPatientModal">
+        <button type="button" id="addPatientButton" class="btn btn-outline-primary hidden" data-bs-toggle="modal"
+            data-bs-target="#addPatientModal">
             <i class="bi bi-plus-circle text-primary me-1"></i> Patient:in hinzufügen
         </button>
     </div>
@@ -102,8 +103,11 @@ save_file: belegung-station
     window.addEventListener('directoryHandleInitialized', async function () {
         await loadData('rooms-station', 'zimmer-station');
         await loadData('patients-station', 'belegung-station');
+        window.dispatchEvent(new CustomEvent('dataLoaded'));
+    });
 
-        if(authorize('editPatientsStation')) initializeAddPatientForm();
+    window.addEventListener('dataLoaded', function () {
+        if (authorize('editPatientsStation')) initializeAddPatientForm();
         fillPatientsTable();
 
         showIfAuthorized('#addPatientButton', 'editPatientsStation');

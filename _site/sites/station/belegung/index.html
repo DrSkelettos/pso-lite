@@ -7,20 +7,20 @@
     <title>PSOrga - Belegung</title>
 
     
-    <link href="../../src/style.css" rel="stylesheet">
+    <link href="../../../src/style.css" rel="stylesheet">
     
 
-    <script src="../../src/idb-keyval/umd.js"></script>
-    <script src="../../src/popperjs/popper.min.js"></script>
-    <link href="../../src/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <script src="../../src/bootstrap/bootstrap.min.js"></script>
-    <link href="../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+    <script src="../../../src/idb-keyval/umd.js"></script>
+    <script src="../../../src/popperjs/popper.min.js"></script>
+    <link href="../../../src/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="../../../src/bootstrap/bootstrap.min.js"></script>
+    <link href="../../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
 
-    <script src="../../src/data-manager.js"></script>
-    <script src="../../src/data-directory.js"></script>
-    <script src="../../src/helpers.js"></script>
-    <script src="../../src/user.js"></script>
-    <script src="../../src/init.js"></script>
+    <script src="../../../src/data-manager.js"></script>
+    <script src="../../../src/data-directory.js"></script>
+    <script src="../../../src/helpers.js"></script>
+    <script src="../../../src/user.js"></script>
+    <script src="../../../src/init.js"></script>
 
     <script>
         // Add warning when user tries to close page with unsaved data
@@ -34,20 +34,21 @@
             }
         });
 
-        init('Belegung', '../../');
+        init('Belegung', '../../../');
 
         window.addEventListener('directoryHandleInitialized', async function () {
             await loadData('employees', 'mitarbeiter_innen');
-            await checkLogin('Belegung', '../../');
+            await checkLogin('Belegung', '../../../');
             window.dispatchEvent(new Event('baseDataLoaded'));
 
-            showIfAuthorized('#navLinkWorkload', 'workloadStation');
-            showIfAuthorized('#navLinkKosi', 'kosiStation');
+            showIfAuthorized('#navLinkWorkloadStation', 'workloadStation');
+            showIfAuthorized('#navLinkKosiStation', 'kosiStation');
             showIfAuthorized('#navLinkPatientsStation', 'viewPatientsStation');
             showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
             showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
             showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
             showIfAuthorized('#navLinkStation', 'viewPatientsStation');
+            showIfAuthorized('#navLinkStationDivider', 'workloadStation');
         });
     </script>
 </head>
@@ -57,71 +58,60 @@
 <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
         <div class="container-fluid">
-            <a class="navbar-brand" href="../../index.html" style="margin-top:-4px;">
-                <img src="../../src/images/psorga-white.svg" alt="PSOrga" height="20">
+            <a class="navbar-brand" href="../../../index.html" style="margin-top:-4px;">
+                <img src="../../../src/images/psorga-white.svg" alt="PSOrga" height="20">
             </a>
 
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item me-2">
-                    <a class="nav-link " href="../../index.html">
+                    <a class="nav-link " href="../../../index.html">
                         <i class="bi bi-house me-1 text-light"></i>
                         Startseite
                     </a>
                 </li>
                 <li class="nav-item me-2">
-                    <a class="nav-link" href="../../sites/kalender/index.html">
+                    <a class="nav-link" href="../../../sites/kalender/index.html">
                         <i class="bi bi-calendar-date me-1 text-light"></i>
                         Kalender
                     </a>
                 </li>
 
                 <div class="dropdown hidden" id="navLinkStation">
-                <li class="nav-item me-2">
-                    <a class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        <i class="bi bi-people me-1 text-light"></i>
-                        Station
-                    </a>
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" id="navLinkPatientsStation" href="../../sites/belegung/index.html"><i class="bi bi-people me-1"></i> Belegung</a></li>
-                      <li><a class="dropdown-item" id="navLinkPatientsStation" href="../../sites/therapiezuordnung/index.html"><i class="bi bi-list-columns me-1"></i> Therapiezuordnung</a></li>
-                      <li><a class="dropdown-item" id="navLinkPatientsStation" href="../../sites/poststationaer/index.html"><i class="bi bi-person-x me-1"></i> Poststationär</a></li>
-                      <li><a class="dropdown-item" id="navLinkRoundsStation" href="../../sites/chefaerztinvisite/index.html"><i class="bi bi-eye me-1"></i> Rounds</a></li>
-                    </ul>
-                </li>
+                    <li class="nav-item me-2">
+                        <a class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-hospital me-1 text-light"></i>
+                            Station
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item hidden" id="navLinkPatientsStation" href="../../../sites/station/belegung/index.html"><i class="bi bi-people me-1"></i>Belegung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkTherapiesStation" href="../../../sites/station/therapiezuordnung/index.html"><i class="bi bi-list-columns me-1"></i> Therapiezuordnung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkPoststationaer" href="../../../sites/station/poststationaer/index.html"><i class="bi bi-person-x me-1"></i> Poststationär</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkRoundsStation" href="../../../sites/station/chefaerztinvisite/index.html"><i class="bi bi-eye me-1"></i> Rounds</a></li>
+                            <li class="dropdown-divider hidden" id="navLinkStationDivider"></li>
+                            <li><a class="dropdown-item hidden" id="navLinkWorkloadStation" href="../../../sites/station/auslastung/index.html"><i class="bi bi-bar-chart me-1"></i> Auslastung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkKosiStation" href="../../../sites/station/kosi/index.html"><i class="bi bi-coin me-1"></i>Kostensicherung</a></li>
+                        </ul>
+                    </li>
                 </div>
             </ul>
 
-            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer"
-                onclick="saveData('patients-station', 'belegung-station')">
+            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('patients-station', 'belegung-station')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
 
             <ul class="navbar-nav ms-3 mb-2 mb-md-0">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
-                        aria-expanded="false">Mehr</a>
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Mehr</a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li id="navLinkWorkload">
-                            <a class="dropdown-item" href="../../sites/auslastung/index.html">
-                                <i class="bi bi-bar-chart me-1"></i>
-                                Auslastung
-                            </a>
-                        </li>
-                        <li id="navLinkKosi">
-                            <a class="dropdown-item" href="../../sites/kosi/index.html">
-                                <i class="bi bi-coin me-1"></i>
-                                KoSi
-                            </a>
-                        </li>
                         <li>
-                            <a class="dropdown-item" href="../../sites/mitarbeiterinnen/index.html">
+                            <a class="dropdown-item" href="../../../sites/mitarbeiterinnen/index.html">
                                 <i class="bi bi-people me-1"></i>
                                 Mitarbeiter:innen
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item" href="../../sites/passwort-aendern/index.html">
+                            <a class="dropdown-item" href="../../../sites/passwort-aendern/index.html">
                                 <i class="bi bi-key me-1"></i>
                                 Passwort ändern
                             </a>
@@ -129,7 +119,7 @@
                     </ul>
                 </li>
                 <li class="nav-item" title="Ausloggen">
-                    <a class="nav-link" href="javascript:void(0);"  style="margin-top:-3px; margin-bottom:-10px;" onclick="logout('../../')">
+                    <a class="nav-link" href="javascript:void(0);" style="margin-top:-3px; margin-bottom:-10px;" onclick="logout('../../../')">
                         <i class="bi bi-x-circle text-light fs-5"></i>
                     </a>
                 </li>
@@ -138,7 +128,7 @@
     </nav>
     <div class="container-fluid pb-3">
         
-<script src="../../src/patients.js"></script>
+<script src="../../../src/patients.js"></script>
 
 <style>
     .table-bordered tr.border-bottom-3 {
@@ -203,10 +193,10 @@
             onclick="saveData('patients-station', 'belegung-station')">
             <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
         </button>
-        <a href="../../sites/belegung/ausdruck/index.html" class="btn btn-outline-primary me-2">
+        <a href="../../../sites/station/belegung/ausdruck/index.html" class="btn btn-outline-primary me-2">
             <i class="bi bi-printer text-primary me-1"></i> Ausdruck
         </a>
-        <a href="../../sites/auslastung/index.html" id="workloadButton" class="btn btn-outline-primary me-2 hidden">
+        <a href="../../../sites/station/auslastung/index.html" id="workloadButton" class="btn btn-outline-primary me-2 hidden">
             <i class="bi bi-bar-chart text-primary me-1"></i> Auslastung
         </a>
         <button type="button" id="addPatientButton" class="btn btn-outline-primary hidden" data-bs-toggle="modal"

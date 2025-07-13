@@ -1,14 +1,93 @@
----
-layout: layout_print
-active_belegung: active
-dir: ../../../
-page_size: A4 landscape
-page_width: 297mm
-title: Belegungsplan 7.1
----
+<!doctype html>
+<html lang="de" data-bs-theme="light">
 
-<script src="{{ dir }}src/patients.js"></script>
-<script src="{{ dir }}src/employees.js"></script>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Belegungsplan 7.1</title>
+
+    <link href="../../../../src/style.css" rel="stylesheet">
+
+    <script src="../../../../src/idb-keyval/umd.js"></script>
+    <link href="../../../../src/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="../../../../src/bootstrap/bootstrap.min.js"></script>
+    <link href="../../../../src/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+
+    <script src="../../../../src/data-directory.js"></script>
+    <script src="../../../../src/data-manager.js"></script>
+    <script src="../../../../src/helpers.js"></script>
+    <script src="../../../../src/user.js"></script>
+    <script src="../../../../src/init.js"></script>
+
+    <script>
+        init('Belegungsplan 7.1', '../../../../');
+
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('employees', 'mitarbeiter_innen');
+            await checkLogin('Belegungsplan 7.1', '../../../../');
+            window.dispatchEvent(new Event('baseDataLoaded'));
+        });
+    </script>
+
+    <style>        
+        @page {
+            size: A4 landscape;
+            margin: 8mm;
+        }
+
+        html {
+            font-size: 12px !important;
+            color: black !important;
+        }
+
+        body {
+            font-size: 12px !important;
+            color: black !important;
+            background: none !important;
+        }
+
+        a {
+            text-decoration: none;
+            color: black !important;
+            cursor: default !important;
+        }
+
+        @media print {
+            a {
+                text-decoration: none;
+                color: black !important;
+            }
+
+            .table {
+                font-size: inherit !important;
+            }
+
+            .table th,
+            .table td {
+                font-size: inherit !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Preview styles (when viewing in browser) */
+        @media screen {
+            body {
+                max-width: 297mm;
+                margin: 0 auto;
+                padding: 1rem;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    
+<script src="../../../../src/patients.js"></script>
+<script src="../../../../src/employees.js"></script>
 
 <style>
     .print-header {
@@ -151,12 +230,18 @@ title: Belegungsplan 7.1
     window.addEventListener('directoryHandleInitialized', async function () {
         await loadData('rooms-station', 'zimmer-station');
         await loadData('patients-station', 'belegung-station');
+        window.dispatchEvent(new CustomEvent('dataLoaded'));
+    });
 
+    window.addEventListener('dataLoaded', function () {
         fillPatientsTable();
         fillAbsencesTable();
-
 
         // Get current patients count
         currentPatientCount.textContent = Object.keys(filterPatients().current).length;
     });
 </script>
+
+</body>
+
+</html>

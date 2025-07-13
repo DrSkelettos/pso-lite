@@ -41,11 +41,14 @@
             await checkLogin('Mitarbeiter:innen', '../../');
             window.dispatchEvent(new Event('baseDataLoaded'));
 
-            showIfAuthorized('#navLinkWorkload', 'workloadStation');
-            showIfAuthorized('#navLinkKosi', 'kosiStation');
+            showIfAuthorized('#navLinkWorkloadStation', 'workloadStation');
+            showIfAuthorized('#navLinkKosiStation', 'kosiStation');
             showIfAuthorized('#navLinkPatientsStation', 'viewPatientsStation');
             showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
             showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
+            showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
+            showIfAuthorized('#navLinkStation', 'viewPatientsStation');
+            showIfAuthorized('#navLinkStationDivider', 'workloadStation');
         });
     </script>
 </head>
@@ -62,61 +65,45 @@
             <ul class="navbar-nav me-auto mb-2 mb-md-0">
                 <li class="nav-item me-2">
                     <a class="nav-link " href="../../index.html">
-                        <!-- <i class="bi bi-house me-1 text-light"></i> -->
+                        <i class="bi bi-house me-1 text-light"></i>
                         Startseite
                     </a>
                 </li>
-                <li class="nav-item me-2 hidden" id="navLinkPatientsStation">
-                    <a class="nav-link " href="../../sites/belegung/index.html">
-                        <!-- <i class="bi bi-calendar-date me-1 text-light"></i> -->
-                        Belegung
+                <li class="nav-item me-2">
+                    <a class="nav-link" href="../../sites/kalender/index.html">
+                        <i class="bi bi-calendar-date me-1 text-light"></i>
+                        Kalender
                     </a>
                 </li>
-                <li class="nav-item me-2 hidden" id="navLinkTherapiesStation">
-                    <a class="nav-link "
-                        href="../../sites/therapiezuordnung/index.html">
-                        <!-- <i class="bi bi-list-columns me-1 text-light"></i> -->
-                        Therapiezuordnung
-                    </a>
-                </li>
-                <li class="nav-item me-2 hidden" id="navLinkPoststationaer">
-                    <a class="nav-link " href="../../sites/poststationaer/index.html">
-                        <!-- <i class="bi bi-person-x me-1 text-light"></i> -->
-                        Poststationär
-                    </a>
-                </li>
-                <!-- <li class="nav-item me-2">
-                    <a class="nav-link "
-                        href="../../sites/chefaerztinvisite/index.html">
-                        <i class="bi bi-eye me-1 text-light"></i>
-                        Chefärztinvisite
-                    </a>
-                </li> -->
+
+                <div class="dropdown hidden" id="navLinkStation">
+                    <li class="nav-item me-2">
+                        <a class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-hospital me-1 text-light"></i>
+                            Station
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item hidden" id="navLinkPatientsStation" href="../../sites/station/belegung/index.html"><i class="bi bi-people me-1"></i>Belegung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkTherapiesStation" href="../../sites/station/therapiezuordnung/index.html"><i class="bi bi-list-columns me-1"></i> Therapiezuordnung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkPoststationaer" href="../../sites/station/poststationaer/index.html"><i class="bi bi-person-x me-1"></i> Poststationär</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkRoundsStation" href="../../sites/station/chefaerztinvisite/index.html"><i class="bi bi-eye me-1"></i> Rounds</a></li>
+                            <li class="dropdown-divider hidden" id="navLinkStationDivider"></li>
+                            <li><a class="dropdown-item hidden" id="navLinkWorkloadStation" href="../../sites/station/auslastung/index.html"><i class="bi bi-bar-chart me-1"></i> Auslastung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkKosiStation" href="../../sites/station/kosi/index.html"><i class="bi bi-coin me-1"></i>Kostensicherung</a></li>
+                        </ul>
+                    </li>
+                </div>
             </ul>
 
-            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer"
-                onclick="saveData('employees', 'mitarbeiter_innen')">
+            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('employees', 'mitarbeiter_innen')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
 
             <ul class="navbar-nav ms-3 mb-2 mb-md-0">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown"
-                        aria-expanded="false">Mehr</a>
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Mehr</a>
                     <ul class="dropdown-menu dropdown-menu-end">
-                        <li id="navLinkWorkload">
-                            <a class="dropdown-item" href="../../sites/auslastung/index.html">
-                                <i class="bi bi-bar-chart me-1"></i>
-                                Auslastung
-                            </a>
-                        </li>
-                        <li id="navLinkKosi">
-                            <a class="dropdown-item" href="../../sites/kosi/index.html">
-                                <i class="bi bi-coin me-1"></i>
-                                KoSi
-                            </a>
-                        </li>
                         <li>
                             <a class="dropdown-item" href="../../sites/mitarbeiterinnen/index.html">
                                 <i class="bi bi-people me-1"></i>
@@ -132,7 +119,7 @@
                     </ul>
                 </li>
                 <li class="nav-item" title="Ausloggen">
-                    <a class="nav-link" href="javascript:void(0);"  style="margin-top:-3px; margin-bottom:-10px;" onclick="logout('../../')">
+                    <a class="nav-link" href="javascript:void(0);" style="margin-top:-3px; margin-bottom:-10px;" onclick="logout('../../')">
                         <i class="bi bi-x-circle text-light fs-5"></i>
                     </a>
                 </li>

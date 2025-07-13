@@ -41,11 +41,14 @@
             await checkLogin('Passwort ändern', '../../');
             window.dispatchEvent(new Event('baseDataLoaded'));
 
-            showIfAuthorized('#navLinkWorkload', 'workloadStation');
-            showIfAuthorized('#navLinkKosi', 'kosiStation');
+            showIfAuthorized('#navLinkWorkloadStation', 'workloadStation');
+            showIfAuthorized('#navLinkKosiStation', 'kosiStation');
             showIfAuthorized('#navLinkPatientsStation', 'viewPatientsStation');
             showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
             showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
+            showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
+            showIfAuthorized('#navLinkStation', 'viewPatientsStation');
+            showIfAuthorized('#navLinkStationDivider', 'workloadStation');
         });
     </script>
 </head>

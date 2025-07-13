@@ -3,7 +3,7 @@ layout: layout.html
 active_poststationaer: active
 title: Poststationär
 include_navigation: true
-dir: ../../
+dir: ../../../
 save_data: poststationaer
 save_file: poststationaer
 ---
@@ -37,6 +37,9 @@ save_file: poststationaer
     <button type="button" class="btn btn-outline-primary me-2" onclick="saveData('poststationaer', 'poststationaer')">
         <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
     </button>
+    <button type="button hidden" id="therapiezuordnungButton" class="btn btn-outline-primary me-2" onclick="location.href='{{ dir }}sites/station/therapiezuordnung/index.html'">
+        <i class="bi bi-list-columns text-primary me-1"></i> Therapiezuordnung
+    </button>
     <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
         <i class="bi bi-plus-circle text-primary me-1"></i> Patient:in hinzufügen
     </button>
@@ -48,7 +51,13 @@ save_file: poststationaer
     
     window.addEventListener('directoryHandleInitialized', async function () {
         await loadData('poststationaer', 'poststationaer');
+        window.dispatchEvent(new CustomEvent('dataLoaded'));
+    });
+
+    window.addEventListener('dataLoaded', function () {
         fillPoststationaerTable();
+
+        showIfAuthorized('#therapiezuordnungButton', 'editTherapiesStation');
     });
     
 </script>

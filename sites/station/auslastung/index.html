@@ -3,7 +3,7 @@ layout: layout.html
 title: Auslastung
 include_navigation: true
 active_auslastung: active
-dir: ../../
+dir: ../../../
 ---
 
 <script src="{{ dir }}src/patients.js"></script>
@@ -82,6 +82,10 @@ dir: ../../
 <script>
     window.addEventListener('baseDataLoaded', async function () {
         await loadData('patients-station', 'belegung-station');
+        window.dispatchEvent(new CustomEvent('dataLoaded'));
+    });
+
+    window.addEventListener('dataLoaded', function () {
         fillGroupWorkloadTable();
         fillEmployeeWorkloadTable();
     });
