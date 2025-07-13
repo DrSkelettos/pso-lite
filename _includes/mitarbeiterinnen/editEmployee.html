@@ -18,8 +18,7 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <label for="editEmployeeKey" class="form-label">Kürzel</label>
-                                        <input type="text" class="form-control" id="editEmployeeKey" maxlength="10"
-                                            required>
+                                        <input type="text" class="form-control" id="editEmployeeKey" maxlength="10" required>
                                     </div>
                                     <div class="col-md-6">
                                         <label for="editEmployeeName" class="form-label">Vollständiger Name</label>
@@ -37,10 +36,8 @@
                                         <label for="editEmployeePassword" class="form-label">Passwort</label>
                                         <input type="password" class="form-control" id="editEmployeePassword">
                                         <div class="form-check">
-                                            <input class="form-check-input" type="checkbox"
-                                                id="editEmployeePasswordCheckbox">
-                                            <label class="form-check-label"
-                                                for="editEmployeePasswordCheckbox">Passwortänderung erzwingen</label>
+                                            <input class="form-check-input" type="checkbox" id="editEmployeePasswordCheckbox">
+                                            <label class="form-check-label" for="editEmployeePasswordCheckbox">Passwortänderung erzwingen</label>
                                         </div>
                                     </div>
                                 </div>
@@ -50,8 +47,7 @@
 
                     <div class="card mb-3">
                         <div class="card-header">
-                            <button type="button" class="btn btn-outline-primary btn-sm float-end"
-                                onclick="addAbsenceEntry()">
+                            <button type="button" class="btn btn-outline-primary btn-sm float-end" onclick="addAbsenceEntry()">
                                 <i class="bi bi-plus-lg me-1 text-primary"></i>Abwesenheit hinzufügen
                             </button>
                             <h5 class="card-title mb-0">Abwesenheiten</h5>
@@ -66,25 +62,20 @@
                                     <div class="row g-3 align-items-center">
                                         <div class="col-md-3">
                                             <label class="form-label">Von</label>
-                                            <input type="date" class="form-control form-control-sm absence-start"
-                                                required>
+                                            <input type="date" class="form-control form-control-sm absence-start" required>
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Bis</label>
-                                            <input type="date" class="form-control form-control-sm absence-end"
-                                                required>
+                                            <input type="date" class="form-control form-control-sm absence-end" required>
                                         </div>
                                         <div class="col-md-3">
                                             <label class="form-label">Ankündigung</label>
-                                            <input type="date"
-                                                class="form-control form-control-sm absence-announcement">
+                                            <input type="date" class="form-control form-control-sm absence-announcement">
                                         </div>
                                         <div class="col-md-2">
                                             <div class="form-check mt-4">
-                                                <input class="form-check-input absence-planned" type="checkbox"
-                                                    id="absence-planned-template">
-                                                <label class="form-check-label cursor-pointer"
-                                                    for="absence-planned-template">Geplant</label>
+                                                <input class="form-check-input absence-planned" type="checkbox" id="absence-planned-template">
+                                                <label class="form-check-label cursor-pointer" for="absence-planned-template">Geplant</label>
                                             </div>
                                         </div>
                                         <div class="col-md-1">
@@ -115,40 +106,38 @@
                             <h5 class="card-title mb-0">Berechtigungen</h5>
                         </div>
                         <div class="card-body" id="editEmployeePermissions-link">
-                            <a href="javascript:void(0);"
-                                onclick="document.getElementById('editEmployeePermissions').style.display = 'block'; document.getElementById('editEmployeePermissions-link').style.display = 'none';">
+                            <a href="javascript:void(0);" onclick="document.getElementById('editEmployeePermissions').style.display = 'block'; document.getElementById('editEmployeePermissions-link').style.display = 'none';">
                                 Hier klicken, um Berechtigungen anzuzeigen.
                             </a>
                         </div>
                         <div class="card-body" id="editEmployeePermissions" style="display: none;">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox"
-                                    id="editEmployeeRightsViewPatientsStation">
-                                <label class="form-check-label" for="editEmployeeRightsViewPatientsStation">Station:
-                                    Belegung anzeigen</label>
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsViewPatientsStation">
+                                <label class="form-check-label" for="editEmployeeRightsViewPatientsStation">Station: Belegung anzeigen</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox"
-                                    id="editEmployeeRightsEditPatientsStation">
-                                <label class="form-check-label" for="editEmployeeRightsEditPatientsStation">Station:
-                                    Belegung bearbeiten</label>
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditPatientsStation">
+                                <label class="form-check-label" for="editEmployeeRightsEditPatientsStation">Station: Belegung bearbeiten</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox"
-                                    id="editEmployeeRightsViewTherapiesStation">
-                                <label class="form-check-label" for="editEmployeeRightsViewTherapiesStation">Station:
-                                    Therapiezuordnung anzeigen</label>
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsViewTherapiesStation">
+                                <label class="form-check-label" for="editEmployeeRightsViewTherapiesStation">Station: Therapiezuordnung anzeigen</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox"
-                                    id="editEmployeeRightsEditTherapiesStation">
-                                <label class="form-check-label" for="editEmployeeRightsEditTherapiesStation">Station:
-                                    Therapiezuordnung bearbeiten</label>
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditTherapiesStation">
+                                <label class="form-check-label" for="editEmployeeRightsEditTherapiesStation">Station: Therapiezuordnung bearbeiten</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsViewRoundsStation">
+                                <label class="form-check-label" for="editEmployeeRightsViewRoundsStation">Station: CÄV anzeigen</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditRoundsStation">
+                                <label class="form-check-label" for="editEmployeeRightsEditRoundsStation">Station: CÄV bearbeiten</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="editEmployeeRightsKosiStation">
-                                <label class="form-check-label" for="editEmployeeRightsKosiStation">Station:
-                                    Kostensicherung</label>
+                                <label class="form-check-label" for="editEmployeeRightsKosiStation">Station: Kostensicherung</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="editEmployeeRightsWorkloadStation">
@@ -156,13 +145,11 @@
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditEvents">
-                                <label class="form-check-label" for="editEmployeeRightsEditEvents">Termine
-                                    bearbeiten</label>
+                                <label class="form-check-label" for="editEmployeeRightsEditEvents">Termine bearbeiten</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditEmployees">
-                                <label class="form-check-label" for="editEmployeeRightsEditEmployees">Mitarbeiter:innen
-                                    bearbeiten</label>
+                                <label class="form-check-label" for="editEmployeeRightsEditEmployees">Mitarbeiter:innen bearbeiten</label>
                             </div>
                         </div>
                     </div>
