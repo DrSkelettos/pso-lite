@@ -190,9 +190,22 @@ function addPatientToAddRoundsTable(patient, index, table) {
 
 /**
  * Add a patient to the edit rounds table
+ * @param {Object} patient - Patient object
+ * @param {number} index - Index for ordering
+ * @param {HTMLElement} table - Table to add patient to
  */
 function addPatientToEditRoundsTable(patient, index, table) {
-    const germanDateStr = formatISOToGermanDate(document.getElementById('editRoundsDate').value);
+    // Get the date - either from editRoundsDate or viewRoundsDate
+    let germanDateStr;
+    if (document.getElementById('editRoundsDate').value) {
+        germanDateStr = formatISOToGermanDate(document.getElementById('editRoundsDate').value);
+    } else if (document.getElementById('viewRoundsDate').textContent) {
+        germanDateStr = document.getElementById('viewRoundsDate').textContent;
+    } else {
+        // Fallback to current date if neither is available
+        germanDateStr = formatISOToGermanDate(new Date().toISOString().split('T')[0]);
+    }
+    
     const tbody = table.tBodies[0];
     const row = tbody.insertRow();
     row.setAttribute('data-patient-id', patient.id);
@@ -244,7 +257,7 @@ function addPatientToEditRoundsTable(patient, index, table) {
     // Therapy week cell
     const weekCell = row.insertCell();
     weekCell.classList.add('text-center');
-    weekCell.textContent = calculateTherapyWeek(patient, germanDateStr);
+    weekCell.textContent = calculatePatientWeek(patient.admission, parseGermanDate(germanDateStr));
     
     // Discharge date cell
     const dischargeCell = row.insertCell();
@@ -721,75 +734,8 @@ function showEditRoundsForm() {
 }
 
 /**
- * Add patient to edit rounds table
- * @param {Object} patient - Patient object
- * @param {number} index - Index for ordering
- * @param {HTMLElement} table - Table to add patient to
+ * Hide the edit rounds form
  */
-function addPatientToEditRoundsTable(patient, index, table) {
-    const row = table.tBodies[0].insertRow();
-    row.setAttribute('data-patient-id', patient.id);
-    row.setAttribute('draggable', 'true');
-    row.classList.add('cursor-move');
-
-    // Add drag event listeners
-    row.addEventListener('dragstart', handleDragStart);
-    row.addEventListener('dragover', handleDragOver);
-    row.addEventListener('dragenter', handleDragEnter);
-    row.addEventListener('dragleave', handleDragLeave);
-    row.addEventListener('drop', handleDrop);
-    row.addEventListener('dragend', handleDragEnd);
-
-    // Order cell (hidden)
-    const orderCell = row.insertCell();
-    orderCell.textContent = index;
-    orderCell.classList.add('d-none');
-
-    // Time cell - calculate based on start time and index
-    const timeCell = row.insertCell();
-    const startTime = document.getElementById('editRoundsStartTime').value || '08:30';
-    let timeSlot = startTime;
-    for (let i = 0; i < index; i++) {
-        timeSlot = incrementTimeBy10Minutes(timeSlot);
-    }
-    timeCell.textContent = timeSlot;
-
-    // Name cell
-    const nameCell = row.insertCell();
-    nameCell.textContent = patient.name;
-
-    // Employee cell
-    const empCell = row.insertCell();
-    empCell.classList.add('text-center');
-    const germanDateStr = document.getElementById('viewRoundsDate').textContent;
-    const activeEmployees = getActiveEmployees(patient, germanDateStr);
-    empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
-    
-    // Termine cell with events
-    const termineCell = row.insertCell();
-    termineCell.classList.add('text-center');
-    termineCell.textContent = getPatientEvents(patient, germanDateStr);
-
-    // Group cell
-    const groupCell = row.insertCell();
-    groupCell.classList.add('text-center');
-    groupCell.textContent = patient.group || '';
-
-    // Therapy week cell
-    const weekCell = row.insertCell();
-    weekCell.classList.add('text-center');
-    weekCell.textContent = calculatePatientWeek(patient.admission, parseGermanDate(germanDateStr));
-    
-    // Discharge date cell
-    const dischargeCell = row.insertCell();
-    dischargeCell.classList.add('text-center');
-    dischargeCell.textContent = patient.discharge || '';
-    
-    // Discharge mode cell
-    const dischargeModeCell = row.insertCell();
-    dischargeModeCell.classList.add('text-center');
-    dischargeModeCell.textContent = patient.discharge_mode || '';
-}
 
 /**
  * Hide the edit rounds form
