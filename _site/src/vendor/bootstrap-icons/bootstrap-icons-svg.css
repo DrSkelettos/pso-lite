@@ -182,6 +182,64 @@
   filter: invert(100%) brightness(100%) contrast(100%);
 }
 
+
+/* Bootstrap theme color hover classes */
+.hover-text-primary:hover .bi::before,
+.hover-text-primary[class^="bi-"]:hover::before,
+.hover-text-primary[class*=" bi-"]:hover::before,
+.hover-text-primary:hover .bi::before {
+  filter: invert(34%) sepia(77%) saturate(861%) hue-rotate(182deg) brightness(96%) contrast(98%);
+}
+
+.hover-text-secondary:hover .bi::before,
+.hover-text-secondary[class^="bi-"]:hover::before,
+.hover-text-secondary[class*=" bi-"]:hover::before,
+.hover-text-secondary:hover .bi::before {
+  filter: invert(50%) sepia(9%) saturate(360%) hue-rotate(167deg) brightness(88%) contrast(84%);
+}
+
+.hover-text-success:hover .bi::before,
+.hover-text-success[class^="bi-"]:hover::before,
+.hover-text-success[class*=" bi-"]:hover::before,
+.hover-text-success:hover .bi::before {
+  filter: invert(72%) sepia(40%) saturate(463%) hue-rotate(101deg) brightness(93%) contrast(87%);
+}
+
+.hover-text-danger:hover .bi::before,
+.hover-text-danger[class^="bi-"]:hover::before,
+.hover-text-danger[class*=" bi-"]:hover::before,
+.hover-text-danger:hover .bi::before {
+  filter: invert(29%) sepia(94%) saturate(2258%) hue-rotate(331deg) brightness(85%) contrast(101%);
+}
+
+.hover-text-warning:hover .bi::before,
+.hover-text-warning[class^="bi-"]:hover::before,
+.hover-text-warning[class*=" bi-"]:hover::before,
+.hover-text-warning:hover .bi::before {
+  filter: invert(70%) sepia(96%) saturate(489%) hue-rotate(332deg) brightness(105%) contrast(101%);
+}
+
+.hover-text-info:hover .bi::before,
+.hover-text-info[class^="bi-"]:hover::before,
+.hover-text-info[class*=" bi-"]:hover::before,
+.hover-text-info:hover .bi::before {
+  filter: invert(66%) sepia(16%) saturate(847%) hue-rotate(155deg) brightness(89%) contrast(84%);
+}
+
+.hover-text-light:hover .bi::before,
+.hover-text-light[class^="bi-"]:hover::before,
+.hover-text-light[class*=" bi-"]:hover::before,
+.hover-text-light:hover .bi::before {
+  filter: invert(100%) brightness(100%) contrast(100%);
+}
+
+.hover-text-dark:hover .bi::before,
+.hover-text-dark[class^="bi-"]:hover::before,
+.hover-text-dark[class*=" bi-"]:hover::before,
+.hover-text-dark:hover .bi::before {
+  filter: invert(100%) brightness(100%) contrast(100%);
+}
+
 /* Color helper classes */
 .icon-black {
   --bs-icon-color-invert: 0;

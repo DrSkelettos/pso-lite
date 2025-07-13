@@ -139,6 +139,9 @@
     });
 
     window.addEventListener('dataLoaded', function () {
+        initRounds();
+        showIfAuthorized('#addRoundsButtons', 'editRoundsStation');
+        showIfAuthorized('#editRoundsBtn', 'editRoundsStation');
     });
 </script>
 
@@ -160,15 +163,6 @@
         </div>
     </div>
 
-    <!-- Empty message -->
-    <div id="emptyRoundsMessage" class="row mb-3 d-none">
-        <div class="col">
-            <div class="alert alert-info">
-                Für dieses Datum ist keine Visite eingetragen.
-            </div>
-        </div>
-    </div>
-
     <!-- Add rounds section -->
     <div id="addRoundsSection" class="row mb-3 d-none">
         <div class="col">
@@ -176,7 +170,7 @@
                 Für dieses Datum ist keine Visite eingetragen.
             </div>
         </div>
-        <div class="mt-1">
+        <div class="mt-1 hidden" id="addRoundsButtons">
             <div class="row">
                 <div class="col">
                     <button type="button" id="createRoundsBtn" class="btn btn-primary w-100">
@@ -203,9 +197,17 @@
                             am <span id="viewRoundsDate"></span> ab <span id="viewRoundsStartTime"></span> Uhr
                         </small>
                     </h5>
-                    <button id="editRoundsBtn" class="btn btn-sm btn-outline-primary text-primary">
-                        <i class="bi bi-pencil"></i> Bearbeiten
-                    </button>
+                    <div class="float-end">
+                        <button id="printExternalBtn" class="btn btn-sm btn-outline-secondary me-1" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck/index.html')">
+                            <i class="bi bi-printer me-1 text-secondary hover-text-light"></i> Aushang
+                        </button>
+                        <button id="printInternalBtn" class="btn btn-sm btn-outline-secondary  me-1" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck/internal.html')">
+                            <i class="bi bi-printer me-1 text-secondary hover-text-light"></i> Interne Version
+                        </button>
+                        <button id="editRoundsBtn" class="btn btn-sm btn-outline-primary hidden">
+                            <i class="bi bi-pencil me-1 text-primary hover-text-light"></i> Bearbeiten
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -226,6 +228,20 @@
                                 <!-- Will be filled dynamically -->
                             </tbody>
                         </table>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col">
+                            <button id="printExternalBtn" class="btn btn-outline-primary w-100" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck/index.html')">
+                                <i class="bi bi-printer text-primary hover-text-light me-1"></i> Aushang drucken
+                            </button>
+                        </div>
+                        <div class="col">
+                            <button id="printInternalBtn" class="btn btn-outline-primary w-100" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck/internal.html')">
+                                <i class="bi bi-printer text-primary hover-text-light me-1"></i> Interne Version drucken
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

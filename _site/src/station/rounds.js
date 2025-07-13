@@ -947,7 +947,6 @@ const eventConflictBufferAfter = 10;
  * @returns {Object} - Object with events, conflicting events, and hasConflict flag
  */
 function checkPatientEventConflicts(patient, germanDateStr, timeSlot) {
-    console.log("Checking conflicts for patient: ", patient);
     const date = parseGermanDate(germanDateStr);
     const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 4 = Thursday, ...
     
@@ -1225,8 +1224,3 @@ function copyLatestRounds() {
     // Make the table sortable
     makeTableSortable(activePatientsTable);
 }
-
-// Initialize rounds when data is loaded
-window.addEventListener('dataLoaded', function () {
-    initRounds();
-});

@@ -143,3 +143,8 @@ tr.no-hover:hover {
     position: relative;
     z-index: 1;
 }
+
+.hover-text-light:hover {
+    color: var(--bs-light) !important;
+}
+    
