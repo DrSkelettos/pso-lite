@@ -836,7 +836,7 @@ function getNextThursday() {
 }
 
 /**
- * Get patient events for a specific day
+ * Get patient events for a specific day that fall within the timeframe of rounds
  * @param {Object} patient - Patient object
  * @param {string} germanDateStr - Date in German format (DD.MM.YYYY)
  * @returns {string} - Comma-separated list of events
@@ -846,17 +846,42 @@ function getPatientEvents(patient, germanDateStr) {
     const date = parseGermanDate(germanDateStr);
     const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 4 = Thursday, ...
     
+    // Get rounds start time or default to 08:30
+    let roundsStartTime = '08:30';
+    const startTimeElement = document.getElementById('editRoundsStartTime');
+    if (startTimeElement && startTimeElement.value) {
+        roundsStartTime = startTimeElement.value;
+    }
+    
+    // Parse rounds start time
+    const [startHour, startMinute] = roundsStartTime.split(':').map(Number);
+    
+    // Calculate time window (start time -1 hour to +4 hours)
+    const timeWindowStart = new Date(date);
+    timeWindowStart.setHours(startHour - 1, startMinute, 0, 0);
+    
+    const timeWindowEnd = new Date(date);
+    timeWindowEnd.setHours(startHour + 4, startMinute, 0, 0);
+    
     // Check if the day is Thursday (4)
     if (dayOfWeek === 4) {
-        // Check for MTT for group 3 patients on Thursday
+        // Check for MTT for group 3 patients on Thursday (09:30-10:30)
         if (patient.group && (patient.group === '3-A' || patient.group === '3-B' || patient.group === '3')) {
-            events.push('MTT');
+            const mttTime = new Date(date);
+            mttTime.setHours(9, 30, 0, 0);
+            if (mttTime >= timeWindowStart && mttTime <= timeWindowEnd) {
+                events.push('MTT');
+            }
         }
         
-        // Check for SKT on Thursday
+        // Check for SKT on Thursday (08:05-08:55)
         if (window['therapies-station'] && window['therapies-station'][patient.id] && 
             window['therapies-station'][patient.id].skt === 'X') {
-            events.push('SKT');
+            const sktTime = new Date(date);
+            sktTime.setHours(8, 5, 0, 0);
+            if (sktTime >= timeWindowStart && sktTime <= timeWindowEnd) {
+                events.push('SKT');
+            }
         }
     }
     
@@ -880,7 +905,14 @@ function getPatientEvents(patient, germanDateStr) {
         if (therapies.kreativ_einzel) {
             const kreativMatch = therapies.kreativ_einzel.match(/([MGK])\s*([A-Za-z]{2})\.?\s*(\d{1,2}:\d{2})/i);
             if (kreativMatch && kreativMatch[2].toLowerCase() === weekdayShort.toLowerCase()) {
-                events.push(`${kreativMatch[1]} ${kreativMatch[3]}`);
+                // Check if the time is within the window
+                const [eventHour, eventMinute] = kreativMatch[3].split(':').map(Number);
+                const eventTime = new Date(date);
+                eventTime.setHours(eventHour, eventMinute, 0, 0);
+                
+                if (eventTime >= timeWindowStart && eventTime <= timeWindowEnd) {
+                    events.push(`${kreativMatch[1]} ${kreativMatch[3]}`);
+                }
             }
         }
         
@@ -888,7 +920,14 @@ function getPatientEvents(patient, germanDateStr) {
         if (therapies.einzel_physio) {
             const physioMatch = therapies.einzel_physio.match(/([A-Za-z]{2})\.?\s*(\d{1,2}:\d{2})/i);
             if (physioMatch && physioMatch[1].toLowerCase() === weekdayShort.toLowerCase()) {
-                events.push(`P ${physioMatch[2]}`);
+                // Check if the time is within the window
+                const [eventHour, eventMinute] = physioMatch[2].split(':').map(Number);
+                const eventTime = new Date(date);
+                eventTime.setHours(eventHour, eventMinute, 0, 0);
+                
+                if (eventTime >= timeWindowStart && eventTime <= timeWindowEnd) {
+                    events.push(`P ${physioMatch[2]}`);
+                }
             }
         }
     }
