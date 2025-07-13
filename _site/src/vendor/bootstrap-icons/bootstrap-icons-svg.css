@@ -85,6 +85,10 @@
   background-image: url("./svg/coin.svg"); 
 }
 
+.bi-info-circle::before { 
+  background-image: url("./svg/info-circle.svg"); 
+}
+
 .bi-info-square::before { 
   background-image: url("./svg/info-square.svg"); 
 }
