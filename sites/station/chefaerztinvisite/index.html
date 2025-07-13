@@ -4,6 +4,19 @@ active_chefaerztinvisite: active
 title: Chefärztinvisite
 include_navigation: true
 dir: ../../../
+save_data: rounds-station
+save_file: chefaerztinvisite-station
 ---
+<script src="{{ dir }}src/station/rounds.js"></script>
 
-<h1>{{ title }}</h1>
+<script>
+    window.addEventListener('baseDataLoaded', async function () {
+        await loadData('patients-station', 'belegung-station');
+        await loadData('therapies-station', 'therapiezuordnung-station');
+        await loadData('rounds-station', 'chefaerztinvisite-station');
+        window.dispatchEvent(new CustomEvent('dataLoaded'));
+    });
+
+    window.addEventListener('dataLoaded', function () {
+    });
+</script>

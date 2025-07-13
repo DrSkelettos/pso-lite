@@ -95,7 +95,7 @@
                 </div>
             </ul>
 
-            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('', '')">
+            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('rounds-station', 'chefaerztinvisite-station')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
@@ -127,8 +127,19 @@
         </div>
     </nav>
     <div class="container-fluid pb-3">
-        
-<h1>Chefärztinvisite</h1>
+        <script src="../../../src/station/rounds.js"></script>
+
+<script>
+    window.addEventListener('baseDataLoaded', async function () {
+        await loadData('patients-station', 'belegung-station');
+        await loadData('therapies-station', 'therapiezuordnung-station');
+        await loadData('rounds-station', 'chefaerztinvisite-station');
+        window.dispatchEvent(new CustomEvent('dataLoaded'));
+    });
+
+    window.addEventListener('dataLoaded', function () {
+    });
+</script>
     </div>
 
 </body>
