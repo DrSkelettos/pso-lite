@@ -764,6 +764,11 @@ function addPatientToEditRoundsTable(patient, index, table) {
     const germanDateStr = document.getElementById('viewRoundsDate').textContent;
     const activeEmployees = getActiveEmployees(patient, germanDateStr);
     empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
+    
+    // Termine cell (empty for now)
+    const termineCell = row.insertCell();
+    termineCell.classList.add('text-center');
+    termineCell.textContent = '';
 
     // Group cell
     const groupCell = row.insertCell();
@@ -774,6 +779,16 @@ function addPatientToEditRoundsTable(patient, index, table) {
     const weekCell = row.insertCell();
     weekCell.classList.add('text-center');
     weekCell.textContent = calculatePatientWeek(patient.admission, parseGermanDate(germanDateStr));
+    
+    // Discharge date cell
+    const dischargeCell = row.insertCell();
+    dischargeCell.classList.add('text-center');
+    dischargeCell.textContent = patient.discharge || '';
+    
+    // Discharge mode cell
+    const dischargeModeCell = row.insertCell();
+    dischargeModeCell.classList.add('text-center');
+    dischargeModeCell.textContent = patient.discharge_mode || '';
 }
 
 /**
