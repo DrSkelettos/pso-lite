@@ -87,6 +87,38 @@ function initRoundsEventListeners() {
 }
 
 /**
+ * View rounds for a specific date
+ * @param {string} isoDate - Date in ISO format (YYYY-MM-DD)
+ * @param {boolean} isInternalView - Whether this is an internal view
+ */
+function viewRounds(isoDate, isInternalView = false) {
+
+    currentRoundsDate = isoDate;
+    roundsData = window['rounds-station'];
+
+    const roundsForDate = getRoundsForDate(isoDate);
+    if (!roundsForDate)
+        window.close();
+
+    document.getElementById('roundsTitle').textContent = roundsForDate.title;
+    document.getElementById('roundsDate').textContent = roundsForDate.date;
+
+    populateRoundsTable(roundsForDate, !isInternalView);
+}
+
+function getRoundsForDate(isoDate) {
+    const germanDate = formatISOToGermanDate(isoDate);
+    let roundsForDate = null;
+    for (const id in roundsData) {
+        if (roundsData[id].date === germanDate) {
+            roundsForDate = roundsData[id];
+            break;
+        }
+    }
+    return roundsForDate;
+}
+
+/**
  * Check if there are existing rounds for the given date and show the appropriate UI
  * @param {string} isoDate - Date in ISO format (YYYY-MM-DD)
  */
@@ -110,12 +142,12 @@ function checkForExistingRounds(isoDate) {
     }
 
     // Always hide the edit section when changing dates
-    document.getElementById('editRoundsSection').classList.add('d-none');
+    document.getElementById('editRoundsSection')?.classList?.add('d-none');
 
     // Show appropriate UI based on whether we have rounds for this date
     if (roundsForDate) {
         // Show view UI
-        document.getElementById('addRoundsSection').classList.add('d-none');
+        document.getElementById('addRoundsSection')?.classList?.add('d-none');
         document.getElementById('viewRoundsSection').classList.remove('d-none');
 
         // Populate view with data
@@ -127,8 +159,8 @@ function checkForExistingRounds(isoDate) {
         populateRoundsTable(roundsForDate);
     } else {
         // Show add UI
-        document.getElementById('addRoundsSection').classList.remove('d-none');
-        document.getElementById('viewRoundsSection').classList.add('d-none');
+        document.getElementById('addRoundsSection')?.classList?.remove('d-none');
+        document.getElementById('viewRoundsSection')?.classList?.add('d-none');
 
     }
 }
@@ -205,7 +237,7 @@ function addPatientToEditRoundsTable(patient, index, table) {
         // Fallback to current date if neither is available
         germanDateStr = formatISOToGermanDate(new Date().toISOString().split('T')[0]);
     }
-    
+
     const tbody = table.tBodies[0];
     const row = tbody.insertRow();
     row.setAttribute('data-patient-id', patient.id);
@@ -243,28 +275,28 @@ function addPatientToEditRoundsTable(patient, index, table) {
     empCell.classList.add('text-center');
     const activeEmployees = getActiveEmployees(patient, germanDateStr);
     empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
-    
+
     // Check for event conflicts with the timeslot
     const eventConflicts = checkPatientEventConflicts(patient, germanDateStr, timeSlot);
-    
+
     // Termine cell with events
     const termineCell = row.insertCell();
     termineCell.classList.add('text-center');
     termineCell.textContent = eventConflicts.events;
-    
+
     // If there are conflicts, highlight the Termine cell and make conflicting events bold
     if (eventConflicts.hasConflict) {
-        
+
         // Make conflicting events bold
         if (eventConflicts.conflictingEvents.length > 0) {
             // Replace the text with HTML that has bold conflicting events
             termineCell.textContent = '';
-            
+
             const eventsArray = eventConflicts.events.split(', ');
             eventsArray.forEach((event, i) => {
                 // Check if this event is in the conflicting events list
                 const isConflicting = eventConflicts.conflictingEvents.includes(event);
-                
+
                 // Create a span for the event
                 const eventSpan = document.createElement('span');
                 if (isConflicting) {
@@ -272,10 +304,10 @@ function addPatientToEditRoundsTable(patient, index, table) {
                     eventSpan.classList.add('text-danger');
                 }
                 eventSpan.textContent = event;
-                
+
                 // Add the span to the cell
                 termineCell.appendChild(eventSpan);
-                
+
                 // Add comma if not the last event
                 if (i < eventsArray.length - 1) {
                     termineCell.appendChild(document.createTextNode(', '));
@@ -293,12 +325,12 @@ function addPatientToEditRoundsTable(patient, index, table) {
     const weekCell = row.insertCell();
     weekCell.classList.add('text-center');
     weekCell.textContent = calculatePatientWeek(patient.admission, parseGermanDate(germanDateStr));
-    
+
     // Discharge date cell
     const dischargeCell = row.insertCell();
     dischargeCell.classList.add('text-center');
     dischargeCell.textContent = patient.discharge || '';
-    
+
     // Discharge mode cell
     const dischargeModeCell = row.insertCell();
     dischargeModeCell.classList.add('text-center');
@@ -441,7 +473,7 @@ function updateRowOrder(tbody) {
         // Fallback to current date if neither is available
         germanDateStr = formatISOToGermanDate(new Date().toISOString().split('T')[0]);
     }
-    
+
     Array.from(tbody.rows).forEach((row, idx) => {
         // Update order index
         row.cells[0].textContent = idx;
@@ -457,30 +489,30 @@ function updateRowOrder(tbody) {
             timeSlot = incrementTimeBy10Minutes(timeSlot);
         }
         row.cells[1].textContent = timeSlot;
-        
+
         // Update Termine cell with conflict highlighting
         // Get patient ID
         const patientId = row.getAttribute('data-patient-id');
-        
+
         // Find the patient object
         const patient = window['patients-station'] ? window['patients-station'][patientId] : null;
         if (!patient) return;
-        
+
         // Add ID to patient object for consistency with other functions
         patient.id = patientId;
-        
+
         // Check for event conflicts with the new time slot
         const eventConflicts = checkPatientEventConflicts(patient, germanDateStr, timeSlot);
-        
+
         // Get the Termine cell (fifth cell)
         const termineCell = row.cells[4];
-        
+
         // Clear existing content and classes
         termineCell.textContent = '';
-        
+
         // Set the events text
         termineCell.textContent = eventConflicts.events;
-        
+
         // If there are conflicts, highlight the Termine cell and make conflicting events bold
         if (eventConflicts.hasConflict) {
 
@@ -488,12 +520,12 @@ function updateRowOrder(tbody) {
             if (eventConflicts.conflictingEvents.length > 0) {
                 // Replace the text with HTML that has bold conflicting events
                 termineCell.textContent = '';
-                
+
                 const eventsArray = eventConflicts.events.split(', ');
                 eventsArray.forEach((event, i) => {
                     // Check if this event is in the conflicting events list
                     const isConflicting = eventConflicts.conflictingEvents.includes(event);
-                    
+
                     // Create a span for the event
                     const eventSpan = document.createElement('span');
                     if (isConflicting) {
@@ -501,10 +533,10 @@ function updateRowOrder(tbody) {
                         eventSpan.classList.add('text-danger');
                     }
                     eventSpan.textContent = event;
-                    
+
                     // Add the span to the cell
                     termineCell.appendChild(eventSpan);
-                    
+
                     // Add comma if not the last event
                     if (i < eventsArray.length - 1) {
                         termineCell.appendChild(document.createTextNode(', '));
@@ -623,10 +655,11 @@ function createNewRounds() {
 /**
  * Populate the rounds table with the given rounds data
  * @param {Object} rounds - Rounds data
+ * @param {boolean} hideInternal - Whether to hide internal rows
  */
-function populateRoundsTable(rounds) {
+function populateRoundsTable(rounds, hideInternal = false) {
     const tbody = document.getElementById('viewRoundsPatientsTable').tBodies[0];
-
+console.log("hide internal", hideInternal)
     // Clear existing rows
     while (tbody.rows.length > 0) {
         tbody.deleteRow(0);
@@ -664,31 +697,39 @@ function populateRoundsTable(rounds) {
             empCell.classList.add('text-center');
             const activeEmployees = getActiveEmployees(patient, rounds.date);
             empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
-            
-            // Termine cell with events
-            const termineCell = row.insertCell();
-            termineCell.classList.add('text-center');
-            termineCell.textContent = getPatientEvents(patient, rounds.date);
 
             // Group cell
             const groupCell = row.insertCell();
             groupCell.classList.add('text-center');
             groupCell.textContent = patient.group || '';
 
+            // Termine cell with events
+            if (!hideInternal) {
+                const termineCell = row.insertCell();
+                termineCell.classList.add('text-center');
+                termineCell.textContent = getPatientEvents(patient, rounds.date);
+            }
+
             // Therapy week cell
-            const weekCell = row.insertCell();
-            weekCell.classList.add('text-center');
-            weekCell.textContent = calculatePatientWeek(patient.admission, parseGermanDate(rounds.date));
-            
+            if (!hideInternal) {
+                const weekCell = row.insertCell();
+                weekCell.classList.add('text-center');
+                weekCell.textContent = calculatePatientWeek(patient.admission, parseGermanDate(rounds.date));
+            }
+
             // Discharge date cell
-            const dischargeCell = row.insertCell();
-            dischargeCell.classList.add('text-center');
-            dischargeCell.textContent = patient.discharge || '';
-            
+            if (!hideInternal) {
+                const dischargeCell = row.insertCell();
+                dischargeCell.classList.add('text-center');
+                dischargeCell.textContent = patient.discharge || '';
+            }
+
             // Discharge mode cell
-            const dischargeModeCell = row.insertCell();
-            dischargeModeCell.classList.add('text-center');
-            dischargeModeCell.textContent = patient.discharge_mode || '';
+            if (!hideInternal) {
+                const dischargeModeCell = row.insertCell();
+                dischargeModeCell.classList.add('text-center');
+                dischargeModeCell.textContent = patient.discharge_mode || '';
+            }
 
             // Remove from map to track which patients we've included
             delete activePatientsMap[patientId];
@@ -717,7 +758,7 @@ function populateRoundsTable(rounds) {
         empCell.classList.add('text-center');
         const activeEmployees = getActiveEmployees(patient, rounds.date);
         empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
-        
+
         // Termine cell with events
         const termineCell = row.insertCell();
         termineCell.classList.add('text-center');
@@ -732,12 +773,12 @@ function populateRoundsTable(rounds) {
         const weekCell = row.insertCell();
         weekCell.classList.add('text-center');
         weekCell.textContent = calculatePatientWeek(patient.admission, parseGermanDate(rounds.date));
-        
+
         // Discharge date cell
         const dischargeCell = row.insertCell();
         dischargeCell.classList.add('text-center');
         dischargeCell.textContent = patient.discharge || '';
-        
+
         // Discharge mode cell
         const dischargeModeCell = row.insertCell();
         dischargeModeCell.classList.add('text-center');
@@ -924,12 +965,12 @@ function getNextThursday() {
     const today = new Date();
     const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, ..., 4 = Thursday, ...
     const daysUntilThursday = (4 - dayOfWeek + 7) % 7;
-    
+
     // If today is Thursday and it's before noon, return today
     if (dayOfWeek === 4 && today.getHours() < 12) {
         return today.toISOString().split('T')[0];
     }
-    
+
     // Otherwise, return the next Thursday
     const nextThursday = new Date(today);
     nextThursday.setDate(today.getDate() + daysUntilThursday);
@@ -949,69 +990,69 @@ const eventConflictBufferAfter = 10;
 function checkPatientEventConflicts(patient, germanDateStr, timeSlot) {
     const date = parseGermanDate(germanDateStr);
     const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 4 = Thursday, ...
-    
+
     // Parse the timeslot
     const [slotHour, slotMinute] = timeSlot.split(':').map(Number);
     const slotTime = new Date(date);
     slotTime.setHours(slotHour, slotMinute, 0, 0);
-    
+
     const events = [];
     const conflictingEvents = [];
     let hasConflict = false;
-    
+
     // Check if the day is Thursday (4)
     if (dayOfWeek === 4) {
         // Check for MTT for group 3 patients on Thursday (09:30-10:30)
         if (patient.group && (patient.group === '3-A' || patient.group === '3-B' || patient.group === '3')) {
             const mttStartTime = new Date(date);
             mttStartTime.setHours(9, 30, 0, 0);
-            
+
             // MTT is 60 minutes long
             const mttEndTime = new Date(mttStartTime);
             mttEndTime.setMinutes(mttStartTime.getMinutes() + 60);
-            
+
             events.push('MTT');
-            
+
             // Check if MTT conflicts with the timeslot
             // Conflict if the slot time is between (event_start_time - buffer) and (event_end_time + buffer)
             const eventBufferStart = new Date(mttStartTime);
             eventBufferStart.setMinutes(mttStartTime.getMinutes() - eventConflictBufferBefore);
-            
+
             const eventBufferEnd = new Date(mttEndTime);
             eventBufferEnd.setMinutes(mttEndTime.getMinutes() + eventConflictBufferAfter);
-            
+
             if (slotTime >= eventBufferStart && slotTime <= eventBufferEnd) {
                 conflictingEvents.push('MTT');
                 hasConflict = true;
             }
         }
-        
+
         // Check for SKT on Thursday (08:05-08:55)
-        if (window['therapies-station'] && window['therapies-station'][patient.id] && 
+        if (window['therapies-station'] && window['therapies-station'][patient.id] &&
             window['therapies-station'][patient.id].skt === 'X') {
             const sktStartTime = new Date(date);
             sktStartTime.setHours(8, 5, 0, 0);
-            
+
             // SKT is 50 minutes long
             const sktEndTime = new Date(sktStartTime);
             sktEndTime.setMinutes(sktStartTime.getMinutes() + 50);
-            
+
             events.push('SKT');
-            
+
             // Check if SKT conflicts with the timeslot
             const eventBufferStart = new Date(sktStartTime);
             eventBufferStart.setMinutes(sktStartTime.getMinutes() - eventConflictBufferBefore);
-            
+
             const eventBufferEnd = new Date(sktEndTime);
             eventBufferEnd.setMinutes(sktEndTime.getMinutes() + eventConflictBufferAfter);
-            
+
             if (slotTime >= eventBufferStart && slotTime <= eventBufferEnd) {
                 conflictingEvents.push('SKT');
                 hasConflict = true;
             }
         }
     }
-    
+
     // Get German weekday short name for the date
     const weekdayMap = {
         0: 'So', // Sunday
@@ -1023,11 +1064,11 @@ function checkPatientEventConflicts(patient, germanDateStr, timeSlot) {
         6: 'Sa'  // Saturday
     };
     const weekdayShort = weekdayMap[dayOfWeek];
-    
+
     // Check for kreativ_einzel and einzel_physio appointments
     if (window['therapies-station'] && window['therapies-station'][patient.id]) {
         const therapies = window['therapies-station'][patient.id];
-        
+
         // Check kreativ_einzel (50 minutes long)
         if (therapies.kreativ_einzel) {
             const kreativMatch = therapies.kreativ_einzel.match(/([MGK])\s*([A-Za-z]{2})\.?\s*(\d{1,2}:\d{2})/i);
@@ -1035,29 +1076,29 @@ function checkPatientEventConflicts(patient, germanDateStr, timeSlot) {
                 const [eventHour, eventMinute] = kreativMatch[3].split(':').map(Number);
                 const eventStartTime = new Date(date);
                 eventStartTime.setHours(eventHour, eventMinute, 0, 0);
-                
+
                 // Kreativ_einzel is 50 minutes long
                 const eventEndTime = new Date(eventStartTime);
                 eventEndTime.setMinutes(eventStartTime.getMinutes() + 50);
-                
+
                 const eventText = `${kreativMatch[1]} ${kreativMatch[3]}`;
                 events.push(eventText);
-                
+
                 // Check if the event conflicts with the timeslot
                 // Conflict if the slot time is between (event_start_time - buffer) and (event_end_time + buffer)
                 const eventBufferStart = new Date(eventStartTime);
                 eventBufferStart.setMinutes(eventStartTime.getMinutes() - eventConflictBufferBefore);
-                
+
                 const eventBufferEnd = new Date(eventEndTime);
                 eventBufferEnd.setMinutes(eventEndTime.getMinutes() + eventConflictBufferAfter);
-                
+
                 if (slotTime >= eventBufferStart && slotTime <= eventBufferEnd) {
                     conflictingEvents.push(eventText);
                     hasConflict = true;
                 }
             }
         }
-        
+
         // Check einzel_physio (30 minutes long)
         if (therapies.einzel_physio) {
             const physioMatch = therapies.einzel_physio.match(/([A-Za-z]{2})\.?\s*(\d{1,2}:\d{2})/i);
@@ -1065,22 +1106,22 @@ function checkPatientEventConflicts(patient, germanDateStr, timeSlot) {
                 const [eventHour, eventMinute] = physioMatch[2].split(':').map(Number);
                 const eventStartTime = new Date(date);
                 eventStartTime.setHours(eventHour, eventMinute, 0, 0);
-                
+
                 // Einzel_physio is 30 minutes long
                 const eventEndTime = new Date(eventStartTime);
                 eventEndTime.setMinutes(eventStartTime.getMinutes() + 30);
-                
+
                 const eventText = `P ${physioMatch[2]}`;
                 events.push(eventText);
-                
+
                 // Check if the event conflicts with the timeslot
                 // Conflict if the slot time is between (event_start_time - buffer) and (event_end_time + buffer)
                 const eventBufferStart = new Date(eventStartTime);
                 eventBufferStart.setMinutes(eventStartTime.getMinutes() - eventConflictBufferBefore);
-                
+
                 const eventBufferEnd = new Date(eventEndTime);
                 eventBufferEnd.setMinutes(eventEndTime.getMinutes() + eventConflictBufferAfter);
-                
+
                 if (slotTime >= eventBufferStart && slotTime <= eventBufferEnd) {
                     conflictingEvents.push(eventText);
                     hasConflict = true;
@@ -1088,7 +1129,7 @@ function checkPatientEventConflicts(patient, germanDateStr, timeSlot) {
             }
         }
     }
-    
+
     return {
         events: events.join(', '),
         conflictingEvents: conflictingEvents,
@@ -1109,7 +1150,7 @@ function getPatientEvents(patient, germanDateStr) {
     if (startTimeElement && startTimeElement.value) {
         roundsStartTime = startTimeElement.value;
     }
-    
+
     // Use the checkPatientEventConflicts function to get events
     // We pass a dummy timeslot that's far outside normal hours to avoid conflicts
     const eventInfo = checkPatientEventConflicts(patient, germanDateStr, '23:59');
@@ -1123,43 +1164,43 @@ function copyLatestRounds() {
     // Get the currently selected date
     const dateInput = document.getElementById('roundsDate');
     const targetGermanDate = formatISOToGermanDate(dateInput.value);
-    
+
     // Find the latest rounds
     let latestRounds = null;
     let latestDate = null;
-    
+
     if (window['rounds-station']) {
         for (const id in window['rounds-station']) {
             const rounds = window['rounds-station'][id];
             const roundsDate = parseGermanDate(rounds.date);
-            
+
             // Skip if this is for the target date
             if (rounds.date === targetGermanDate) {
                 continue;
             }
-            
+
             if (!latestDate || roundsDate > latestDate) {
                 latestDate = roundsDate;
                 latestRounds = rounds;
             }
         }
     }
-    
+
     if (!latestRounds) {
         alert('Keine vorherige Visite gefunden zum Kopieren.');
         return;
     }
-    
+
     // Get active patients for the target date
     const activePatients = getActivePatientsForDate(targetGermanDate);
     const activePatientsMap = {};
     activePatients.forEach(patient => {
         activePatientsMap[patient.id] = patient;
     });
-    
+
     // Filter out inactive patients from the latest rounds
     const filteredPatients = latestRounds.patients.filter(patientId => activePatientsMap[patientId]);
-    
+
     // Add any new patients that weren't in the original list
     const includedPatientIds = new Set(filteredPatients);
     activePatients.forEach(patient => {
@@ -1167,7 +1208,7 @@ function copyLatestRounds() {
             filteredPatients.push(patient.id);
         }
     });
-    
+
     // Create new rounds object with copied data
     const newRounds = {
         date: targetGermanDate,
@@ -1175,44 +1216,44 @@ function copyLatestRounds() {
         startTime: latestRounds.startTime,
         patients: filteredPatients
     };
-    
+
     // Initialize window['rounds-station'] if it doesn't exist
     if (!window['rounds-station']) {
         window['rounds-station'] = {};
     }
-    
+
     // Find next available ID
     const maxId = Object.keys(window['rounds-station']).reduce((max, id) => Math.max(max, parseInt(id) || 0), 0);
     const newId = maxId + 1;
-    
+
     // Add the new rounds
     window['rounds-station'][newId] = newRounds;
-    
+
     // Update our local copy of the data
     roundsData = window['rounds-station'];
-    
+
     // Save data
     saveData('rounds-station', 'chefaerztinvisite-station');
-    
+
     // Prepare the edit form
     document.getElementById('editRoundsDate').value = dateInput.value;
     document.getElementById('editRoundsTitle').value = newRounds.title;
     document.getElementById('editRoundsStartTime').value = newRounds.startTime;
     document.getElementById('editRoundsId').value = newId;
-    
+
     // Hide add section, show edit section
     document.getElementById('addRoundsSection').classList.add('d-none');
     document.getElementById('viewRoundsSection').classList.add('d-none');
     document.getElementById('editRoundsSection').classList.remove('d-none');
-    
+
     // Fill the edit table with patients
     const activePatientsTable = document.getElementById('editRoundsPatientsTable');
-    
+
     // Clear existing rows
     while (activePatientsTable.tBodies[0].rows.length > 0) {
         activePatientsTable.tBodies[0].deleteRow(0);
     }
-    
+
     // Add rows for patients in the copied order
     let index = 0;
     filteredPatients.forEach(patientId => {
@@ -1220,7 +1261,7 @@ function copyLatestRounds() {
             addPatientToEditRoundsTable(activePatientsMap[patientId], index++, activePatientsTable);
         }
     });
-    
+
     // Make the table sortable
     makeTableSortable(activePatientsTable);
 }

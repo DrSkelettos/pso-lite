@@ -1,0 +1,93 @@
+---
+layout: layout_print
+dir: ../../../../
+page_size: A4 portrait
+page_width: 210mm
+title: Chefärztinvisite
+---
+
+<script src="{{ dir }}src/station/patients.js"></script>
+<script src="{{ dir }}src/station/rounds.js"></script>
+
+<style>
+    .print-header {
+        margin-bottom: 1rem;
+    }
+
+    .print-header h4 {
+        font-size: 18px !important;
+    }
+
+    .table-bordered>tbody>tr.border-bottom-3 {
+        border-bottom-width: 3px !important;
+    }
+
+    .table-bordered td.border-end-3,
+    .table-bordered th.border-end-3 {
+        border-right: 7px solid #dee2e6 !important;
+    }
+
+    .table {
+        width: 100%;
+    }
+
+    /* Override Bootstrap's default font sizes */
+    .table th,
+    .table td,
+    .table tr {
+        font-size: 120% !important;
+    }
+</style>
+
+<script>
+    window.addEventListener('baseDataLoaded', async function () {
+        await loadData('patients-station', 'belegung-station');
+        await loadData('therapies-station', 'therapiezuordnung-station');
+        await loadData('rounds-station', 'chefaerztinvisite-station');
+        window.dispatchEvent(new CustomEvent('dataLoaded'));
+    });
+
+    window.addEventListener('dataLoaded', function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const dateParam = urlParams.get('date');
+        if (dateParam) {
+            viewRounds(dateParam, false);
+        } else {
+            window.close();
+        }
+    });
+</script>
+
+<div class="container-fluid">
+    <div class="mb-2 text-center">
+        <h1>
+            <span id="roundsTitle">Chefärztinvisite</span>
+            am
+            <span id="roundsDate"></span>
+        </h1>
+    </div>
+    <div class="mb-4 text-center">
+        <h4 class="mb-0">Bitte finden Sie sich 10 Minuten vor Ihrer angegebenen Uhrzeit vor der Glastür ein.</h4>
+        <h4 class="fw-normal">Bei Terminüberschneidungen geht die Visite vor!</h4>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered mb-0" id="viewRoundsPatientsTable">
+            <thead>
+                <tr>
+                    <th width="60">Zeit</th>
+                    <th>Patient:in</th>
+                    <th width="120" class="text-center">Therapeut:in</th>
+                    <th width="80" class="text-center">Gruppe</th>
+                    <!-- <th width="200" class="text-center">Termine</th> -->
+                    <!-- <th width="80" class="text-center">Woche</th> -->
+                    <!-- <th width="120" class="text-center">Entlassung</th> -->
+                    <!-- <th width="120" class="text-center">E-Modus</th> -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Will be filled dynamically -->
+            </tbody>
+        </table>
+    </div>
+</div>

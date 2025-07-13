@@ -198,10 +198,10 @@
                         </small>
                     </h5>
                     <div class="float-end">
-                        <button id="printExternalBtn" class="btn btn-sm btn-outline-secondary me-1" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck/index.html')">
+                        <button id="printExternalBtn" class="btn btn-sm btn-outline-secondary me-1" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck/index.html?date='+currentRoundsDate)">
                             <i class="bi bi-printer me-1 text-secondary hover-text-light"></i> Aushang
                         </button>
-                        <button id="printInternalBtn" class="btn btn-sm btn-outline-secondary  me-1" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck/internal.html')">
+                        <button id="printInternalBtn" class="btn btn-sm btn-outline-secondary  me-1" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck-intern/index.html?date='+currentRoundsDate)">
                             <i class="bi bi-printer me-1 text-secondary hover-text-light"></i> Interne Version
                         </button>
                         <button id="editRoundsBtn" class="btn btn-sm btn-outline-primary hidden">
@@ -217,8 +217,8 @@
                                     <th width="60">Zeit</th>
                                     <th>Patient:in</th>
                                     <th width="120" class="text-center">Therapeut:in</th>
-                                    <th width="200" class="text-center">Termine</th>
                                     <th width="80" class="text-center">Gruppe</th>
+                                    <th width="200" class="text-center">Termine</th>
                                     <th width="80" class="text-center">Woche</th>
                                     <th width="120" class="text-center">Entlassung</th>
                                     <th width="120" class="text-center">E-Modus</th>
@@ -233,12 +233,12 @@
                 <div class="card-footer">
                     <div class="row">
                         <div class="col">
-                            <button id="printExternalBtn" class="btn btn-outline-primary w-100" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck/index.html')">
+                            <button id="printExternalBtn" class="btn btn-outline-primary w-100" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck/index.html?date='+currentRoundsDate)">
                                 <i class="bi bi-printer text-primary hover-text-light me-1"></i> Aushang drucken
                             </button>
                         </div>
                         <div class="col">
-                            <button id="printInternalBtn" class="btn btn-outline-primary w-100" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck/internal.html')">
+                            <button id="printInternalBtn" class="btn btn-outline-primary w-100" onclick="window.open('../../../sites/station/chefaerztinvisite/ausdruck-intern/index.html?date='+currentRoundsDate)">
                                 <i class="bi bi-printer text-primary hover-text-light me-1"></i> Interne Version drucken
                             </button>
                         </div>
@@ -287,8 +287,8 @@
                                                 <th width="60">Zeit</th>
                                                 <th>Patient:in</th>
                                                 <th width="120" class="text-center">Therapeut:in</th>
-                                                <th width="200" class="text-center">Termine</th>
                                                 <th width="80" class="text-center">Gruppe</th>
+                                                <th width="200" class="text-center">Termine</th>
                                                 <th width="80" class="text-center">Woche</th>
                                                 <th width="120" class="text-center">Entlassung</th>
                                                 <th width="120" class="text-center">E-Modus</th>
