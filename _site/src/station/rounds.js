@@ -244,10 +244,45 @@ function addPatientToEditRoundsTable(patient, index, table) {
     const activeEmployees = getActiveEmployees(patient, germanDateStr);
     empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
     
+    // Check for event conflicts with the timeslot
+    const eventConflicts = checkPatientEventConflicts(patient, germanDateStr, timeSlot);
+    
     // Termine cell with events
     const termineCell = row.insertCell();
     termineCell.classList.add('text-center');
-    termineCell.textContent = getPatientEvents(patient, germanDateStr);
+    termineCell.textContent = eventConflicts.events;
+    
+    // If there are conflicts, highlight the Termine cell and make conflicting events bold
+    if (eventConflicts.hasConflict) {
+        
+        // Make conflicting events bold
+        if (eventConflicts.conflictingEvents.length > 0) {
+            // Replace the text with HTML that has bold conflicting events
+            termineCell.textContent = '';
+            
+            const eventsArray = eventConflicts.events.split(', ');
+            eventsArray.forEach((event, i) => {
+                // Check if this event is in the conflicting events list
+                const isConflicting = eventConflicts.conflictingEvents.includes(event);
+                
+                // Create a span for the event
+                const eventSpan = document.createElement('span');
+                if (isConflicting) {
+                    eventSpan.style.fontWeight = 'bold';
+                    eventSpan.classList.add('text-danger');
+                }
+                eventSpan.textContent = event;
+                
+                // Add the span to the cell
+                termineCell.appendChild(eventSpan);
+                
+                // Add comma if not the last event
+                if (i < eventsArray.length - 1) {
+                    termineCell.appendChild(document.createTextNode(', '));
+                }
+            });
+        }
+    }
 
     // Group cell
     const groupCell = row.insertCell();
@@ -368,7 +403,7 @@ function handleDrop(e) {
             tbody.insertBefore(draggedElement, this);
         }
 
-        // Update the order values
+        // Update the order values and refresh Termine cells with conflict highlighting
         updateRowOrder(tbody);
     }
 
@@ -396,6 +431,17 @@ function handleDragEnd(e) {
  * @param {HTMLElement} tbody - Table body element
  */
 function updateRowOrder(tbody) {
+    // Get the date
+    let germanDateStr;
+    if (document.getElementById('editRoundsDate').value) {
+        germanDateStr = formatISOToGermanDate(document.getElementById('editRoundsDate').value);
+    } else if (document.getElementById('viewRoundsDate').textContent) {
+        germanDateStr = document.getElementById('viewRoundsDate').textContent;
+    } else {
+        // Fallback to current date if neither is available
+        germanDateStr = formatISOToGermanDate(new Date().toISOString().split('T')[0]);
+    }
+    
     Array.from(tbody.rows).forEach((row, idx) => {
         // Update order index
         row.cells[0].textContent = idx;
@@ -411,6 +457,61 @@ function updateRowOrder(tbody) {
             timeSlot = incrementTimeBy10Minutes(timeSlot);
         }
         row.cells[1].textContent = timeSlot;
+        
+        // Update Termine cell with conflict highlighting
+        // Get patient ID
+        const patientId = row.getAttribute('data-patient-id');
+        
+        // Find the patient object
+        const patient = window['patients-station'] ? window['patients-station'][patientId] : null;
+        if (!patient) return;
+        
+        // Add ID to patient object for consistency with other functions
+        patient.id = patientId;
+        
+        // Check for event conflicts with the new time slot
+        const eventConflicts = checkPatientEventConflicts(patient, germanDateStr, timeSlot);
+        
+        // Get the Termine cell (fifth cell)
+        const termineCell = row.cells[4];
+        
+        // Clear existing content and classes
+        termineCell.textContent = '';
+        
+        // Set the events text
+        termineCell.textContent = eventConflicts.events;
+        
+        // If there are conflicts, highlight the Termine cell and make conflicting events bold
+        if (eventConflicts.hasConflict) {
+
+            // Make conflicting events bold
+            if (eventConflicts.conflictingEvents.length > 0) {
+                // Replace the text with HTML that has bold conflicting events
+                termineCell.textContent = '';
+                
+                const eventsArray = eventConflicts.events.split(', ');
+                eventsArray.forEach((event, i) => {
+                    // Check if this event is in the conflicting events list
+                    const isConflicting = eventConflicts.conflictingEvents.includes(event);
+                    
+                    // Create a span for the event
+                    const eventSpan = document.createElement('span');
+                    if (isConflicting) {
+                        eventSpan.style.fontWeight = 'bold';
+                        eventSpan.classList.add('text-danger');
+                    }
+                    eventSpan.textContent = event;
+                    
+                    // Add the span to the cell
+                    termineCell.appendChild(eventSpan);
+                    
+                    // Add comma if not the last event
+                    if (i < eventsArray.length - 1) {
+                        termineCell.appendChild(document.createTextNode(', '));
+                    }
+                });
+            }
+        }
     });
 }
 
@@ -835,52 +936,79 @@ function getNextThursday() {
     return nextThursday.toISOString().split('T')[0];
 }
 
+const eventConflictBufferBefore = 20;
+const eventConflictBufferAfter = 10;
+
 /**
- * Get patient events for a specific day that fall within the timeframe of rounds
+ * Check if patient events conflict with a given timeslot
  * @param {Object} patient - Patient object
  * @param {string} germanDateStr - Date in German format (DD.MM.YYYY)
- * @returns {string} - Comma-separated list of events
+ * @param {string} timeSlot - Time slot in format HH:MM
+ * @returns {Object} - Object with events, conflicting events, and hasConflict flag
  */
-function getPatientEvents(patient, germanDateStr) {
-    const events = [];
+function checkPatientEventConflicts(patient, germanDateStr, timeSlot) {
+    console.log("Checking conflicts for patient: ", patient);
     const date = parseGermanDate(germanDateStr);
     const dayOfWeek = date.getDay(); // 0 = Sunday, 1 = Monday, ..., 4 = Thursday, ...
     
-    // Get rounds start time or default to 08:30
-    let roundsStartTime = '08:30';
-    const startTimeElement = document.getElementById('editRoundsStartTime');
-    if (startTimeElement && startTimeElement.value) {
-        roundsStartTime = startTimeElement.value;
-    }
+    // Parse the timeslot
+    const [slotHour, slotMinute] = timeSlot.split(':').map(Number);
+    const slotTime = new Date(date);
+    slotTime.setHours(slotHour, slotMinute, 0, 0);
     
-    // Parse rounds start time
-    const [startHour, startMinute] = roundsStartTime.split(':').map(Number);
-    
-    // Calculate time window (start time -1 hour to +4 hours)
-    const timeWindowStart = new Date(date);
-    timeWindowStart.setHours(startHour - 1, startMinute, 0, 0);
-    
-    const timeWindowEnd = new Date(date);
-    timeWindowEnd.setHours(startHour + 4, startMinute, 0, 0);
+    const events = [];
+    const conflictingEvents = [];
+    let hasConflict = false;
     
     // Check if the day is Thursday (4)
     if (dayOfWeek === 4) {
         // Check for MTT for group 3 patients on Thursday (09:30-10:30)
         if (patient.group && (patient.group === '3-A' || patient.group === '3-B' || patient.group === '3')) {
-            const mttTime = new Date(date);
-            mttTime.setHours(9, 30, 0, 0);
-            if (mttTime >= timeWindowStart && mttTime <= timeWindowEnd) {
-                events.push('MTT');
+            const mttStartTime = new Date(date);
+            mttStartTime.setHours(9, 30, 0, 0);
+            
+            // MTT is 60 minutes long
+            const mttEndTime = new Date(mttStartTime);
+            mttEndTime.setMinutes(mttStartTime.getMinutes() + 60);
+            
+            events.push('MTT');
+            
+            // Check if MTT conflicts with the timeslot
+            // Conflict if the slot time is between (event_start_time - buffer) and (event_end_time + buffer)
+            const eventBufferStart = new Date(mttStartTime);
+            eventBufferStart.setMinutes(mttStartTime.getMinutes() - eventConflictBufferBefore);
+            
+            const eventBufferEnd = new Date(mttEndTime);
+            eventBufferEnd.setMinutes(mttEndTime.getMinutes() + eventConflictBufferAfter);
+            
+            if (slotTime >= eventBufferStart && slotTime <= eventBufferEnd) {
+                conflictingEvents.push('MTT');
+                hasConflict = true;
             }
         }
         
         // Check for SKT on Thursday (08:05-08:55)
         if (window['therapies-station'] && window['therapies-station'][patient.id] && 
             window['therapies-station'][patient.id].skt === 'X') {
-            const sktTime = new Date(date);
-            sktTime.setHours(8, 5, 0, 0);
-            if (sktTime >= timeWindowStart && sktTime <= timeWindowEnd) {
-                events.push('SKT');
+            const sktStartTime = new Date(date);
+            sktStartTime.setHours(8, 5, 0, 0);
+            
+            // SKT is 50 minutes long
+            const sktEndTime = new Date(sktStartTime);
+            sktEndTime.setMinutes(sktStartTime.getMinutes() + 50);
+            
+            events.push('SKT');
+            
+            // Check if SKT conflicts with the timeslot
+            const eventBufferStart = new Date(sktStartTime);
+            eventBufferStart.setMinutes(sktStartTime.getMinutes() - eventConflictBufferBefore);
+            
+            const eventBufferEnd = new Date(sktEndTime);
+            eventBufferEnd.setMinutes(sktEndTime.getMinutes() + eventConflictBufferAfter);
+            
+            if (slotTime >= eventBufferStart && slotTime <= eventBufferEnd) {
+                conflictingEvents.push('SKT');
+                hasConflict = true;
             }
         }
     }
@@ -901,38 +1029,92 @@ function getPatientEvents(patient, germanDateStr) {
     if (window['therapies-station'] && window['therapies-station'][patient.id]) {
         const therapies = window['therapies-station'][patient.id];
         
-        // Check kreativ_einzel
+        // Check kreativ_einzel (50 minutes long)
         if (therapies.kreativ_einzel) {
             const kreativMatch = therapies.kreativ_einzel.match(/([MGK])\s*([A-Za-z]{2})\.?\s*(\d{1,2}:\d{2})/i);
             if (kreativMatch && kreativMatch[2].toLowerCase() === weekdayShort.toLowerCase()) {
-                // Check if the time is within the window
                 const [eventHour, eventMinute] = kreativMatch[3].split(':').map(Number);
-                const eventTime = new Date(date);
-                eventTime.setHours(eventHour, eventMinute, 0, 0);
+                const eventStartTime = new Date(date);
+                eventStartTime.setHours(eventHour, eventMinute, 0, 0);
                 
-                if (eventTime >= timeWindowStart && eventTime <= timeWindowEnd) {
-                    events.push(`${kreativMatch[1]} ${kreativMatch[3]}`);
+                // Kreativ_einzel is 50 minutes long
+                const eventEndTime = new Date(eventStartTime);
+                eventEndTime.setMinutes(eventStartTime.getMinutes() + 50);
+                
+                const eventText = `${kreativMatch[1]} ${kreativMatch[3]}`;
+                events.push(eventText);
+                
+                // Check if the event conflicts with the timeslot
+                // Conflict if the slot time is between (event_start_time - buffer) and (event_end_time + buffer)
+                const eventBufferStart = new Date(eventStartTime);
+                eventBufferStart.setMinutes(eventStartTime.getMinutes() - eventConflictBufferBefore);
+                
+                const eventBufferEnd = new Date(eventEndTime);
+                eventBufferEnd.setMinutes(eventEndTime.getMinutes() + eventConflictBufferAfter);
+                
+                if (slotTime >= eventBufferStart && slotTime <= eventBufferEnd) {
+                    conflictingEvents.push(eventText);
+                    hasConflict = true;
                 }
             }
         }
         
-        // Check einzel_physio
+        // Check einzel_physio (30 minutes long)
         if (therapies.einzel_physio) {
             const physioMatch = therapies.einzel_physio.match(/([A-Za-z]{2})\.?\s*(\d{1,2}:\d{2})/i);
             if (physioMatch && physioMatch[1].toLowerCase() === weekdayShort.toLowerCase()) {
-                // Check if the time is within the window
                 const [eventHour, eventMinute] = physioMatch[2].split(':').map(Number);
-                const eventTime = new Date(date);
-                eventTime.setHours(eventHour, eventMinute, 0, 0);
+                const eventStartTime = new Date(date);
+                eventStartTime.setHours(eventHour, eventMinute, 0, 0);
                 
-                if (eventTime >= timeWindowStart && eventTime <= timeWindowEnd) {
-                    events.push(`P ${physioMatch[2]}`);
+                // Einzel_physio is 30 minutes long
+                const eventEndTime = new Date(eventStartTime);
+                eventEndTime.setMinutes(eventStartTime.getMinutes() + 30);
+                
+                const eventText = `P ${physioMatch[2]}`;
+                events.push(eventText);
+                
+                // Check if the event conflicts with the timeslot
+                // Conflict if the slot time is between (event_start_time - buffer) and (event_end_time + buffer)
+                const eventBufferStart = new Date(eventStartTime);
+                eventBufferStart.setMinutes(eventStartTime.getMinutes() - eventConflictBufferBefore);
+                
+                const eventBufferEnd = new Date(eventEndTime);
+                eventBufferEnd.setMinutes(eventEndTime.getMinutes() + eventConflictBufferAfter);
+                
+                if (slotTime >= eventBufferStart && slotTime <= eventBufferEnd) {
+                    conflictingEvents.push(eventText);
+                    hasConflict = true;
                 }
             }
         }
     }
     
-    return events.join(', ');
+    return {
+        events: events.join(', '),
+        conflictingEvents: conflictingEvents,
+        hasConflict: hasConflict
+    };
+}
+
+/**
+ * Get patient events for a specific day that fall within the timeframe of rounds
+ * @param {Object} patient - Patient object
+ * @param {string} germanDateStr - Date in German format (DD.MM.YYYY)
+ * @returns {string} - Comma-separated list of events
+ */
+function getPatientEvents(patient, germanDateStr) {
+    // Get rounds start time or default to 08:30
+    let roundsStartTime = '08:30';
+    const startTimeElement = document.getElementById('editRoundsStartTime');
+    if (startTimeElement && startTimeElement.value) {
+        roundsStartTime = startTimeElement.value;
+    }
+    
+    // Use the checkPatientEventConflicts function to get events
+    // We pass a dummy timeslot that's far outside normal hours to avoid conflicts
+    const eventInfo = checkPatientEventConflicts(patient, germanDateStr, '23:59');
+    return eventInfo.events;
 }
 
 /**
