@@ -81,6 +81,10 @@
   background-image: url("./svg/cash-coin.svg"); 
 }
 
+.bi-copy::before { 
+  background-image: url("./svg/copy.svg"); 
+}
+
 .bi-coin::before { 
   background-image: url("./svg/coin.svg"); 
 }

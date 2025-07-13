@@ -27,11 +27,16 @@ save_file: chefaerztinvisite-station
         <div class="col">
             <h1>Chefärztinvisite</h1>
         </div>
-        <div class="col-auto">
+        <div class="col-auto pe-1">
             <div class="input-group">
                 <span class="input-group-text">Datum</span>
                 <input type="date" id="roundsDate" class="form-control">
             </div>
+        </div>
+        <div class="col-auto ps-1">
+            <button type="button" id="nextThursdayBtn" class="btn btn-outline-secondary">
+                Nächster Do.
+            </button>
         </div>
     </div>
 
@@ -52,9 +57,13 @@ save_file: chefaerztinvisite-station
             </div>
         </div>
         <div class="mt-1">
-            <button type="button" id="createRoundsBtn" class="btn btn-primary w-100">
-                <i class="bi bi-plus-circle me-1 text-light"></i> Visite anlegen
-            </button>
+            <div class="row">
+                <div class="col">
+                    <button type="button" id="createRoundsBtn" class="btn btn-primary w-100">
+                        <i class="bi bi-plus-circle me-1 text-light"></i> Neue Visite erstellen
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 

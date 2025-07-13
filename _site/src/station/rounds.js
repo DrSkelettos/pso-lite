@@ -39,6 +39,14 @@ function initRoundsEventListeners() {
         checkForExistingRounds(this.value);
     });
 
+    // Next Thursday button
+    document.getElementById('nextThursdayBtn').addEventListener('click', function () {
+        const datePicker = document.getElementById('roundsDate');
+        datePicker.value = getNextThursday();
+        // Trigger the change event to update the UI
+        datePicker.dispatchEvent(new Event('change'));
+    });
+
     // Create rounds button
     document.getElementById('createRoundsBtn').addEventListener('click', function () {
         createNewRounds();
@@ -741,6 +749,23 @@ function deleteRounds() {
             checkForExistingRounds(dateInput.value);
         }
     }
+}
+
+/**
+ * Get the date of the next Thursday in ISO format (YYYY-MM-DD)
+ */
+function getNextThursday() {
+    const today = new Date();
+    const dayOfWeek = today.getDay(); // 0 = Sunday, 4 = Thursday
+    const daysUntilThursday = (4 + 7 - dayOfWeek) % 7;
+    
+    // If today is Thursday, get next Thursday (add 7 days)
+    const daysToAdd = daysUntilThursday === 0 ? 7 : daysUntilThursday;
+    
+    const nextThursday = new Date(today);
+    nextThursday.setDate(today.getDate() + daysToAdd);
+    
+    return nextThursday.toISOString().split('T')[0];
 }
 
 // Initialize rounds when data is loaded
