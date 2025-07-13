@@ -19,6 +19,11 @@ function initRounds() {
     // Set default time to 08:30
     document.getElementById('roundsStartTime').value = '08:30';
     
+    // Copy data from window to local variable
+    if (window['rounds-station']) {
+        roundsData = window['rounds-station'];
+    }
+    
     // Initialize event listeners
     initRoundsEventListeners();
     
@@ -32,6 +37,8 @@ function initRounds() {
 function initRoundsEventListeners() {
     // Date picker change
     document.getElementById('roundsDate').addEventListener('change', function() {
+        // Hide edit section and show appropriate section based on date
+        document.getElementById('editRoundsSection').classList.add('d-none');
         checkForExistingRounds(this.value);
     });
     
@@ -39,6 +46,13 @@ function initRoundsEventListeners() {
     document.getElementById('addRoundsForm').addEventListener('submit', function(e) {
         e.preventDefault();
         addOrUpdateRounds();
+    });
+    
+    // Listen for data updates
+    window.addEventListener('dataSaved', function() {
+        if (window['rounds-station']) {
+            roundsData = window['rounds-station'];
+        }
     });
     
     // Edit rounds button
@@ -64,47 +78,51 @@ function initRoundsEventListeners() {
 }
 
 /**
- * Check if rounds exist for the given date and display accordingly
- * @param {string} dateString - Date in ISO format (YYYY-MM-DD)
+ * Check if there are existing rounds for the given date and show the appropriate UI
+ * @param {string} isoDate - Date in ISO format (YYYY-MM-DD)
  */
-function checkForExistingRounds(dateString) {
-    currentRoundsDate = dateString;
-    const germanDateString = formatISOToGermanDate(dateString);
+function checkForExistingRounds(isoDate) {
+    // Store the current date
+    currentRoundsDate = isoDate;
     
-    // Check if we have rounds for this date
-    let existingRounds = null;
+    // Convert to German date format for lookup
+    const germanDate = formatISOToGermanDate(isoDate);
     
-    if (window['rounds-station']) {
-        for (const id in window['rounds-station']) {
-            if (window['rounds-station'][id].date === germanDateString) {
-                existingRounds = window['rounds-station'][id];
-                existingRounds.id = id;
-                break;
-            }
+    // Get active patients for this date
+    const activePatients = getActivePatientsForDate(germanDate);
+    
+    // Check if we have rounds data for this date
+    let roundsForDate = null;
+    for (const id in roundsData) {
+        if (roundsData[id].date === germanDate) {
+            roundsForDate = roundsData[id];
+            break;
         }
     }
     
-    if (existingRounds) {
-        // Show the existing rounds
+    // Always hide the edit section when changing dates
+    document.getElementById('editRoundsSection').classList.add('d-none');
+    
+    // Show appropriate UI based on whether we have rounds for this date
+    if (roundsForDate) {
+        // Show view UI
         document.getElementById('addRoundsSection').classList.add('d-none');
         document.getElementById('viewRoundsSection').classList.remove('d-none');
-        document.getElementById('emptyRoundsMessage').classList.add('d-none');
         
-        // Display rounds information
-        document.getElementById('viewRoundsTitle').textContent = existingRounds.title;
-        document.getElementById('viewRoundsDate').textContent = existingRounds.date;
-        document.getElementById('viewRoundsStartTime').textContent = existingRounds.startTime;
+        // Populate view with data
+        document.getElementById('viewRoundsTitle').textContent = roundsForDate.title;
+        document.getElementById('viewRoundsDate').textContent = roundsForDate.date;
+        document.getElementById('viewRoundsStartTime').textContent = roundsForDate.startTime;
         
-        // Populate the rounds table
-        populateRoundsTable(existingRounds);
+        // Populate table
+        populateRoundsTable(roundsForDate);
     } else {
-        // No rounds for this date, show empty message or add form
+        // Show add UI
         document.getElementById('addRoundsSection').classList.remove('d-none');
         document.getElementById('viewRoundsSection').classList.add('d-none');
-        document.getElementById('emptyRoundsMessage').classList.remove('d-none');
         
-        // Pre-fill the add form with active patients
-        prefillAddRoundsForm(dateString);
+        // Populate add table with active patients
+        prefillAddRoundsForm(isoDate);
     }
 }
 
@@ -199,8 +217,13 @@ function makeTableSortable(table) {
  * @param {Event} e - Drag event
  */
 function handleDragStart(e) {
+    // Store the dragged element
     draggedElement = this;
+    
+    // Add dragging class for visual feedback
     this.classList.add('dragging');
+    
+    // Set drag effect and data
     e.dataTransfer.effectAllowed = 'move';
     e.dataTransfer.setData('text/plain', this.getAttribute('data-patient-id'));
 }
@@ -210,10 +233,22 @@ function handleDragStart(e) {
  * @param {Event} e - Drag event
  */
 function handleDragOver(e) {
-    if (e.preventDefault) {
-        e.preventDefault();
-    }
+    // Prevent default to allow drop
+    e.preventDefault();
+    
+    // Set the drop effect
     e.dataTransfer.dropEffect = 'move';
+    
+    // Add drag-over class to this row
+    if (!this.classList.contains('drag-over') && this !== draggedElement) {
+        // Remove from all rows first
+        const rows = this.parentNode.querySelectorAll('tr');
+        rows.forEach(row => row.classList.remove('drag-over'));
+        
+        // Add to current row
+        this.classList.add('drag-over');
+    }
+    
     return false;
 }
 
@@ -222,6 +257,12 @@ function handleDragOver(e) {
  * @param {Event} e - Drag event
  */
 function handleDragEnter(e) {
+    e.preventDefault();
+    // Remove drag-over class from all rows
+    const rows = this.parentNode.querySelectorAll('tr');
+    rows.forEach(row => row.classList.remove('drag-over'));
+    
+    // Add drag-over class to current row
     this.classList.add('drag-over');
 }
 
@@ -230,7 +271,8 @@ function handleDragEnter(e) {
  * @param {Event} e - Drag event
  */
 function handleDragLeave(e) {
-    this.classList.remove('drag-over');
+    // Don't remove the class here, as it causes flickering
+    // We'll handle this in dragEnter by removing from all rows first
 }
 
 /**
@@ -238,26 +280,32 @@ function handleDragLeave(e) {
  * @param {Event} e - Drag event
  */
 function handleDrop(e) {
-    if (e.stopPropagation) {
-        e.stopPropagation();
-    }
+    e.stopPropagation();
     
+    // Remove drag-over class from all rows
+    const rows = this.parentNode.querySelectorAll('tr');
+    rows.forEach(row => row.classList.remove('drag-over'));
+    
+    // Don't do anything if dropping the same row we're dragging
     if (draggedElement !== this) {
-        const table = this.closest('tbody');
-        const draggedIdx = Array.from(table.rows).indexOf(draggedElement);
-        const dropIdx = Array.from(table.rows).indexOf(this);
+        // Get the table body
+        const tbody = this.parentNode;
         
-        if (draggedIdx < dropIdx) {
-            table.insertBefore(draggedElement, this.nextSibling);
+        // Get the indices of the dragged and target rows
+        const draggedIndex = Array.from(tbody.children).indexOf(draggedElement);
+        const targetIndex = Array.from(tbody.children).indexOf(this);
+        
+        // Reorder the rows
+        if (draggedIndex < targetIndex) {
+            tbody.insertBefore(draggedElement, this.nextSibling);
         } else {
-            table.insertBefore(draggedElement, this);
+            tbody.insertBefore(draggedElement, this);
         }
         
-        // Update order values
-        updateRowOrder(table);
+        // Update the order values
+        updateRowOrder(tbody);
     }
     
-    this.classList.remove('drag-over');
     return false;
 }
 
@@ -266,7 +314,14 @@ function handleDrop(e) {
  * @param {Event} e - Drag event
  */
 function handleDragEnd(e) {
+    // Remove the dragging class
     this.classList.remove('dragging');
+    
+    // Remove drag-over class from all rows
+    const rows = this.parentNode.querySelectorAll('tr');
+    rows.forEach(row => row.classList.remove('drag-over'));
+    
+    // Clear the draggedElement reference
     draggedElement = null;
 }
 
@@ -373,14 +428,19 @@ function addOrUpdateRounds() {
         window['rounds-station'][existingRoundId] = rounds;
     } else {
         // Find next available ID
-        const nextId = Object.keys(window['rounds-station']).length > 0 
-            ? Math.max(...Object.keys(window['rounds-station']).map(Number)) + 1 
-            : 1;
-        window['rounds-station'][nextId] = rounds;
+        const maxId = Object.keys(window['rounds-station']).reduce((max, id) => Math.max(max, parseInt(id) || 0), 0);
+        window['rounds-station'][maxId + 1] = rounds;
     }
     
+    // Update our local copy of the data
+    roundsData = window['rounds-station'];
+    
     // Save data
-    saveData('rounds-station', 'chefaerztinvisite-station');
+    saveData('rounds-station');
+    
+    // Show the view
+    document.getElementById('addRoundsSection').classList.add('d-none');
+    document.getElementById('viewRoundsSection').classList.remove('d-none');
     
     // Refresh the view
     checkForExistingRounds(dateInput.value);
@@ -644,64 +704,65 @@ function updateRounds() {
     const roundsIdInput = document.getElementById('editRoundsId');
     
     if (!dateInput.value || !titleInput.value || !startTimeInput.value || !roundsIdInput.value) {
-        alert('Bitte füllen Sie alle erforderlichen Felder aus.');
+        alert('Fehler: Unvollständige Daten.');
         return;
     }
     
-    const germanDateStr = formatISOToGermanDate(dateInput.value);
     const roundsId = roundsIdInput.value;
+    const germanDateStr = formatISOToGermanDate(dateInput.value);
     
     // Get patient order from the table
     const patientsTable = document.getElementById('editRoundsPatientsTable');
     const patientRows = Array.from(patientsTable.tBodies[0].rows);
     const patientOrder = patientRows.map(row => row.getAttribute('data-patient-id'));
     
-    // Create updated rounds object
-    const rounds = {
-        date: germanDateStr,
-        title: titleInput.value,
-        startTime: startTimeInput.value,
-        patients: patientOrder
-    };
-    
-    // Update rounds
-    window['rounds-station'][roundsId] = rounds;
-    
-    // Save data
-    saveData('rounds-station', 'chefaerztinvisite-station');
-    
-    // Refresh the view
-    hideEditRoundsForm();
-    checkForExistingRounds(dateInput.value);
+    // Update rounds object
+    if (window['rounds-station'] && window['rounds-station'][roundsId]) {
+        window['rounds-station'][roundsId] = {
+            date: germanDateStr,
+            title: titleInput.value,
+            startTime: startTimeInput.value,
+            patients: patientOrder
+        };
+        
+        // Update our local copy of the data
+        roundsData = window['rounds-station'];
+        
+        // Save data
+        saveData('rounds-station');
+        
+        // Hide edit form
+        hideEditRoundsForm();
+        
+        // Refresh the view
+        checkForExistingRounds(dateInput.value);
+    } else {
+        alert('Fehler: Visite nicht gefunden.');
+    }
 }
 
 /**
  * Delete rounds
  */
 function deleteRounds() {
-    const roundsIdInput = document.getElementById('editRoundsId');
-    
-    if (!roundsIdInput.value) {
-        alert('Keine Visite zum Löschen ausgewählt.');
-        return;
+    if (confirm('Möchten Sie diese Visite wirklich löschen?')) {
+        const roundsId = document.getElementById('editRoundsId').value;
+        const dateInput = document.getElementById('editRoundsDate');
+        
+        if (roundsId && window['rounds-station'] && window['rounds-station'][roundsId]) {
+            delete window['rounds-station'][roundsId];
+            
+            // Update our local copy of the data
+            roundsData = window['rounds-station'];
+            
+            // Save data
+            saveData('rounds-station');
+            
+            // Refresh the view
+            hideEditRoundsForm();
+            checkForExistingRounds(dateInput.value);
+        }
     }
-    
-    if (!confirm('Möchten Sie diese Visite wirklich löschen?')) {
-        return;
-    }
-    
-    const roundsId = roundsIdInput.value;
-    const dateInput = document.getElementById('editRoundsDate');
-    
-    // Delete rounds
-    delete window['rounds-station'][roundsId];
-    
-    // Save data
-    saveData('rounds-station', 'chefaerztinvisite-station');
-    
-    // Refresh the view
-    hideEditRoundsForm();
-    checkForExistingRounds(dateInput.value);
 }
 
 // Initialize rounds when data is loaded
