@@ -84,6 +84,52 @@ function initRoundsEventListeners() {
     document.getElementById('deleteRoundsBtn').addEventListener('click', function () {
         deleteRounds();
     });
+    
+    // Add context menu event listener to the edit rounds table
+    document.getElementById('editRoundsPatientsTable').addEventListener('contextmenu', function(e) {
+        // Find the closest row element
+        const row = e.target.closest('tr');
+        if (row && row.hasAttribute('data-patient-id')) {
+            // Only handle context menu in edit mode
+            if (!document.getElementById('editRoundsForm').classList.contains('d-none')) {
+                e.preventDefault();
+                
+                const patientId = row.getAttribute('data-patient-id');
+                if (!patientId) return;
+                
+                // Prompt for additional event
+                const eventText = prompt('Tragen Sie zusätzliche Termine ein:', window['patient-events-station']?.[patientId]?.rounds || '');
+                if (eventText && eventText.trim() !== '') {
+                    // Get or initialize patient events data
+                    if (!window['patient-events-station']) {
+                        window['patient-events-station'] = {};
+                    }
+                    
+                    // Add or update the rounds event for this patient
+                    if (!window['patient-events-station'][patientId]) {
+                        window['patient-events-station'][patientId] = {};
+                    }
+                    
+                    window['patient-events-station'][patientId].rounds = eventText.trim();
+                    
+                    // Save the data
+                    saveData('patient-events-station', 'patienten-termine-station');
+                    
+                    // Update the termine cell
+                    const termineCell = row.querySelector('td:nth-child(6)');
+                    if (termineCell) {
+                        // If there's existing content, append the custom event
+                        const existingContent = termineCell.textContent.trim();
+                        if (existingContent) {
+                            termineCell.innerHTML = existingContent + ', <span class="fw-bold">' + eventText.trim() + '</span>';
+                        } else {
+                            termineCell.innerHTML = '<span class="fw-bold">' + eventText.trim() + '</span>';
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
 
 /**
@@ -1154,7 +1200,19 @@ function getPatientEvents(patient, germanDateStr) {
     // Use the checkPatientEventConflicts function to get events
     // We pass a dummy timeslot that's far outside normal hours to avoid conflicts
     const eventInfo = checkPatientEventConflicts(patient, germanDateStr, '23:59');
-    return eventInfo.events;
+    
+    // Check for custom rounds events from patient-events-station
+    let events = eventInfo.events;
+    if (window['patient-events-station'] && window['patient-events-station'][patient.id] && 
+        window['patient-events-station'][patient.id].rounds) {
+        if (events) {
+            events += ', ' + window['patient-events-station'][patient.id].rounds;
+        } else {
+            events = window['patient-events-station'][patient.id].rounds;
+        }
+    }
+    
+    return events;
 }
 
 /**
