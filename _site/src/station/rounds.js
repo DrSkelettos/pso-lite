@@ -276,6 +276,11 @@ function addPatientToEditRoundsTable(patient, index, table) {
     const activeEmployees = getActiveEmployees(patient, germanDateStr);
     empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
 
+    // Group cell
+    const groupCell = row.insertCell();
+    groupCell.classList.add('text-center');
+    groupCell.textContent = patient.group || '';
+
     // Check for event conflicts with the timeslot
     const eventConflicts = checkPatientEventConflicts(patient, germanDateStr, timeSlot);
 
@@ -315,11 +320,6 @@ function addPatientToEditRoundsTable(patient, index, table) {
             });
         }
     }
-
-    // Group cell
-    const groupCell = row.insertCell();
-    groupCell.classList.add('text-center');
-    groupCell.textContent = patient.group || '';
 
     // Therapy week cell
     const weekCell = row.insertCell();
@@ -505,7 +505,7 @@ function updateRowOrder(tbody) {
         const eventConflicts = checkPatientEventConflicts(patient, germanDateStr, timeSlot);
 
         // Get the Termine cell (fifth cell)
-        const termineCell = row.cells[4];
+        const termineCell = row.cells[5];
 
         // Clear existing content and classes
         termineCell.textContent = '';
