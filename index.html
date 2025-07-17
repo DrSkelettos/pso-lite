@@ -42,8 +42,7 @@ dir: ./
 
         <!-- Therapiezuordnung -->
         <div class="col hidden" id="dashboardLinkTherapiesStation">
-            <div class="card text-center cursor-pointer"
-                onclick="window.location.href='sites/station/therapiezuordnung/index.html';">
+            <div class="card text-center cursor-pointer" onclick="window.location.href='sites/station/therapiezuordnung/index.html';">
                 <div class="card-header">
                     <i class="bi bi-list-columns" style="font-size: 5rem;"></i>
                 </div>
@@ -105,24 +104,22 @@ dir: ./
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        await loadData('patients-station', 'belegung-station');
-        await loadData('kosi-station', 'kostensicherung-station');
-        await loadData('events', 'termine');
-        updateKosiCounts();
-        initCalendarDashboard();
-        updateCalendar();
+        loadMultipleData(['patients-station', 'kosi-station', 'events'], function (result) {
+            updateKosiCounts();
+            initCalendarDashboard();
+            updateCalendar();
 
-        
-        showIfAuthorized('#dashboardLinkPatientsStation', 'viewPatientsStation');
-        showIfAuthorized('#dashboardLinkTherapiesStation', 'viewTherapiesStation');
-        showIfAuthorized('#dashboardLinkRoundsStation', 'viewRoundsStation');
-        showIfAuthorized('#dashboardLinkKosiStation', 'kosiStation');
 
-        if (window['user'].needsToChangePassword) {
-            document.getElementById('passwordChangeAlert').classList.remove('hidden');
-        }
+            showIfAuthorized('#dashboardLinkPatientsStation', 'viewPatientsStation');
+            showIfAuthorized('#dashboardLinkTherapiesStation', 'viewTherapiesStation');
+            showIfAuthorized('#dashboardLinkRoundsStation', 'viewRoundsStation');
+            showIfAuthorized('#dashboardLinkKosiStation', 'kosiStation');
+
+            if (window['user'].needsToChangePassword) {
+                document.getElementById('passwordChangeAlert').classList.remove('hidden');
+            }
+        });
     });
-
 </script>
 </body>
 

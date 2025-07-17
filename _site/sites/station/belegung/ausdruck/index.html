@@ -226,19 +226,14 @@
     // Update document title with current date
     document.title = document.title + ' - ' + dateStr;
 
-    // Load Data
-    window.addEventListener('directoryHandleInitialized', async function () {
-        await loadData('rooms-station', 'zimmer-station');
-        await loadData('patients-station', 'belegung-station');
-        window.dispatchEvent(new CustomEvent('dataLoaded'));
-    });
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['patients-station', 'rooms-station'], function (result) {
+            fillPatientsTable();
+            fillAbsencesTable();
 
-    window.addEventListener('dataLoaded', function () {
-        fillPatientsTable();
-        fillAbsencesTable();
-
-        // Get current patients count
-        currentPatientCount.textContent = Object.keys(filterPatients().current).length;
+            // Get current patients count
+            currentPatientCount.textContent = Object.keys(filterPatients().current).length;
+        });
     });
 </script>
 

@@ -48,16 +48,11 @@ save_file: poststationaer
 {% include "poststationaer/addPatient.html" %}
 
 <script>
-    
-    window.addEventListener('directoryHandleInitialized', async function () {
-        await loadData('poststationaer', 'poststationaer');
-        window.dispatchEvent(new CustomEvent('dataLoaded'));
-    });
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['patients-station', 'poststationaer'], function (result) {
+            fillPoststationaerTable();
 
-    window.addEventListener('dataLoaded', function () {
-        fillPoststationaerTable();
-
-        showIfAuthorized('#therapiezuordnungButton', 'editTherapiesStation');
+            showIfAuthorized('#therapiezuordnungButton', 'editTherapiesStation');
+        });
     });
-    
 </script>

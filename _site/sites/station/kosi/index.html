@@ -134,7 +134,7 @@
     .table-bordered tr.border-bottom-3 {
         border-bottom-width: 3px !important;
     }
-    
+
     /* Unset background color for table cells to make borders visible */
     .table>:not(caption)>*>* {
         background-color: transparent !important;
@@ -169,13 +169,9 @@
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        await loadData('patients-station', 'belegung-station');
-        await loadData('kosi-station', 'kostensicherung-station');
-        window.dispatchEvent(new CustomEvent('dataLoaded'));
-    });
-
-    window.addEventListener('dataLoaded', function () {
-        fillKosiTable();
+        loadMultipleData(['patients-station', 'kosi-station'], function (result) {
+            fillKosiTable();
+        });
     });
 </script>
     </div>

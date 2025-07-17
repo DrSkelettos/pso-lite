@@ -604,18 +604,13 @@
 </script>
 
 <script>
-    window.addEventListener('directoryHandleInitialized', async function () {
-        await loadData('patients-station', 'belegung-station');
-        await loadData('rooms-station', 'zimmer-station');
-        await loadData('therapies-station', 'therapiezuordnung-station');
-        window.dispatchEvent(new CustomEvent('dataLoaded'));
-    });
-
-    window.addEventListener('dataLoaded', function () {
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['patients-station', 'rooms-station', 'therapies-station'], function (result) {
         fillTherapyTable();
 
         showIfAuthorized('#saveButton', 'editTherapiesStation');
         showIfAuthorized('#poststationaerButton', 'editTherapiesStation');
+        });
     });
 </script>
     </div>

@@ -6,9 +6,11 @@ const dataFileMap = {
     'patient-events-station': 'patienten-termine-station',
     'therapies-station': 'therapiezuordnung-station',
     'rounds-station': 'chefaerztinvisite-station',
+    'rooms-station': 'zimmer-station',
     'employees': 'mitarbeiterinnen',
     'settings': 'einstellungen',
-    // Add more mappings as needed
+    'events': 'termine',
+    'kosi-station': 'kostensicherung-station',
 };
 
 /**

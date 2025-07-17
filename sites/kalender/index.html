@@ -20,13 +20,9 @@ save_file: termine
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        await loadData('patients-station', 'belegung-station');
-        await loadData('events', 'termine');
-        window.dispatchEvent(new CustomEvent('dataLoaded'));
-    });
-
-    window.addEventListener('dataLoaded', function () {
-        initCalendar();
-        updateCalendar();
+        loadMultipleData(['patients-station', 'events'], function (result) {
+            initCalendar();
+            updateCalendar();
+        });
     });
 </script>

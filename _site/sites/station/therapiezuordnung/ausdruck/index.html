@@ -284,17 +284,11 @@
     // Update document title with current date
     document.title = document.title + ' - ' + dateStr;
 
-    window.addEventListener('directoryHandleInitialized', async function () {
-        await loadData('patients-station', 'belegung-station');
-        await loadData('rooms-station', 'zimmer-station');
-        await loadData('therapies-station', 'therapiezuordnung-station');
-        await loadData('poststationaer', 'poststationaer');
-        window.dispatchEvent(new CustomEvent('dataLoaded'));
-    });
-
-    window.addEventListener('dataLoaded', function () {
-        fillTherapyTable();
-        fillPoststationaerTherapyTable();
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['patients-station', 'rooms-station', 'therapies-station', 'poststationaer'], function (result) {
+            fillTherapyTable();
+            fillPoststationaerTherapyTable();
+        });
     });
 </script>
 

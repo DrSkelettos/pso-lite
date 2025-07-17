@@ -203,13 +203,10 @@
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        await loadData('patients-station', 'belegung-station');
-        window.dispatchEvent(new CustomEvent('dataLoaded'));
-    });
-
-    window.addEventListener('dataLoaded', function () {
+        loadMultipleData(['patients-station'], function (result) {
         fillGroupWorkloadTable();
         fillEmployeeWorkloadTable();
+        });
     });
 </script>
     </div>
