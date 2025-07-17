@@ -299,7 +299,7 @@
 
         // Add employee options
         for (let empKey in window['employees']) {
-            if(window['employees'][empKey].maxPatients === '-1') continue;
+            if(window['employees'][empKey].patients < 0) continue;
             
             const option = document.createElement('option');
             option.value = empKey;
@@ -516,7 +516,8 @@
 
         // Populate employee options
         for (let id in window['employees']) {
-            if (window['employees'][id].maxPatients === '-1') continue;
+            console.log(window['employees'][id]);
+            if (window['employees'][id].patients < 0) continue;
 
             const option = document.createElement('option');
             option.value = id;
