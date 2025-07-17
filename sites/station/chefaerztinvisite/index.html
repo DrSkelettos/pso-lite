@@ -12,17 +12,11 @@ save_file: chefaerztinvisite-station
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        await loadData('patients-station', 'belegung-station');
-        await loadData('patient-events-station', 'patienten-termine-station');
-        await loadData('therapies-station', 'therapiezuordnung-station');
-        await loadData('rounds-station', 'chefaerztinvisite-station');
-        window.dispatchEvent(new CustomEvent('dataLoaded'));
-    });
-
-    window.addEventListener('dataLoaded', function () {
-        initRounds();
-        showIfAuthorized('#addRoundsButtons', 'editRoundsStation');
-        showIfAuthorized('#editRoundsBtn', 'editRoundsStation');
+        loadMultipleData(['patients-station', 'patient-events-station', 'therapies-station', 'rounds-station'], function (result) {
+            initRounds();
+            showIfAuthorized('#addRoundsButtons', 'editRoundsStation');
+            showIfAuthorized('#editRoundsBtn', 'editRoundsStation');
+        });
     });
 </script>
 

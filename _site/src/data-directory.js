@@ -1,5 +1,79 @@
 let directoryHandle;
 
+// Mapping of data names to their corresponding file names (without .json extension)
+const dataFileMap = {
+    'patients-station': 'belegung-station',
+    'patient-events-station': 'patienten-termine-station',
+    'therapies-station': 'therapiezuordnung-station',
+    'rounds-station': 'chefaerztinvisite-station',
+    'employees': 'mitarbeiterinnen',
+    'settings': 'einstellungen',
+    // Add more mappings as needed
+};
+
+/**
+ * Loads multiple data files in parallel and executes a callback when done
+ * @param {string[]} dataNames - Array of data names to load (e.g., ['patients-station', 'therapies-station'])
+ * @param {Function} [callback] - Optional callback function to execute after all data is loaded
+ * @returns {Promise<Object>} - Object containing loaded data and success status
+ */
+async function loadMultipleData(dataNames, callback) {
+    if (!Array.isArray(dataNames) || dataNames.length === 0) {
+        const error = new Error('Invalid data names array');
+        if (callback) callback({ success: false, error });
+        return { success: false, error };
+    }
+
+    try {
+        // Create an array of load promises with error handling
+        const loadPromises = dataNames.map(dataName => {
+            const fileName = dataFileMap[dataName] || dataName;
+            return loadData(dataName, fileName)
+                .catch(error => {
+                    console.error(`Error loading ${dataName}:`, error);
+                    // Initialize with empty object if loading fails
+                    window[dataName] = {};
+                    return { dataName, success: false, error };
+                });
+        });
+
+        // Wait for all loads to complete
+        const results = await Promise.all(loadPromises);
+        
+        // Check for any failures
+        const failedLoads = results.filter(result => result && !result.success);
+        const success = failedLoads.length === 0;
+        
+        const result = {
+            success,
+            loaded: dataNames.filter((_, index) => results[index]?.success !== false),
+            failed: failedLoads.map((result, index) => ({
+                dataName: dataNames[index],
+                error: result?.error?.message || 'Unknown error'
+            }))
+        };
+
+        // Execute callback if provided
+        if (callback) {
+            try {
+                callback(result);
+            } catch (callbackError) {
+                console.error('Error in loadMultipleData callback:', callbackError);
+            }
+        }
+
+        return result;
+    } catch (error) {
+        console.error('Error in loadMultipleData:', error);
+        const result = { 
+            success: false, 
+            error: error.message || 'Unknown error during data loading' 
+        };        
+        
+        return result;
+    }
+}
+
 // Save directory handle to IndexedDB
 async function saveDirectoryHandle(handle) {
     idbKeyval.set('directory', handle)

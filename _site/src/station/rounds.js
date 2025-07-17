@@ -716,7 +716,7 @@ function createNewRounds() {
  */
 function populateRoundsTable(rounds, hideInternal = false) {
     const tbody = document.getElementById('viewRoundsPatientsTable').tBodies[0];
-console.log("hide internal", hideInternal)
+
     // Clear existing rows
     while (tbody.rows.length > 0) {
         tbody.deleteRow(0);
