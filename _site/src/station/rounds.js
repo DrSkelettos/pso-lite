@@ -121,9 +121,9 @@ function initRoundsEventListeners() {
                         // If there's existing content, append the custom event
                         const existingContent = termineCell.textContent.trim();
                         if (existingContent) {
-                            termineCell.innerHTML = existingContent + ', <span class="fw-bold">' + eventText.trim() + '</span>';
+                            termineCell.innerHTML = existingContent + ', <span>' + eventText.trim() + '</span>';
                         } else {
-                            termineCell.innerHTML = '<span class="fw-bold">' + eventText.trim() + '</span>';
+                            termineCell.innerHTML = '<span>' + eventText.trim() + '</span>';
                         }
                     }
                 }
@@ -333,7 +333,10 @@ function addPatientToEditRoundsTable(patient, index, table) {
     // Termine cell with events
     const termineCell = row.insertCell();
     termineCell.classList.add('text-center');
-    termineCell.textContent = eventConflicts.events;
+    
+    // Get all events including custom events
+    const allEvents = getPatientEvents(patient, germanDateStr);    
+    termineCell.textContent = allEvents;
 
     // If there are conflicts, highlight the Termine cell and make conflicting events bold
     if (eventConflicts.hasConflict) {
@@ -343,10 +346,15 @@ function addPatientToEditRoundsTable(patient, index, table) {
             // Replace the text with HTML that has bold conflicting events
             termineCell.textContent = '';
 
-            const eventsArray = eventConflicts.events.split(', ');
+            // Split all events including custom events
+            const eventsArray = allEvents.split(', ');
             eventsArray.forEach((event, i) => {
                 // Check if this event is in the conflicting events list
                 const isConflicting = eventConflicts.conflictingEvents.includes(event);
+                // Check if this is a custom event from patient-events-station
+                const isCustomEvent = window['patient-events-station']?.[patient.id]?.rounds === event ||
+                                     (window['patient-events-station']?.[patient.id]?.rounds && 
+                                      window['patient-events-station'][patient.id].rounds.includes(event));
 
                 // Create a span for the event
                 const eventSpan = document.createElement('span');
@@ -556,8 +564,11 @@ function updateRowOrder(tbody) {
         // Clear existing content and classes
         termineCell.textContent = '';
 
+        // Get all events including custom events
+        const allEvents = getPatientEvents(patient, germanDateStr);
+        
         // Set the events text
-        termineCell.textContent = eventConflicts.events;
+        termineCell.textContent = allEvents;
 
         // If there are conflicts, highlight the Termine cell and make conflicting events bold
         if (eventConflicts.hasConflict) {
@@ -567,7 +578,7 @@ function updateRowOrder(tbody) {
                 // Replace the text with HTML that has bold conflicting events
                 termineCell.textContent = '';
 
-                const eventsArray = eventConflicts.events.split(', ');
+                const eventsArray = allEvents.split(', ');
                 eventsArray.forEach((event, i) => {
                     // Check if this event is in the conflicting events list
                     const isConflicting = eventConflicts.conflictingEvents.includes(event);
