@@ -252,8 +252,8 @@ function addPatientToAddRoundsTable(patient, index, table) {
     // Employee cell
     const empCell = row.insertCell();
     empCell.classList.add('text-center');
-    const activeEmployees = getActiveEmployees(patient, formatISOToGermanDate(currentRoundsDate));
-    empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
+    const activeEmployee = getActiveEmployee(patient, formatISOToGermanDate(currentRoundsDate));
+    empCell.textContent = activeEmployee;
 
     // Group cell
     const groupCell = row.insertCell();
@@ -319,8 +319,8 @@ function addPatientToEditRoundsTable(patient, index, table) {
     // Employee cell
     const empCell = row.insertCell();
     empCell.classList.add('text-center');
-    const activeEmployees = getActiveEmployees(patient, germanDateStr);
-    empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
+    const activeEmployee = getActiveEmployee(patient, germanDateStr);
+    empCell.textContent = activeEmployee;
 
     // Group cell
     const groupCell = row.insertCell();
@@ -622,6 +622,8 @@ function getActivePatientsForDate(germanDateStr) {
         const admissionDate = parseGermanDate(patient.admission);
         const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;
 
+        if(patient.name === "X") continue;
+
         // Patient is active if admission date is before or on the target date
         // and discharge date is either not set or after the target date
         if (admissionDate <= dateObj && (!dischargeDate || dischargeDate >= dateObj)) {
@@ -752,8 +754,8 @@ function populateRoundsTable(rounds, hideInternal = false) {
             // Employee cell
             const empCell = row.insertCell();
             empCell.classList.add('text-center');
-            const activeEmployees = getActiveEmployees(patient, rounds.date);
-            empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
+            const activeEmployee = getActiveEmployee(patient, rounds.date);
+            empCell.textContent = activeEmployee;
 
             // Group cell
             const groupCell = row.insertCell();
@@ -813,8 +815,8 @@ function populateRoundsTable(rounds, hideInternal = false) {
         // Employee cell
         const empCell = row.insertCell();
         empCell.classList.add('text-center');
-        const activeEmployees = getActiveEmployees(patient, rounds.date);
-        empCell.textContent = activeEmployees.length > 0 ? activeEmployees[0] : '';
+        const activeEmployee = getActiveEmployee(patient, rounds.date);
+        empCell.textContent = activeEmployee;
 
         // Termine cell with events
         const termineCell = row.insertCell();

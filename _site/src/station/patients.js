@@ -56,6 +56,28 @@ function getActiveEmployees(patient, date) {
     }).map(emp => emp.employee);
 }
 
+function getActiveEmployee(patient, date) {
+    const activeEmployees = getActiveEmployees(patient, date);
+    if (activeEmployees.length === 0) return null;
+    
+    // Sort to put employees with end dates (substitutes) first
+    const sortedEmployees = [...patient.employees]
+        .filter(emp => activeEmployees.includes(emp.employee))
+        .sort((a, b) => {
+            // If one has an end date and the other doesn't, the one with end date comes first
+            if (a.end && !b.end) return -1;
+            if (!a.end && b.end) return 1;
+            // If both have end dates, sort by end date (most recent first)
+            if (a.end && b.end) {
+                return parseGermanDate(b.end) - parseGermanDate(a.end);
+            }
+            // If neither has an end date, just return the first one
+            return 0;
+        });
+    
+    return sortedEmployees[0]?.employee || null;
+}
+
 function fillPatientData(row, patient) {
     if (!patient) return;
 
