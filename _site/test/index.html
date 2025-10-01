@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PDF Form Reader</title>
+  <script src="pdf-lib.min.js"></script>
+</head>
+<body>
+  <h1>PDF Formular auslesen</h1>
+  <input type="file" id="pdfFile" accept="application/pdf">
+
+  <pre id="output"></pre>
+
+  <script>
+    document.getElementById('pdfFile').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+
+      try {
+        const form = pdfDoc.getForm();
+        const fields = form.getFields();
+        const data = fields.map(f => {
+          const type = f.constructor.name;
+          let value;
+
+          if (f.getText) value = f.getText();
+          else if (f.isChecked) value = f.isChecked();
+          else if (f.getSelected) value = f.getSelected();
+          else value = "(unbekannter Typ)";
+
+          return {
+            name: f.getName(),
+            type,
+            value
+          };
+        });
+
+        document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById('output').textContent = "⚠️ Kein AcroForm oder Fehler: " + err;
+      }
+    });
+  </script>
+</body>
+</html>
