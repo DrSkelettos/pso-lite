@@ -85,6 +85,11 @@ function initRoundsEventListeners() {
         deleteRounds();
     });
     
+    // Save patient additional content button
+    document.getElementById('savePatientAdditionalContent').addEventListener('click', function () {
+        savePatientAdditionalContent();
+    });
+    
     // Add context menu event listener to the edit rounds table
     document.getElementById('editRoundsPatientsTable').addEventListener('contextmenu', function(e) {
         // Find the closest row element
@@ -97,36 +102,8 @@ function initRoundsEventListeners() {
                 const patientId = row.getAttribute('data-patient-id');
                 if (!patientId) return;
                 
-                // Prompt for additional event
-                const eventText = prompt('Tragen Sie zusätzliche Termine ein:', window['patient-events-station']?.[patientId]?.rounds || '');
-                if (eventText && eventText.trim() !== '') {
-                    // Get or initialize patient events data
-                    if (!window['patient-events-station']) {
-                        window['patient-events-station'] = {};
-                    }
-                    
-                    // Add or update the rounds event for this patient
-                    if (!window['patient-events-station'][patientId]) {
-                        window['patient-events-station'][patientId] = {};
-                    }
-                    
-                    window['patient-events-station'][patientId].rounds = eventText.trim();
-                    
-                    // Save the data
-                    saveData('patient-events-station', 'patienten-termine-station');
-                    
-                    // Update the termine cell
-                    const termineCell = row.querySelector('td:nth-child(6)');
-                    if (termineCell) {
-                        // If there's existing content, append the custom event
-                        const existingContent = termineCell.textContent.trim();
-                        if (existingContent) {
-                            termineCell.innerHTML = existingContent + ', <span>' + eventText.trim() + '</span>';
-                        } else {
-                            termineCell.innerHTML = '<span>' + eventText.trim() + '</span>';
-                        }
-                    }
-                }
+                // Show the modal with patient data
+                showPatientAdditionalContentModal(patientId);
             }
         }
     });
@@ -389,6 +366,14 @@ function addPatientToEditRoundsTable(patient, index, table) {
     const dischargeModeCell = row.insertCell();
     dischargeModeCell.classList.add('text-center');
     dischargeModeCell.textContent = patient.discharge_mode || '';
+
+    // WE cell (weekend) - empty as requested
+    const weCell = row.insertCell();
+    weCell.classList.add('text-center');
+    weCell.textContent = '';
+
+    // Add additional content row if there is any content
+    createAdditionalContentRow(patient, tbody, 9, row);
 }
 
 /**
@@ -469,15 +454,16 @@ function handleDragLeave(e) {
 function handleDrop(e) {
     e.stopPropagation();
 
+    // Remove existing additional content rows before reordering
+    const tbody = this.parentNode;
+    Array.from(tbody.querySelectorAll('.additional-content-row')).forEach(row => row.remove());
+
     // Remove drag-over class from all rows
-    const rows = this.parentNode.querySelectorAll('tr');
+    const rows = tbody.querySelectorAll('tr');
     rows.forEach(row => row.classList.remove('drag-over'));
 
     // Don't do anything if dropping the same row we're dragging
     if (draggedElement !== this) {
-        // Get the table body
-        const tbody = this.parentNode;
-
         // Get the indices of the dragged and target rows
         const draggedIndex = Array.from(tbody.children).indexOf(draggedElement);
         const targetIndex = Array.from(tbody.children).indexOf(this);
@@ -528,7 +514,12 @@ function updateRowOrder(tbody) {
         germanDateStr = formatISOToGermanDate(new Date().toISOString().split('T')[0]);
     }
 
-    Array.from(tbody.rows).forEach((row, idx) => {
+    // Remove previously generated additional content rows
+    Array.from(tbody.querySelectorAll('.additional-content-row')).forEach(row => row.remove());
+
+    const patientRows = Array.from(tbody.rows).filter(row => row.hasAttribute('data-patient-id'));
+
+    patientRows.forEach((row, idx) => {
         // Update order index
         row.cells[0].textContent = idx;
 
@@ -601,6 +592,15 @@ function updateRowOrder(tbody) {
                 });
             }
         }
+
+        // WE cell (weekend) - empty as requested
+        const weCell = row.cells[8];
+        weCell.textContent = '';
+
+        // Re-create additional content row after updating the patient row
+        const hasHiddenOrderCell = row.cells[0]?.classList.contains('d-none');
+        const colspan = row.cells.length - (hasHiddenOrderCell ? 1 : 0);
+        createAdditionalContentRow(patient, tbody, colspan, row);
     });
 }
 
@@ -790,6 +790,18 @@ function populateRoundsTable(rounds, hideInternal = false) {
                 dischargeModeCell.textContent = patient.discharge_mode || '';
             }
 
+            // WE cell (weekend) - empty as requested
+            if (!hideInternal) {
+                const weCell = row.insertCell();
+                weCell.classList.add('text-center');
+                weCell.textContent = '';
+            }
+
+            // Add additional content row if there is any content
+            if (!hideInternal) {
+                createAdditionalContentRow(patient, tbody, 9);
+            }
+
             // Remove from map to track which patients we've included
             delete activePatientsMap[patientId];
 
@@ -843,9 +855,201 @@ function populateRoundsTable(rounds, hideInternal = false) {
         dischargeModeCell.classList.add('text-center');
         dischargeModeCell.textContent = patient.discharge_mode || '';
 
+        // WE cell (weekend) - empty as requested
+        const weCell = row.insertCell();
+        weCell.classList.add('text-center');
+        weCell.textContent = '';
+
+        // Add additional content row if there is any content
+        createAdditionalContentRow(patient, tbody, 9);
+
         // Increment time slot by 10 minutes
         timeSlot = incrementTimeBy10Minutes(timeSlot);
     }
+}
+
+/**
+ * Show the patient additional content modal
+ * @param {string} patientId - Patient ID
+ */
+function showPatientAdditionalContentModal(patientId) {
+    const patient = window['patients-station'] ? window['patients-station'][patientId] : null;
+    if (!patient) return;
+
+    // Set patient ID
+    document.getElementById('patientId').value = patientId;
+
+    // Load existing data
+    const additionalData = patient.additionalContent || {};
+    const eventData = window['patient-events-station']?.[patientId]?.rounds || '';
+
+    // Populate form fields
+    document.getElementById('additionalEvent').value = eventData;
+    document.getElementById('weightAdmission').value = additionalData.weightAdmission || '';
+    document.getElementById('bmiAdmission').value = additionalData.bmiAdmission || '';
+    document.getElementById('minWeight').value = additionalData.minWeight || '';
+    document.getElementById('targetWeight').value = additionalData.targetWeight || '';
+    document.getElementById('motivationPhaseEnd').value = additionalData.motivationPhaseEnd || '';
+    document.getElementById('warnings').value = additionalData.warnings || '';
+
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('patientAdditionalContentModal'));
+    modal.show();
+}
+
+/**
+ * Save patient additional content
+ */
+function savePatientAdditionalContent() {
+    const patientId = document.getElementById('patientId').value;
+    if (!patientId) return;
+
+    const patient = window['patients-station'] ? window['patients-station'][patientId] : null;
+    if (!patient) return;
+
+    // Get form data
+    const additionalEvent = document.getElementById('additionalEvent').value.trim();
+    const weightAdmission = document.getElementById('weightAdmission').value.trim();
+    const bmiAdmission = document.getElementById('bmiAdmission').value.trim();
+    const minWeight = document.getElementById('minWeight').value.trim();
+    const targetWeight = document.getElementById('targetWeight').value.trim();
+    const motivationPhaseEnd = document.getElementById('motivationPhaseEnd').value.trim();
+    const warnings = document.getElementById('warnings').value.trim();
+
+    // Save additional content to patient data
+    if (!patient.additionalContent) {
+        patient.additionalContent = {};
+    }
+    
+    patient.additionalContent.weightAdmission = weightAdmission;
+    patient.additionalContent.bmiAdmission = bmiAdmission;
+    patient.additionalContent.minWeight = minWeight;
+    patient.additionalContent.targetWeight = targetWeight;
+    patient.additionalContent.motivationPhaseEnd = motivationPhaseEnd;
+    patient.additionalContent.warnings = warnings;
+
+    // Save event data to patient-events-station
+    if (!window['patient-events-station']) {
+        window['patient-events-station'] = {};
+    }
+    
+    if (!window['patient-events-station'][patientId]) {
+        window['patient-events-station'][patientId] = {};
+    }
+    
+    if (additionalEvent) {
+        window['patient-events-station'][patientId].rounds = additionalEvent;
+    } else {
+        delete window['patient-events-station'][patientId].rounds;
+    }
+
+    // Save both data structures
+    saveData('patients-station', 'belegung-station');
+    saveData('patient-events-station', 'patienten-termine-station');
+
+    // Refresh the edit table to show updated additional content
+    refreshEditRoundsTable();
+
+    // Hide modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('patientAdditionalContentModal'));
+    modal.hide();
+}
+
+/**
+ * Refresh the edit rounds table with current data
+ */
+function refreshEditRoundsTable() {
+    const editTable = document.getElementById('editRoundsPatientsTable');
+    if (!editTable || document.getElementById('editRoundsForm').classList.contains('d-none')) {
+        return;
+    }
+
+    const tbody = editTable.tBodies[0];
+    const rows = Array.from(tbody.rows).filter(row => row.hasAttribute('data-patient-id'));
+    
+    // Get the current patient order
+    const patientOrder = rows.map(row => row.getAttribute('data-patient-id'));
+    
+    // Clear the table
+    while (tbody.rows.length > 0) {
+        tbody.deleteRow(0);
+    }
+    
+    // Re-add all patients in the same order
+    patientOrder.forEach((patientId, index) => {
+        const patient = window['patients-station'] ? window['patients-station'][patientId] : null;
+        if (patient) {
+            patient.id = patientId;
+            addPatientToEditRoundsTable(patient, index, editTable);
+        }
+    });
+}
+
+/**
+ * Get current German date for the active rounds
+ * @returns {string} German date string
+ */
+function getCurrentGermanDate() {
+    const dateInput = document.getElementById('editRoundsDate');
+    if (dateInput && dateInput.value) {
+        return formatISOToGermanDate(dateInput.value);
+    } else if (document.getElementById('viewRoundsDate').textContent) {
+        return document.getElementById('viewRoundsDate').textContent;
+    }
+    return formatISOToGermanDate(new Date().toISOString().split('T')[0]);
+}
+
+/**
+ * Create additional content row for a patient
+ * @param {Object} patient - Patient object
+ * @param {HTMLElement} tbody - Table body to add row to
+ * @param {number} colspan - Number of columns to span
+ */
+function createAdditionalContentRow(patient, tbody, colspan, referenceRow = null) {
+    const additionalContent = patient.additionalContent || {};
+
+    // Check if there's any additional content to display
+    const hasContent = additionalContent.weightAdmission ||
+        additionalContent.bmiAdmission ||
+        additionalContent.minWeight ||
+        additionalContent.targetWeight ||
+        additionalContent.motivationPhaseEnd ||
+        additionalContent.warnings;
+
+    if (!hasContent) return;
+
+    // Create the additional content row
+    const insertIndex = referenceRow ? referenceRow.sectionRowIndex + 1 : -1;
+    const row = insertIndex >= 0 ? tbody.insertRow(insertIndex) : tbody.insertRow();
+    row.classList.add('additional-content-row');
+
+    const cell = row.insertCell();
+    cell.colSpan = colspan;
+    cell.classList.add('p-2', 'bg-light', 'small', 'fs-6');
+
+    const parts = [];
+
+    if (additionalContent.weightAdmission) {
+        parts.push(`<span class="me-2 fs-6"><span class="fw-medium">Aufnahmegewicht:</span> ${additionalContent.weightAdmission} kg</span>`);
+    }
+    if (additionalContent.bmiAdmission) {
+        parts.push(`<span class="me-2 fs-6"><span class="fw-medium">Aufnahme-BMI:</span> ${additionalContent.bmiAdmission}</span>`);
+    }
+    if (additionalContent.minWeight) {
+        parts.push(`<span class="me-2 fs-6"><span class="fw-medium">Mindestgewicht:</span> ${additionalContent.minWeight} kg</span>`);
+    }
+    if (additionalContent.targetWeight) {
+        parts.push(`<span class="me-2 fs-6"><span class="fw-medium">Zielgewicht:</span> ${additionalContent.targetWeight} kg</span>`);
+    }
+    if (additionalContent.motivationPhaseEnd) {
+        const formattedMotivationEnd = formatISOToGermanDate(additionalContent.motivationPhaseEnd);
+        parts.push(`<span class="me-2 fs-6"><span class="fw-medium">Ende Motivationsphase:</span> ${formattedMotivationEnd}</span>`);
+    }
+    if (additionalContent.warnings) {
+        parts.push(`<span class="me-2 fs-6"><span class="fw-medium">Verwarnungen:</span> ${additionalContent.warnings}</span>`);
+    }
+
+    cell.innerHTML = parts.join('');
 }
 
 /**

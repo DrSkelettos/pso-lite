@@ -19,6 +19,11 @@ save_file: chefaerztinvisite-station
         });
     });
 </script>
+<style>
+    .fs-6 {
+        font-size: 0.75rem !important;
+    }
+</style>
 
 <div class="container-fluid">
     <div class="row mb-3">
@@ -85,7 +90,6 @@ save_file: chefaerztinvisite-station
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
                         <table class="table table-striped table-bordered mb-0" id="viewRoundsPatientsTable">
                             <thead>
                                 <tr>
@@ -97,13 +101,13 @@ save_file: chefaerztinvisite-station
                                     <th width="80" class="text-center">Woche</th>
                                     <th width="120" class="text-center">Entlassung</th>
                                     <th width="120" class="text-center">E-Modus</th>
+                                    <th width="60" class="text-center">WE</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <!-- Will be filled dynamically -->
                             </tbody>
                         </table>
-                    </div>
                 </div>
                 <div class="card-footer">
                     <div class="row">
@@ -154,7 +158,6 @@ save_file: chefaerztinvisite-station
 
                         <div class="row mb-3">
                             <div class="col">
-                                <div class="table-responsive">
                                     <table class="table table-bordered table-striped table-hover" id="editRoundsPatientsTable">
                                         <thead>
                                             <tr>
@@ -167,13 +170,13 @@ save_file: chefaerztinvisite-station
                                                 <th width="80" class="text-center">Woche</th>
                                                 <th width="120" class="text-center">Entlassung</th>
                                                 <th width="120" class="text-center">E-Modus</th>
+                                                <th width="60" class="text-center">WE</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <!-- Will be filled dynamically -->
                                         </tbody>
                                     </table>
-                                </div>
                                 <div class="alert alert-info">
                                     <i class="bi bi-info-circle me-1"></i> Sie können die Reihenfolge der Patienten durch Ziehen und Ablegen ändern.
                                 </div>
@@ -195,6 +198,78 @@ save_file: chefaerztinvisite-station
                         </div>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Patient Additional Content Modal -->
+<div class="modal fade" id="patientAdditionalContentModal" tabindex="-1" aria-labelledby="patientAdditionalContentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="patientAdditionalContentModalLabel">Zusätzliche Informationen für Patient:in</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <div class="modal-body">
+                <form id="patientAdditionalContentForm">
+                    <input type="hidden" id="patientId">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6 class="text-primary mb-3">Termine (bisherige zusätzliche Termine)</h6>
+                            <div class="mb-3">
+                                <label class="form-label" for="additionalEvent">Zusätzliche Termine</label>
+                                <textarea class="form-control" id="additionalEvent" rows="2" placeholder="Zusätzliche Termine eintragen..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="weightAdmission">Aufnahmegewicht</label>
+                                <input type="text" class="form-control" id="weightAdmission" placeholder="kg">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="bmiAdmission">Aufnahme-BMI</label>
+                                <input type="text" class="form-control" id="bmiAdmission" placeholder="BMI">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="minWeight">Mindestgewicht</label>
+                                <input type="text" class="form-control" id="minWeight" placeholder="kg">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="targetWeight">Zielgewicht</label>
+                                <input type="text" class="form-control" id="targetWeight" placeholder="kg">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="motivationPhaseEnd">Ende Motivationsphase</label>
+                                <input type="date" class="form-control" id="motivationPhaseEnd">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label" for="warnings">Verwarnungen</label>
+                                <input type="text" class="form-control" id="warnings" placeholder="Verwarnungen eintragen...">
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" id="savePatientAdditionalContent">Speichern</button>
             </div>
         </div>
     </div>
