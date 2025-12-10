@@ -200,6 +200,36 @@ function updateCalendar() {
     monday.setDate(now.getDate() + daysToMonday);
     monday.setHours(0, 0, 0, 0);
 
+    // Add therapy plan events for weeks with non-default plans
+    if (window['therapieplaene'] && window['therapieplaene'].station) {
+        for (const [weekKey, planKey] of Object.entries(window['therapieplaene'].station)) {
+            if (planKey !== 'default' && window['therapieplaene'].plans[planKey]) {
+                const [year, week] = weekKey.split('-').map(Number);
+                const weekMonday = getMondayOfWeek(year, week);
+                const weekSunday = new Date(weekMonday);
+                weekSunday.setDate(weekMonday.getDate() + 7); // Add 7 days for exclusive end date
+                
+                const plan = window['therapieplaene'].plans[planKey];
+                
+                window['calendar'].addEvent({
+                    title: `Therapieplan: ${plan.title}`,
+                    start: weekMonday.toISOString().slice(0, 10),
+                    end: weekSunday.toISOString().slice(0, 10),
+                    allDay: true,
+                    backgroundColor: '#dc3545',
+                    borderColor: '#dc3545',
+                    textColor: '#fff',
+                    extendedProps: {
+                        type: 'therapyplan',
+                        planKey: planKey,
+                        planTitle: plan.title
+                    },
+                    className: 'therapyplan-event'
+                });
+            }
+        }
+    }
+
 
     // Process employees and their absences
     for (const [id, employee] of Object.entries(window['employees'] || {})) {

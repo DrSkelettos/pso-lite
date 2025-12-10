@@ -198,3 +198,19 @@ function formatDateForCalendar(date) {
     const [day, month, year] = date.split('.').map(Number);
     return year + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
 }
+
+function getMondayOfWeek(year, week) {
+    // Create a date for January 1st of the given year
+    const date = new Date(year, 0, 1);
+    
+    // Find the first Monday of the year
+    const dayOfWeek = date.getDay();
+    const daysToMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
+    const firstMonday = new Date(year, 0, daysToMonday);
+    
+    // Add (week - 1) weeks to get to the desired week
+    const targetMonday = new Date(firstMonday);
+    targetMonday.setDate(firstMonday.getDate() + (week - 1) * 7);
+    
+    return targetMonday;
+}

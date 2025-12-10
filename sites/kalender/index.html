@@ -20,7 +20,7 @@ save_file: termine
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        loadMultipleData(['patients-station', 'events'], function (result) {
+        loadMultipleData(['patients-station', 'events', 'therapieplaene'], function (result) {
             initCalendar();
             updateCalendar();
         });

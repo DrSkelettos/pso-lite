@@ -25,13 +25,13 @@ dir: ./
     </div>
 
     <!-- LINKS -->
-    <div class="row">
+    <div class="d-flex flex-wrap gap-3">
 
         <!-- Belegung -->
-        <div class="col hidden" id="dashboardLinkPatientsStation">
-            <div class="card text-center cursor-pointer" onclick="window.location.href='sites/station/belegung/index.html';">
+        <div class="hidden" id="dashboardLinkPatientsStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" onclick="window.location.href='sites/station/belegung/index.html';">
                 <div class="card-header">
-                    <i class="bi bi-calendar-date" style="font-size: 5rem;"></i>
+                    <i class="bi bi-calendar-date" style="font-size: 3rem;"></i>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Belegung</h5>
@@ -41,10 +41,10 @@ dir: ./
         </div>
 
         <!-- Therapiezuordnung -->
-        <div class="col hidden" id="dashboardLinkTherapiesStation">
-            <div class="card text-center cursor-pointer" onclick="window.location.href='sites/station/therapiezuordnung/index.html';">
+        <div class="hidden" id="dashboardLinkTherapiesStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" onclick="window.location.href='sites/station/therapiezuordnung/index.html';">
                 <div class="card-header">
-                    <i class="bi bi-list-columns" style="font-size: 5rem;"></i>
+                    <i class="bi bi-list-columns" style="font-size: 3rem;"></i>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Therapiezuordnung</h5>
@@ -54,14 +54,40 @@ dir: ./
         </div>
 
         <!-- Chefärztinvisite -->
-        <div class="col hidden" id="dashboardLinkRoundsStation">
-            <div class="card text-center cursor-pointer" onclick="window.location.href='sites/station/chefaerztinvisite/index.html';">
+        <div class="hidden" id="dashboardLinkRoundsStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" onclick="window.location.href='sites/station/chefaerztinvisite/index.html';">
                 <div class="card-header">
-                    <i class="bi bi-people" style="font-size: 5rem;"></i>
+                    <i class="bi bi-people" style="font-size: 3rem;"></i>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Chefärztinvisite</h5>
                     <p class="card-text">Planung für die Chefärztinvisite</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ankündigungen -->
+        <div class="hidden" id="dashboardLinkAnnouncementsStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" onclick="window.location.href='sites/station/ankuendigungen/index.html';">
+                <div class="card-header">
+                    <i class="bi bi-megaphone" style="font-size: 3rem;"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Ankündigungen</h5>
+                    <p class="card-text">Ausrdurck für die Stationsversammlung</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Abwesenheiten -->
+        <div class="hidden" id="dashboardLinkAbsencesStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" onclick="window.location.href='sites/station/abwesenheiten/index.html';">
+                <div class="card-header">
+                    <i class="bi bi-calendar-x" style="font-size: 3rem;"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Abwesenheiten</h5>
+                    <p class="card-text">Ausdrück für den Aufenthaltsraum</p>
                 </div>
             </div>
         </div>
@@ -104,7 +130,7 @@ dir: ./
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        loadMultipleData(['patients-station', 'kosi-station', 'events'], function (result) {
+        loadMultipleData(['patients-station', 'kosi-station', 'events', 'therapieplaene'], function (result) {
             updateKosiCounts();
             initCalendarDashboard();
             updateCalendar();
@@ -113,6 +139,8 @@ dir: ./
             showIfAuthorized('#dashboardLinkPatientsStation', 'viewPatientsStation');
             showIfAuthorized('#dashboardLinkTherapiesStation', 'viewTherapiesStation');
             showIfAuthorized('#dashboardLinkRoundsStation', 'viewRoundsStation');
+            showIfAuthorized('#dashboardLinkAnnouncementsStation', 'viewAnnouncementsStation');
+            showIfAuthorized('#dashboardLinkAbsencesStation', 'viewAnnouncementsStation');
             showIfAuthorized('#dashboardLinkKosiStation', 'kosiStation');
 
             if (window['user'].needsToChangePassword) {
