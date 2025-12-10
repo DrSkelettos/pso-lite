@@ -1,0 +1,185 @@
+---
+layout: layout.html
+title: Startseite anpassen
+include_navigation: true
+dir: ../../
+---
+
+<div class="container my-5">
+    <h1>Startseite anpassen</h1>
+    <p class="text-muted">Wählen Sie, welche Elemente auf Ihrer Startseite angezeigt werden sollen.</p>
+
+    <form id="dashboardSettingsForm">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Kalender</h5>
+            </div>
+            <div class="card-body">
+                <div class="form-check form-switch">
+                    <input class="form-check-input" type="checkbox" id="showCalendar" checked>
+                    <label class="form-check-label" for="showCalendar">
+                        Kalender anzeigen
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Schnellzugriff</h5>
+            </div>
+            <div class="card-body">
+                <!-- Schnellzugriff -->
+                <div class="mb-4">
+                    <h6>Station</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="showBelegung" checked>
+                                <label class="form-check-label" for="showBelegung">
+                                    Belegung
+                                </label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="showTherapiezuordnung" checked>
+                                <label class="form-check-label" for="showTherapiezuordnung">
+                                    Therapiezuordnung
+                                </label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="showChefaerztinvisite" checked>
+                                <label class="form-check-label" for="showChefaerztinvisite">
+                                    Chefärztinvisite
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="showAnkündigungen" checked>
+                                <label class="form-check-label" for="showAnkündigungen">
+                                    Ankündigungen
+                                </label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="showAbwesenheiten" checked>
+                                <label class="form-check-label" for="showAbwesenheiten">
+                                    Abwesenheiten
+                                </label>
+                            </div>
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="showWarteliste" checked>
+                                <label class="form-check-label" for="showWarteliste">
+                                    Warteliste
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-outline-primary" onclick="saveDashboardSettings()">
+            <i class="bi bi-floppy text-primary me-1"></i>
+            Einstellungen speichern
+        </button>
+
+        <div id="alert"></div>
+    </form>
+</div>
+
+<script>
+    window.addEventListener('baseDataLoaded', function () {
+        loadMultipleData(['employees'], function (result) {
+            loadDashboardSettings();
+        });
+    });
+
+    function loadDashboardSettings() {
+        const user = window['user'];
+        if (!user || !user.username) return;
+
+        const employee = window['employees'][user.username];
+        if (!employee) return;
+
+        const settings = employee.dashboardSettings || {};
+
+        // Load calendar setting (default: true)
+        document.getElementById('showCalendar').checked = settings.showCalendar !== false;
+
+        // Load quick access settings (default: true)
+        document.getElementById('showBelegung').checked = settings.showBelegung !== false;
+        document.getElementById('showTherapiezuordnung').checked = settings.showTherapiezuordnung !== false;
+        document.getElementById('showChefaerztinvisite').checked = settings.showChefaerztinvisite !== false;
+        document.getElementById('showAnkündigungen').checked = settings.showAnkündigungen !== false;
+        document.getElementById('showAbwesenheiten').checked = settings.showAbwesenheiten !== false;
+        document.getElementById('showWarteliste').checked = settings.showWarteliste !== false;
+    }
+
+    function saveDashboardSettings() {
+        const user = window['user'];
+        if (!user || !user.key) {
+            alert('Benutzer nicht gefunden');
+            return;
+        }
+
+        const employee = window['employees'][user.key];
+        if (!employee) {
+            alert('Mitarbeiter nicht gefunden');
+            return;
+        }
+
+        // Collect settings - only save hidden state (false values)
+        const settings = {};
+
+        // Calendar setting (save only if hidden)
+        if (!document.getElementById('showCalendar').checked) {
+            settings.showCalendar = false;
+        }
+
+        // Quick access settings (save only if hidden)
+        if (!document.getElementById('showBelegung').checked) {
+            settings.showBelegung = false;
+        }
+        if (!document.getElementById('showTherapiezuordnung').checked) {
+            settings.showTherapiezuordnung = false;
+        }
+        if (!document.getElementById('showChefaerztinvisite').checked) {
+            settings.showChefaerztinvisite = false;
+        }
+        if (!document.getElementById('showAnkündigungen').checked) {
+            settings.showAnkündigungen = false;
+        }
+        if (!document.getElementById('showAbwesenheiten').checked) {
+            settings.showAbwesenheiten = false;
+        }
+        if (!document.getElementById('showWarteliste').checked) {
+            settings.showWarteliste = false;
+        }
+
+        // Save to employee object
+        employee.dashboardSettings = settings;
+
+        // Save employees data
+        saveFile('mitarbeiter_innen', window['employees']).then(() => {
+            // Show success message
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-success alert-dismissible fade show mt-3';
+            alert.innerHTML = `
+                <i class="bi bi-check-circle me-1"></i>
+                Einstellungen wurden erfolgreich gespeichert!
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('#alert').appendChild(alert);
+
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 3000);
+        }).catch(error => {
+            console.error('Fehler beim Speichern:', error);
+            alert('Fehler beim Speichern der Einstellungen');
+        });
+    }
+</script>

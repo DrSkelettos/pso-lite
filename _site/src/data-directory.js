@@ -7,7 +7,7 @@ const dataFileMap = {
     'therapies-station': 'therapiezuordnung-station',
     'rounds-station': 'chefaerztinvisite-station',
     'rooms-station': 'zimmer-station',
-    'employees': 'mitarbeiterinnen',
+    'employees': 'mitarbeiter_innen',
     'settings': 'einstellungen',
     'events': 'termine',
     'kosi-station': 'kostensicherung-station',

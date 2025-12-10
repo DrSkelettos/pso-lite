@@ -116,6 +116,12 @@
                     <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Mehr</a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
+                            <a class="dropdown-item" href="./sites/dashboard-settings/index.html">
+                                <i class="bi bi-gear me-1"></i>
+                                Startseite anpassen
+                            </a>
+                        </li>
+                        <li>
                             <a class="dropdown-item" href="./sites/mitarbeiterinnen/index.html">
                                 <i class="bi bi-people me-1"></i>
                                 Mitarbeiter:innen
@@ -152,17 +158,17 @@
     </div>
 
     <!-- Kalender -->
-    <div class="card mb-5 cursor-pointer" style="min-height: 300px;" onclick="window.location.href='sites/kalender/index.html';">
+    <div class="card mb-5 cursor-pointer" id="dashboardCalendar" style="min-height: 300px;" onclick="window.location.href='sites/kalender/index.html';">
         <div id="calendar">
         </div>
     </div>
 
     <!-- LINKS -->
-    <div class="d-flex flex-wrap gap-3">
+    <div class="hidden flex-wrap gap-3" id="dashboardLinks">
 
         <!-- Belegung -->
-        <div class="hidden" id="dashboardLinkPatientsStation" style="flex: 1;">
-            <div class="card text-center cursor-pointer h-100" onclick="window.location.href='sites/station/belegung/index.html';">
+        <div id="dashboardLinkPatientsStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" id="dashboardCardBelegung" onclick="window.location.href='sites/station/belegung/index.html';">
                 <div class="card-header">
                     <i class="bi bi-calendar-date" style="font-size: 3rem;"></i>
                 </div>
@@ -174,8 +180,8 @@
         </div>
 
         <!-- Therapiezuordnung -->
-        <div class="hidden" id="dashboardLinkTherapiesStation" style="flex: 1;">
-            <div class="card text-center cursor-pointer h-100" onclick="window.location.href='sites/station/therapiezuordnung/index.html';">
+        <div id="dashboardLinkTherapiesStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" id="dashboardCardTherapiezuordnung" onclick="window.location.href='sites/station/therapiezuordnung/index.html';">
                 <div class="card-header">
                     <i class="bi bi-list-columns" style="font-size: 3rem;"></i>
                 </div>
@@ -187,8 +193,8 @@
         </div>
 
         <!-- Chefärztinvisite -->
-        <div class="hidden" id="dashboardLinkRoundsStation" style="flex: 1;">
-            <div class="card text-center cursor-pointer h-100" onclick="window.location.href='sites/station/chefaerztinvisite/index.html';">
+        <div id="dashboardLinkRoundsStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" id="dashboardCardChefaerztinvisite" onclick="window.location.href='sites/station/chefaerztinvisite/index.html';">
                 <div class="card-header">
                     <i class="bi bi-people" style="font-size: 3rem;"></i>
                 </div>
@@ -200,27 +206,27 @@
         </div>
 
         <!-- Ankündigungen -->
-        <div class="hidden" id="dashboardLinkAnnouncementsStation" style="flex: 1;">
-            <div class="card text-center cursor-pointer h-100" onclick="window.location.href='sites/station/ankuendigungen/index.html';">
+        <div id="dashboardLinkAnnouncementsStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" id="dashboardCardAnkündigungen" onclick="window.location.href='sites/station/ankuendigungen/index.html';">
                 <div class="card-header">
                     <i class="bi bi-megaphone" style="font-size: 3rem;"></i>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Ankündigungen</h5>
-                    <p class="card-text">Ausrdurck für die Stationsversammlung</p>
+                    <p class="card-text">Ausdruck für die Stationsversammlung</p>
                 </div>
             </div>
         </div>
 
         <!-- Abwesenheiten -->
-        <div class="hidden" id="dashboardLinkAbsencesStation" style="flex: 1;">
-            <div class="card text-center cursor-pointer h-100" onclick="window.location.href='sites/station/abwesenheiten/index.html';">
+        <div id="dashboardLinkAbsencesStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" id="dashboardCardAbwesenheiten" onclick="window.location.href='sites/station/abwesenheiten/index.html';">
                 <div class="card-header">
                     <i class="bi bi-calendar-x" style="font-size: 3rem;"></i>
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">Abwesenheiten</h5>
-                    <p class="card-text">Ausdrück für den Aufenthaltsraum</p>
+                    <p class="card-text">Ausdruck für den Aufenthaltsraum</p>
                 </div>
             </div>
         </div>
@@ -263,17 +269,14 @@
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        loadMultipleData(['patients-station', 'kosi-station', 'events', 'therapieplaene'], function (result) {
+        loadMultipleData(['patients-station', 'kosi-station', 'events', 'therapieplaene', 'employees'], function (result) {
             updateKosiCounts();
             initCalendarDashboard();
             updateCalendar();
 
+            // Apply dashboard settings
+            applyDashboardSettings();
 
-            showIfAuthorized('#dashboardLinkPatientsStation', 'viewPatientsStation');
-            showIfAuthorized('#dashboardLinkTherapiesStation', 'viewTherapiesStation');
-            showIfAuthorized('#dashboardLinkRoundsStation', 'viewRoundsStation');
-            showIfAuthorized('#dashboardLinkAnnouncementsStation', 'viewAnnouncementsStation');
-            showIfAuthorized('#dashboardLinkAbsencesStation', 'viewAnnouncementsStation');
             showIfAuthorized('#dashboardLinkKosiStation', 'kosiStation');
 
             if (window['user'].needsToChangePassword) {
@@ -281,6 +284,46 @@
             }
         });
     });
+
+    function applyDashboardSettings() {
+        const user = window['user'];
+        if (!user || !user.username) return;
+
+        const employee = window['employees'][user.username];
+        if (!employee) return;
+
+        const settings = employee.dashboardSettings || {};
+
+        // Apply calendar setting
+        if (settings.showCalendar === false) {
+            document.getElementById('dashboardCalendar').style.display = 'none';
+        }
+
+        // Apply quick access settings - remove elements completely for proper flex layout
+        if (settings.showBelegung === false || !authorize('viewPatientsStation')) {
+            const element = document.getElementById('dashboardLinkPatientsStation');
+            if (element) element.remove();
+        }
+        if (settings.showTherapiezuordnung === false || !authorize('viewTherapiesStation')) {
+            const element = document.getElementById('dashboardLinkTherapiesStation');
+            if (element) element.remove();
+        }
+        if (settings.showChefaerztinvisite === false || !authorize('viewRoundsStation')) {
+            const element = document.getElementById('dashboardLinkRoundsStation');
+            if (element) element.remove();
+        }
+        if (settings.showAnkündigungen === false || !authorize('viewAnnouncementsStation')) {
+            const element = document.getElementById('dashboardLinkAnnouncementsStation');
+            if (element) element.remove();
+        }
+        if (settings.showAbwesenheiten === false || !authorize('viewAnnouncementsStation')) {
+            const element = document.getElementById('dashboardLinkAbsencesStation');
+            if (element) element.remove();
+        }
+
+        document.getElementById('dashboardLinks').classList.remove('hidden');
+        document.getElementById('dashboardLinks').classList.add('d-flex');
+    }
 </script>
 </body>
 

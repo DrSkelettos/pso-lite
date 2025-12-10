@@ -149,6 +149,10 @@
   background-image: url("./svg/clipboard-check.svg"); 
 }
 
+.bi-gear::before { 
+  background-image: url("./svg/gear.svg"); 
+}
+
 /* Bootstrap theme color classes */
 .text-primary .bi::before,
 .text-primary[class^="bi-"]::before,
