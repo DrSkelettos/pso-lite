@@ -209,7 +209,22 @@ function getNextAnnouncementSunday() {
  */
 function countUncheckedAnnouncements(dateStr) {
     const entries = window['announcements-station']?.[dateStr] || [];
-    return entries.filter(e => !e.checked).length;
+    const user = window['user'];
+    
+    if (!user) return 0;
+    
+    // If user can edit all announcements, count all unchecked
+    if (user.rights?.editAllAnnouncementsStation) {
+        return entries.filter(e => !e.checked).length;
+    }
+    
+    // If user can only edit own announcements, count only their own unchecked
+    if (user.rights?.editOwnAnnouncementsStation) {
+        return entries.filter(e => !e.checked && e.employee === user.key).length;
+    }
+    
+    // If user has no edit rights, count none
+    return 0;
 }
 
 /**

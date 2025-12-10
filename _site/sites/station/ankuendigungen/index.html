@@ -172,30 +172,35 @@
     }
 </style>
 
-<div class="row">
-    <div class="col-12">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h4 class="mb-0">Ankündigungen</h4>
-            <div>
-                <button type="button" id="addAnnouncementButton" class="btn btn-outline-primary hidden" onclick="showAddAnnouncementModal()">
-                    <i class="bi bi-plus-circle text-primary me-1"></i> Neue Ankündigung
-                </button>
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col">
+            <h1>Ankündigungen</h1>
+        </div>
+        <div class="col-auto">
+            <button type="button" id="addAnnouncementButton" class="btn btn-outline-primary hidden" onclick="showAddAnnouncementModal()">
+                <i class="bi bi-plus-circle text-primary me-1"></i> Neue Ankündigung
+            </button>
+        </div>
+    </div>
+
+    <!-- Non-Sunday announcements -->
+    <div id="nonSundayAnnouncements" class="mb-3" style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Sonstige Termine</h5>
+            </div>
+            <div class="card-body">
+                <div id="nonSundayButtons" class="date-buttons">
+                    <!-- Non-Sunday date buttons will be added here -->
+                </div>
             </div>
         </div>
+    </div>
 
-        <!-- Non-Sunday announcements -->
-        <div id="nonSundayAnnouncements" class="mb-4" style="display: none;">
-            <h5 class="text-muted mb-3">Sonstige Termine</h5>
-            <div id="nonSundayButtons" class="date-buttons mb-3">
-                <!-- Non-Sunday date buttons will be added here -->
-            </div>
-            <hr>
-        </div>
-
-        <!-- Sunday announcements by month -->
-        <div id="sundayAnnouncements">
-            <!-- Month rows will be added here dynamically -->
-        </div>
+    <!-- Sunday announcements by month -->
+    <div id="sundayAnnouncements">
+        <!-- Month rows will be added here dynamically -->
     </div>
 </div>
 
@@ -296,7 +301,7 @@
             sundays.forEach(sunday => {
                 const dateStr = formatDateToGerman(sunday);
                 const hasAnnouncements = window['announcements-station']?.[dateStr]?.length > 0;
-                const uncheckedCount = viewOnlyMode ? 0 : countUncheckedAnnouncements(dateStr);
+                const uncheckedCount = countUncheckedAnnouncements(dateStr);
                 const isNextSunday = dateStr === nextSundayStr;
 
                 const btnWrapper = document.createElement('div');
@@ -355,7 +360,7 @@
 
         nonSundayDates.forEach(dateStr => {
             const date = parseGermanDate(dateStr);
-            const uncheckedCount = viewOnlyMode ? 0 : countUncheckedAnnouncements(dateStr);
+            const uncheckedCount = countUncheckedAnnouncements(dateStr);
 
             const btnWrapper = document.createElement('div');
             btnWrapper.className = 'position-relative';
