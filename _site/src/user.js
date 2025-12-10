@@ -21,7 +21,15 @@ async function login() {
         localStorage.setItem('passwordHash', passwordHash);
         location.href = "../../index.html";
     } else {
+        // Clear password field
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+        // Show error message
         document.getElementById('errorAlert').style.display = 'block';
+        // Hide error message after 3 seconds
+        setTimeout(() => {
+            document.getElementById('errorAlert').style.display = 'none';
+        }, 3000);
     }
 }
 
