@@ -50,6 +50,7 @@
             showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
             showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
             showIfAuthorized('#navLinkAnnouncementsStation', 'viewAnnouncementsStation');
+            showIfAuthorized('#navLinkAbsencesStation', 'viewAnnouncementsStation');
             // Show Station dropdown if user has any station-related rights
             if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation')) {
                 document.getElementById('navLinkStation').classList.remove('hidden');
@@ -94,6 +95,7 @@
                             <li><a class="dropdown-item hidden" id="navLinkPoststationaer" href="{{ dir }}sites/station/poststationaer/index.html"><i class="bi bi-person-x me-1"></i> Poststationär</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkRoundsStation" href="{{ dir }}sites/station/chefaerztinvisite/index.html"><i class="bi bi-eye me-1"></i> Chefärztinvisite</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkAnnouncementsStation" href="{{ dir }}sites/station/ankuendigungen/index.html"><i class="bi bi-megaphone me-1"></i> Ankündigungen</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkAbsencesStation" href="{{ dir }}sites/station/abwesenheiten/index.html"><i class="bi bi-calendar-x me-1"></i> Abwesenheiten</a></li>
                             <li class="dropdown-divider hidden" id="navLinkStationDivider"></li>
                             <li><a class="dropdown-item hidden" id="navLinkWorkloadStation" href="{{ dir }}sites/station/auslastung/index.html"><i class="bi bi-bar-chart me-1"></i> Auslastung</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkKosiStation" href="{{ dir }}sites/station/kosi/index.html"><i class="bi bi-coin me-1"></i>Kostensicherung</a></li>

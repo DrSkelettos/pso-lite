@@ -1,0 +1,124 @@
+---
+layout: layout.html
+active_abwesenheiten: active
+title: Abwesenheiten
+include_navigation: true
+dir: ../../../
+---
+
+<script src="{{ dir }}src/station/announcements.js"></script>
+
+<style>
+    .month-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    .month-label {
+        min-width: 180px;
+        font-weight: bold;
+        padding-top: 0.5rem;
+    }
+    .date-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .date-btn {
+        min-width: 120px;
+    }
+    .date-btn.next-sunday {
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.5);
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">Abwesenheiten</h4>
+        </div>
+
+        <!-- Sunday buttons by month -->
+        <div id="sundayButtons">
+            <!-- Month rows will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('baseDataLoaded', async function () {
+        renderSundayButtons();
+    });
+
+    function renderSundayButtons() {
+        const container = document.getElementById('sundayButtons');
+        container.innerHTML = '';
+
+        // Get current year and next year
+        const currentYear = new Date().getFullYear();
+        const years = [currentYear, currentYear + 1];
+
+        // Get all Sundays for both years
+        let allSundays = [];
+        years.forEach(year => {
+            allSundays = allSundays.concat(getSundaysForYear(year));
+        });
+
+        // Filter to show only future Sundays (from 2 months ago to 6 months ahead)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const twoMonthsAgo = new Date(today);
+        twoMonthsAgo.setMonth(today.getMonth() - 2);
+        const sixMonthsAhead = new Date(today);
+        sixMonthsAhead.setMonth(today.getMonth() + 6);
+
+        const relevantSundays = allSundays.filter(sunday => 
+            sunday >= twoMonthsAgo && sunday <= sixMonthsAhead
+        );
+
+        // Get next Sunday
+        const nextSunday = getNextAnnouncementSunday();
+        const nextSundayStr = formatDateToGerman(nextSunday);
+
+        // Group by month
+        const groupedSundays = groupSundaysByMonth(relevantSundays);
+
+        // Render each month
+        for (const [monthLabel, sundays] of Object.entries(groupedSundays)) {
+            const monthRow = document.createElement('div');
+            monthRow.className = 'month-row';
+
+            const monthLabelDiv = document.createElement('div');
+            monthLabelDiv.className = 'month-label';
+            monthLabelDiv.textContent = monthLabel;
+            monthRow.appendChild(monthLabelDiv);
+
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'date-buttons';
+
+            sundays.forEach(sunday => {
+                const dateStr = formatDateToGerman(sunday);
+                const isNextSunday = dateStr === nextSundayStr;
+
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-outline-secondary date-btn';
+
+                if (isNextSunday) {
+                btn.className = 'btn btn-primary date-btn';
+                }
+
+                btn.innerHTML = `${getGermanWeekdayAbbr(sunday)} ${dateStr}`;
+                btn.onclick = () => navigateToDate(dateStr);
+
+                buttonsDiv.appendChild(btn);
+            });
+
+            monthRow.appendChild(buttonsDiv);
+            container.appendChild(monthRow);
+        }
+    }
+
+    function navigateToDate(dateStr) {
+        window.location.href = `ausdruck/index.html?date=${dateStr}`;
+    }
+</script>

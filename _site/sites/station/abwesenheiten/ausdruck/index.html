@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Abwesenheiten</title>
+
+    <link href="../../../../src/style.css" rel="stylesheet">
+
+    <script src="../../../../src/vendor/idb-keyval/umd.js"></script>
+    <link href="../../../../src/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="../../../../src/vendor/bootstrap/bootstrap.min.js"></script>
+    <link href="../../../../src/vendor/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+
+    <script src="../../../../src/data-directory.js"></script>
+    <script src="../../../../src/data-manager.js"></script>
+    <script src="../../../../src/helpers.js"></script>
+    <script src="../../../../src/user.js"></script>
+    <script src="../../../../src/init.js"></script>
+
+    <script>
+        init('Abwesenheiten', '../../../../');
+
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('employees', 'mitarbeiter_innen');
+            await checkLogin('Abwesenheiten', '../../../../');
+            window.dispatchEvent(new Event('baseDataLoaded'));
+        });
+    </script>
+
+    <style>        
+        @page {
+            size: A4 portrait;
+            margin: 8mm;
+        }
+
+        html {
+            font-size: 12px !important;
+            color: black !important;
+        }
+
+        body {
+            font-size: 12px !important;
+            color: black !important;
+            background: none !important;
+        }
+
+        a {
+            text-decoration: none;
+            color: black !important;
+            cursor: default !important;
+        }
+
+        @media print {
+            a {
+                text-decoration: none;
+                color: black !important;
+            }
+
+            .table {
+                font-size: inherit !important;
+            }
+
+            .table th,
+            .table td {
+                font-size: inherit !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Preview styles (when viewing in browser) */
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                padding: 1rem;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    
+<script src="../../../../src/station/announcements.js"></script>
+
+<style>
+    @page {
+        size: A4 portrait;
+        margin: 15mm;
+    }
+
+    html {
+        font-size: 14px !important;
+        color: black !important;
+    }
+
+    body {
+        font-size: 14px !important;
+        color: black !important;
+        background: none !important;
+    }
+
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+    }
+
+    @media screen {
+        body {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+    }
+
+    .print-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .print-header h1 {
+        font-size: 24px !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .absences-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .absences-table th,
+    .absences-table td {
+        border: 1px solid #000;
+        padding: 0.5rem;
+        text-align: left;
+    }
+
+    .absences-table th {
+        background-color: #f0f0f0;
+        font-weight: bold;
+    }
+</style>
+
+<div class="print-header">
+    <h1>Abwesenheiten - Stand KW <span id="calendarWeek"></span></h1>
+</div>
+
+<table class="absences-table" id="absencesTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Von</th>
+            <th>Bis</th>
+        </tr>
+    </thead>
+    <tbody id="absencesBody">
+        <!-- Absences will be added here -->
+    </tbody>
+</table>
+
+<div id="noAbsences" class="text-center text-muted" style="display: none;">
+    Keine Abwesenheiten für diesen Zeitraum vorhanden.
+</div>
+
+<script>
+    window.addEventListener('baseDataLoaded', async function () {
+        // Get date from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const dateParam = urlParams.get('date');
+
+        let sundayDate;
+        if (dateParam) {
+            // Check if it's German format (contains dots) or ISO format
+            if (dateParam.includes('.')) {
+                sundayDate = parseGermanDate(dateParam);
+            } else {
+                sundayDate = new Date(dateParam);
+            }
+        } else {
+            // Default to next Sunday
+            sundayDate = getNextAnnouncementSunday();
+        }
+
+        // Calculate the Monday after the Sunday (start of the week for absences)
+        const mondayAfterSunday = new Date(sundayDate);
+        mondayAfterSunday.setDate(sundayDate.getDate() + 1);
+
+        // Get calendar week of the Monday (which is the week after the Sunday)
+        const calendarWeek = getCalendarWeek(mondayAfterSunday);
+
+        // Update title
+        document.getElementById('calendarWeek').textContent = calendarWeek;
+        document.title = `Abwesenheiten - Stand KW ${calendarWeek}`;
+
+        // Render absences
+        renderAbsences(sundayDate);
+    });
+
+    function renderAbsences(sundayDate) {
+        const tbody = document.getElementById('absencesBody');
+        const table = document.getElementById('absencesTable');
+        const noAbsencesDiv = document.getElementById('noAbsences');
+
+        // Calculate the Monday after the Sunday (absences are relevant from this day on)
+        const mondayAfterSunday = new Date(sundayDate);
+        mondayAfterSunday.setDate(sundayDate.getDate() + 1);
+        mondayAfterSunday.setHours(0, 0, 0, 0);
+
+        // Collect all relevant absences
+        const absences = [];
+
+        Object.entries(window['employees']).forEach(([empKey, employee]) => {
+            if (!employee.absences) return;
+
+            employee.absences.forEach(absence => {
+                const startDate = parseGermanDate(absence.start);
+                const endDate = parseGermanDate(absence.end);
+                const announcementDate = absence.announcement ? parseGermanDate(absence.announcement) : null;
+
+                // Check conditions:
+                // 1. Announcement date must be set and <= the Sunday date (already announced)
+                // 2. End date must be >= Monday after Sunday (not yet in the past)
+                if (announcementDate && 
+                    announcementDate <= sundayDate && 
+                    endDate >= mondayAfterSunday) {
+                    absences.push({
+                        name: employee.name,
+                        startDate: startDate,
+                        endDate: endDate,
+                        startStr: absence.start,
+                        endStr: absence.end
+                    });
+                }
+            });
+        });
+
+        if (absences.length === 0) {
+            table.style.display = 'none';
+            noAbsencesDiv.style.display = 'block';
+            return;
+        }
+
+        // Sort by start date, then by name
+        absences.sort((a, b) => {
+            const dateCompare = a.startDate - b.startDate;
+            if (dateCompare !== 0) return dateCompare;
+            return a.name.localeCompare(b.name);
+        });
+
+        noAbsencesDiv.style.display = 'none';
+        tbody.innerHTML = '';
+
+        absences.forEach(absence => {
+            const tr = document.createElement('tr');
+            
+            const tdName = document.createElement('td');
+            tdName.textContent = absence.name;
+            tr.appendChild(tdName);
+
+            const tdStart = document.createElement('td');
+            tdStart.textContent = absence.startStr;
+            tr.appendChild(tdStart);
+
+            const tdEnd = document.createElement('td');
+            tdEnd.textContent = absence.endStr;
+            tr.appendChild(tdEnd);
+
+            tbody.appendChild(tr);
+        });
+    }
+</script>
+
+
+</body>
+
+</html>

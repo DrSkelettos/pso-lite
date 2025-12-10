@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PSOrga - KoSi</title>
+    <title>PSOrga - Abwesenheiten</title>
 
     
     <link href="../../../src/style.css" rel="stylesheet">
@@ -34,11 +34,11 @@
             }
         });
 
-        init('KoSi', '../../../');
+        init('Abwesenheiten', '../../../');
 
         window.addEventListener('directoryHandleInitialized', async function () {
             await loadData('employees', 'mitarbeiter_innen');
-            await checkLogin('KoSi', '../../../');
+            await checkLogin('Abwesenheiten', '../../../');
             window.dispatchEvent(new Event('baseDataLoaded'));
 
             showIfAuthorized('#navLinkWorkloadStation', 'workloadStation');
@@ -102,7 +102,7 @@
                 </div>
             </ul>
 
-            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('kosi-station', 'kostensicherung-station')">
+            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('', '')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
@@ -135,52 +135,123 @@
     </nav>
     <div class="container-fluid pb-3">
         
-<script src="../../../src/station/kosi.js"></script>
+<script src="../../../src/station/announcements.js"></script>
 
 <style>
-    .table-bordered tr.border-bottom-3 {
-        border-bottom-width: 3px !important;
+    .month-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1rem;
     }
-
-    /* Unset background color for table cells to make borders visible */
-    .table>:not(caption)>*>* {
-        background-color: transparent !important;
+    .month-label {
+        min-width: 180px;
+        font-weight: bold;
+        padding-top: 0.5rem;
     }
-
-    /* Preserve background color for specific classes */
-    .table>:not(caption)>.table-light>*,
-    .table>:not(caption)>* .bg-secondary-striped {
-        background-color: var(--bs-table-bg) !important;
+    .date-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .date-btn {
+        min-width: 120px;
+    }
+    .date-btn.next-sunday {
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.5);
     }
 </style>
 
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">Abwesenheiten</h4>
+        </div>
 
-<table id="kosiTable" class="table table-sm table-bordered table-hover align-middle">
-    <thead>
-        <tr class="text-center table-light">
-            <th class="text-start">Patient:in</th>
-            <th width="100">Aufnahme</th>
-            <th width="50">AD</th>
-            <th width="100">Entlassung</th>
-            <th width="100">KOÜB</th>
-            <th width="100">Verlängerung</th>
-            <th width="50">ED</th>
-            <th width="50">FA</th>
-            <th width="50">Aktion</th>
-        </tr>
-    </thead>
-    <tbody>
-
-    </tbody>
-</table>
+        <!-- Sunday buttons by month -->
+        <div id="sundayButtons">
+            <!-- Month rows will be added here dynamically -->
+        </div>
+    </div>
+</div>
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        loadMultipleData(['patients-station', 'kosi-station'], function (result) {
-            fillKosiTable();
-        });
+        renderSundayButtons();
     });
+
+    function renderSundayButtons() {
+        const container = document.getElementById('sundayButtons');
+        container.innerHTML = '';
+
+        // Get current year and next year
+        const currentYear = new Date().getFullYear();
+        const years = [currentYear, currentYear + 1];
+
+        // Get all Sundays for both years
+        let allSundays = [];
+        years.forEach(year => {
+            allSundays = allSundays.concat(getSundaysForYear(year));
+        });
+
+        // Filter to show only future Sundays (from 2 months ago to 6 months ahead)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const twoMonthsAgo = new Date(today);
+        twoMonthsAgo.setMonth(today.getMonth() - 2);
+        const sixMonthsAhead = new Date(today);
+        sixMonthsAhead.setMonth(today.getMonth() + 6);
+
+        const relevantSundays = allSundays.filter(sunday => 
+            sunday >= twoMonthsAgo && sunday <= sixMonthsAhead
+        );
+
+        // Get next Sunday
+        const nextSunday = getNextAnnouncementSunday();
+        const nextSundayStr = formatDateToGerman(nextSunday);
+
+        // Group by month
+        const groupedSundays = groupSundaysByMonth(relevantSundays);
+
+        // Render each month
+        for (const [monthLabel, sundays] of Object.entries(groupedSundays)) {
+            const monthRow = document.createElement('div');
+            monthRow.className = 'month-row';
+
+            const monthLabelDiv = document.createElement('div');
+            monthLabelDiv.className = 'month-label';
+            monthLabelDiv.textContent = monthLabel;
+            monthRow.appendChild(monthLabelDiv);
+
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'date-buttons';
+
+            sundays.forEach(sunday => {
+                const dateStr = formatDateToGerman(sunday);
+                const isNextSunday = dateStr === nextSundayStr;
+
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-outline-secondary date-btn';
+
+                if (isNextSunday) {
+                btn.className = 'btn btn-primary date-btn';
+                }
+
+                btn.innerHTML = `${getGermanWeekdayAbbr(sunday)} ${dateStr}`;
+                btn.onclick = () => navigateToDate(dateStr);
+
+                buttonsDiv.appendChild(btn);
+            });
+
+            monthRow.appendChild(buttonsDiv);
+            container.appendChild(monthRow);
+        }
+    }
+
+    function navigateToDate(dateStr) {
+        window.location.href = `ausdruck/index.html?date=${dateStr}`;
+    }
 </script>
+
     </div>
 
 </body>

@@ -177,13 +177,14 @@ save_file: ankuendigungen-station
                 btn.className = 'btn date-btn';
                 
                 if (hasAnnouncements) {
-                    btn.classList.add('btn-primary', 'has-announcements');
+                    btn.classList.add('btn-outline-primary', 'has-announcements');
                 } else {
                     btn.classList.add('btn-outline-secondary');
                 }
 
                 if (isNextSunday) {
-                    btn.classList.add('next-announcement');
+                    btn.classList.remove('btn-outline-primary');
+                    btn.classList.add('btn-primary');
                 }
 
                 btn.innerHTML = `${getGermanWeekdayAbbr(sunday)} ${dateStr}`;
