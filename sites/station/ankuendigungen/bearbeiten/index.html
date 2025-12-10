@@ -1,0 +1,341 @@
+---
+layout: layout.html
+active_ankuendigungen: active
+title: Ankündigung bearbeiten
+include_navigation: true
+dir: ../../../../
+save_data: announcements-station
+save_file: ankuendigungen-station
+---
+
+<script src="{{ dir }}src/station/announcements.js"></script>
+
+<style>
+    .announcement-card {
+        margin-bottom: 1rem;
+    }
+    .announcement-card .card-body {
+        padding: 1rem;
+    }
+    .announcement-card.unchecked {
+        background-color: rgba(220, 53, 69, 0.05); /* Very light red background */
+    }
+    .announcement-card textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+    .announcement-card.readonly textarea {
+        background-color: #e9ecef;
+    }
+    .employee-badge {
+        font-size: 0.9rem;
+    }
+    .absence-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .absence-info .form-check {
+        margin-bottom: 0;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center">
+                <a href="../index.html" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h4 class="mb-0">
+                    Ankündigungen vom 
+                    <input type="date" class="form-control d-inline-block" id="announcementDate" style="width: auto;" onchange="changeDateHandler()">
+                </h4>
+            </div>
+            <div>
+                <a href="#" id="printButton" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-printer text-primary me-1"></i> Ausdruck
+                </a>
+                <button type="button" id="addEntryButton" class="btn btn-outline-primary hidden" onclick="addNewEntry()">
+                    <i class="bi bi-plus-circle text-primary me-1"></i> Eintrag hinzufügen
+                </button>
+            </div>
+        </div>
+
+        <div id="announcementsContainer">
+            <!-- Announcement cards will be added here -->
+        </div>
+
+        <div id="noAnnouncements" class="alert alert-info" style="display: none;">
+            Keine Ankündigungen für dieses Datum vorhanden.
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentDateStr = '';
+    let originalDateStr = '';
+
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['announcements-station'], function (result) {
+            // Initialize empty object if not loaded
+            if (!window['announcements-station']) {
+                window['announcements-station'] = {};
+            }
+
+            // Get date from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const dateParam = urlParams.get('date');
+
+            if (dateParam) {
+                // Check if it's German format (contains dots) or ISO format
+                if (dateParam.includes('.')) {
+                    // German format
+                    currentDateStr = dateParam;
+                    document.getElementById('announcementDate').value = formatGermanToISODate(dateParam);
+                } else {
+                    // ISO format
+                    document.getElementById('announcementDate').value = dateParam;
+                    currentDateStr = formatISOToGermanDate(dateParam);
+                }
+                originalDateStr = currentDateStr;
+            } else {
+                // Default to next Sunday
+                const nextSunday = getNextAnnouncementSunday();
+                const isoDate = nextSunday.toISOString().split('T')[0];
+                document.getElementById('announcementDate').value = isoDate;
+                currentDateStr = formatDateToGerman(nextSunday);
+                originalDateStr = currentDateStr;
+            }
+
+            // Set date input readonly if user doesn't have edit all rights
+            if (!canEditAnnouncementDate()) {
+                document.getElementById('announcementDate').setAttribute('readonly', true);
+            }
+
+            // Update print button link
+            updatePrintButtonLink();
+
+            // Show add button if user has edit rights
+            if (authorize('editOwnAnnouncementsStation') || authorize('editAllAnnouncementsStation')) {
+                document.getElementById('addEntryButton').classList.remove('hidden');
+            }
+
+            renderAnnouncements();
+        });
+    });
+
+    function updatePrintButtonLink() {
+        const dateInput = document.getElementById('announcementDate');
+        const printButton = document.getElementById('printButton');
+        printButton.href = `../ausdruck/index.html?date=${dateInput.value}`;
+    }
+
+    function changeDateHandler() {
+        const dateInput = document.getElementById('announcementDate');
+        const newDateStr = formatISOToGermanDate(dateInput.value);
+
+        // If there are entries for the old date, ask if they should be moved
+        const oldEntries = window['announcements-station']?.[currentDateStr] || [];
+        
+        if (oldEntries.length > 0 && newDateStr !== currentDateStr) {
+            if (confirm(`Möchten Sie alle ${oldEntries.length} Einträge vom ${currentDateStr} auf den ${newDateStr} verschieben?`)) {
+                // Move entries to new date
+                if (!window['announcements-station'][newDateStr]) {
+                    window['announcements-station'][newDateStr] = [];
+                }
+                window['announcements-station'][newDateStr] = window['announcements-station'][newDateStr].concat(oldEntries);
+                delete window['announcements-station'][currentDateStr];
+                checkData();
+            } else {
+                // Revert date change
+                dateInput.value = formatGermanToISODate(currentDateStr);
+                return;
+            }
+        }
+
+        currentDateStr = newDateStr;
+        updatePrintButtonLink();
+        
+        // Update URL without reload (use German format)
+        const newUrl = `${window.location.pathname}?date=${newDateStr}`;
+        window.history.replaceState({}, '', newUrl);
+        
+        renderAnnouncements();
+    }
+
+    function renderAnnouncements() {
+        const container = document.getElementById('announcementsContainer');
+        const noAnnouncementsDiv = document.getElementById('noAnnouncements');
+        container.innerHTML = '';
+
+        const entries = window['announcements-station']?.[currentDateStr] || [];
+
+        if (entries.length === 0) {
+            noAnnouncementsDiv.style.display = 'block';
+            return;
+        }
+
+        noAnnouncementsDiv.style.display = 'none';
+
+        entries.forEach((entry, index) => {
+            const canEdit = canEditAnnouncement(entry);
+            const employeeName = entry.employee ? (window['employees']?.[entry.employee]?.name || entry.employee) : 'Unbekannt';
+            const isChecked = entry.checked || false;
+
+            const card = document.createElement('div');
+            card.className = `card announcement-card ${canEdit ? '' : 'readonly'} ${!isChecked ? 'unchecked' : ''}`;
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+
+            // Header with employee info and delete button
+            const header = document.createElement('div');
+            header.className = 'd-flex justify-content-between align-items-start mb-2';
+
+            const employeeInfo = document.createElement('div');
+            
+            const employeeBadge = document.createElement('span');
+            employeeBadge.className = 'badge bg-secondary employee-badge me-2';
+            employeeBadge.textContent = employeeName;
+            employeeInfo.appendChild(employeeBadge);
+
+            if (entry.start_date && entry.end_date) {
+                const absenceInfo = document.createElement('div');
+                absenceInfo.className = 'absence-info';
+                
+                const dateInfo = document.createElement('small');
+                dateInfo.className = 'text-muted';
+                if (entry.start_date === entry.end_date) {
+                    dateInfo.textContent = `Abwesenheit: ${entry.start_date}`;
+                } else {
+                    dateInfo.textContent = `Abwesenheit: ${entry.start_date} - ${entry.end_date}`;
+                }
+                absenceInfo.appendChild(dateInfo);
+
+                // Add checkbox inline with dates
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = 'form-check';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'form-check-input';
+                checkbox.id = `checked-${index}`;
+                checkbox.checked = isChecked;
+                checkbox.disabled = !canEdit;
+                checkbox.onchange = () => updateEntryChecked(index, checkbox.checked);
+
+                const checkboxLabel = document.createElement('label');
+                checkboxLabel.className = 'form-check-label';
+                checkboxLabel.setAttribute('for', `checked-${index}`);
+                checkboxLabel.textContent = 'Geprüft';
+
+                checkboxDiv.appendChild(checkbox);
+                checkboxDiv.appendChild(checkboxLabel);
+                absenceInfo.appendChild(checkboxDiv);
+
+                employeeInfo.appendChild(absenceInfo);
+            } else {
+                // No absence dates, add checkbox separately
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = 'form-check mt-2';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'form-check-input';
+                checkbox.id = `checked-${index}`;
+                checkbox.checked = isChecked;
+                checkbox.disabled = !canEdit;
+                checkbox.onchange = () => updateEntryChecked(index, checkbox.checked);
+
+                const checkboxLabel = document.createElement('label');
+                checkboxLabel.className = 'form-check-label';
+                checkboxLabel.setAttribute('for', `checked-${index}`);
+                checkboxLabel.textContent = 'Geprüft';
+
+                checkboxDiv.appendChild(checkbox);
+                checkboxDiv.appendChild(checkboxLabel);
+                employeeInfo.appendChild(checkboxDiv);
+            }
+
+            header.appendChild(employeeInfo);
+
+            if (canEdit) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-sm btn-outline-danger';
+                deleteBtn.innerHTML = '<i class="bi bi-trash text-danger"></i>';
+                deleteBtn.onclick = () => deleteEntry(index);
+                header.appendChild(deleteBtn);
+            }
+
+            cardBody.appendChild(header);
+
+            // Content textarea
+            const textarea = document.createElement('textarea');
+            textarea.className = 'form-control mb-2';
+            textarea.value = entry.content || '';
+            textarea.disabled = !canEdit;
+            textarea.onchange = () => updateEntryContent(index, textarea.value);
+            cardBody.appendChild(textarea);
+
+            card.appendChild(cardBody);
+            container.appendChild(card);
+        });
+    }
+
+    function updateEntryContent(index, content) {
+        if (window['announcements-station']?.[currentDateStr]?.[index]) {
+            window['announcements-station'][currentDateStr][index].content = content;
+            checkData();
+        }
+    }
+
+    function updateEntryChecked(index, checked) {
+        if (window['announcements-station']?.[currentDateStr]?.[index]) {
+            window['announcements-station'][currentDateStr][index].checked = checked;
+            
+            // Update visual feedback - add/remove unchecked class
+            const cards = document.querySelectorAll('.announcement-card');
+            if (cards[index]) {
+                if (checked) {
+                    cards[index].classList.remove('unchecked');
+                } else {
+                    cards[index].classList.add('unchecked');
+                }
+            }
+            
+            checkData();
+        }
+    }
+
+    function deleteEntry(index) {
+        if (confirm('Möchten Sie diesen Eintrag wirklich löschen?')) {
+            removeAnnouncementEntry(currentDateStr, index);
+            checkData();
+            renderAnnouncements();
+        }
+    }
+
+    function addNewEntry() {
+        if (!window['announcements-station'][currentDateStr]) {
+            window['announcements-station'][currentDateStr] = [];
+        }
+
+        window['announcements-station'][currentDateStr].push({
+            content: '',
+            employee: window['user']?.key || null,
+            start_date: null,
+            end_date: null,
+            checked: false
+        });
+
+        checkData();
+        renderAnnouncements();
+
+        // Focus the new textarea
+        const textareas = document.querySelectorAll('.announcement-card textarea');
+        if (textareas.length > 0) {
+            textareas[textareas.length - 1].focus();
+        }
+    }
+</script>

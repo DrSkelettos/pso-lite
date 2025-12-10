@@ -75,6 +75,13 @@ function editEmployee(empKey) {
     document.getElementById('editEmployeeRightsWorkloadStation').checked = employee.rights?.workloadStation || false;
     document.getElementById('editEmployeeRightsEditEvents').checked = employee.rights?.editEvents || false;
     document.getElementById('editEmployeeRightsEditEmployees').checked = employee.rights?.editEmployees || false;
+    document.getElementById('editEmployeeRightsViewAnnouncementsStation').checked = employee.rights?.viewAnnouncementsStation || false;
+    document.getElementById('editEmployeeRightsEditOwnAnnouncementsStation').checked = employee.rights?.editOwnAnnouncementsStation || false;
+    document.getElementById('editEmployeeRightsEditAllAnnouncementsStation').checked = employee.rights?.editAllAnnouncementsStation || false;
+
+    // Set announcement texts
+    document.getElementById('editEmployeeAnnouncementTextShort').value = employee.announcementTextShort || '';
+    document.getElementById('editEmployeeAnnouncementTextLong').value = employee.announcementTextLong || '';
 
     const patientsInput = document.getElementById('editEmployeePatients');
     patientsInput.value = employee.patients || 0;
@@ -103,6 +110,16 @@ function editEmployee(empKey) {
             endInput.value = formatGermanToISODate(absence.end);
 
             // Add start date change handler
+            const announcementInput = absenceDiv.querySelector('.absence-announcement');
+            const updateAnnouncementDate = function() {
+                if (startInput.value && endInput.value && typeof calculateAnnouncementDate === 'function') {
+                    const startDate = new Date(startInput.value);
+                    const endDate = new Date(endInput.value);
+                    const suggestedDate = calculateAnnouncementDate(startDate, endDate);
+                    announcementInput.value = suggestedDate.toISOString().split('T')[0];
+                }
+            };
+
             startInput.addEventListener('change', function () {
                 if (!endInput.value) {
                     // Parse the date and ensure we use the correct year
@@ -111,6 +128,17 @@ function editEmployee(empKey) {
                         date.setFullYear(new Date().getFullYear());  // Set to current year
                     }
                     endInput.value = date.toISOString().split('T')[0];
+                }
+                // Update announcement date if not already set
+                if (!announcementInput.value) {
+                    updateAnnouncementDate();
+                }
+            });
+
+            endInput.addEventListener('change', function () {
+                // Update announcement date if not already set
+                if (!announcementInput.value) {
+                    updateAnnouncementDate();
                 }
             });
 
@@ -148,6 +176,17 @@ function addAbsenceEntry() {
     // Add start date change handler
     const startInput = absenceDiv.querySelector('.absence-start');
     const endInput = absenceDiv.querySelector('.absence-end');
+    const announcementInput = absenceDiv.querySelector('.absence-announcement');
+
+    const updateAnnouncementDate = function() {
+        if (startInput.value && endInput.value && typeof calculateAnnouncementDate === 'function') {
+            const startDate = new Date(startInput.value);
+            const endDate = new Date(endInput.value);
+            const suggestedDate = calculateAnnouncementDate(startDate, endDate);
+            announcementInput.value = suggestedDate.toISOString().split('T')[0];
+        }
+    };
+
     startInput.addEventListener('change', function () {
         if (!endInput.value) {
             // Parse the date and ensure we use the correct year
@@ -157,6 +196,13 @@ function addAbsenceEntry() {
             }
             endInput.value = date.toISOString().split('T')[0];
         }
+        // Update announcement date
+        updateAnnouncementDate();
+    });
+
+    endInput.addEventListener('change', function () {
+        // Update announcement date
+        updateAnnouncementDate();
     });
 
     document.getElementById('absences').appendChild(absenceDiv);
@@ -183,12 +229,22 @@ async function saveEmployeeEdit() {
     rights.kosiStation = document.getElementById('editEmployeeRightsKosiStation').checked;
     rights.editEvents = document.getElementById('editEmployeeRightsEditEvents').checked;
     rights.editEmployees = document.getElementById('editEmployeeRightsEditEmployees').checked;
+    rights.viewAnnouncementsStation = document.getElementById('editEmployeeRightsViewAnnouncementsStation').checked;
+    rights.editOwnAnnouncementsStation = document.getElementById('editEmployeeRightsEditOwnAnnouncementsStation').checked;
+    rights.editAllAnnouncementsStation = document.getElementById('editEmployeeRightsEditAllAnnouncementsStation').checked;
+
+    // Get announcement texts
+    const announcementTextShort = document.getElementById('editEmployeeAnnouncementTextShort').value.trim();
+    const announcementTextLong = document.getElementById('editEmployeeAnnouncementTextLong').value.trim();
 
     // Get all absences
     const absencesList = document.getElementById('absences');
     const absences = [];
     const now = new Date();
     now.setHours(0, 0, 0, 0); // Normalize to start of day
+
+    // Track announcements to create
+    const announcementsToCreate = [];
 
     absencesList.querySelectorAll('.list-group-item').forEach(absenceDiv => {
         const startInput = absenceDiv.querySelector('.absence-start');
@@ -197,15 +253,38 @@ async function saveEmployeeEdit() {
         const plannedCheckbox = absenceDiv.querySelector('.absence-planned');
 
         if (startInput.value && endInput.value) {
+            const startDate = new Date(startInput.value);
             const endDate = new Date(endInput.value);
             // Skip if end date is in the past
             if (endDate < now) return;
 
+            // Calculate suggested announcement date if not set
+            let announcementDateStr = announcementInput.value ? formatISOToGermanDate(announcementInput.value) : null;
+            
+            if (!announcementDateStr) {
+                // Calculate announcement date using the helper function
+                const suggestedDate = calculateAnnouncementDate(startDate, endDate);
+                announcementDateStr = formatISOToGermanDate(suggestedDate.toISOString().split('T')[0]);
+                // Update the input field
+                announcementInput.value = suggestedDate.toISOString().split('T')[0];
+            }
+
+            const absenceStartStr = formatISOToGermanDate(startInput.value);
+            const absenceEndStr = formatISOToGermanDate(endInput.value);
+
             absences.push({
-                start: formatISOToGermanDate(startInput.value),
-                end: formatISOToGermanDate(endInput.value),
-                announcement: announcementInput.value ? formatISOToGermanDate(announcementInput.value) : null,
+                start: absenceStartStr,
+                end: absenceEndStr,
+                announcement: announcementDateStr,
                 planned: plannedCheckbox.checked
+            });
+
+            // Queue announcement creation
+            announcementsToCreate.push({
+                announcementDate: announcementDateStr,
+                startDate: absenceStartStr,
+                endDate: absenceEndStr,
+                employeeKey: oldKey !== newKey ? newKey : oldKey
             });
         }
     });
@@ -226,6 +305,8 @@ async function saveEmployeeEdit() {
         rights: rights,
         passwordHash: oldEmployee.passwordHash,
         needsToChangePassword: oldEmployee.needsToChangePassword,
+        announcementTextShort: announcementTextShort || undefined,
+        announcementTextLong: announcementTextLong || undefined,
     };
 
     // If password is set, hash it
@@ -255,6 +336,40 @@ async function saveEmployeeEdit() {
     } else {
         // Just update the existing entry
         window['employees'][oldKey] = updatedEmployee;
+    }
+
+    // Create announcements for absences (if announcements.js is loaded)
+    let announcementsCreated = false;
+    if (typeof addAnnouncementEntry === 'function' && typeof generateAnnouncementContent === 'function') {
+        // Initialize announcements data if not loaded
+        if (!window['announcements-station']) {
+            window['announcements-station'] = {};
+        }
+
+        announcementsToCreate.forEach(announcement => {
+            const content = generateAnnouncementContent(
+                announcement.employeeKey,
+                announcement.startDate,
+                announcement.endDate
+            );
+
+            // Only create announcement if there's content (employee has template)
+            if (content) {
+                addAnnouncementEntry(announcement.announcementDate, {
+                    content: content,
+                    employee: announcement.employeeKey,
+                    start_date: announcement.startDate,
+                    end_date: announcement.endDate,
+                    checked: false
+                });
+                announcementsCreated = true;
+            }
+        });
+
+        // Save announcements data if any were created (use saveFile directly to avoid resetting checkData)
+        if (announcementsCreated) {
+            saveFile('ankuendigungen-station', window['announcements-station']);
+        }
     }
 
     checkData();

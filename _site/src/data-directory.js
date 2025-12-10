@@ -11,6 +11,7 @@ const dataFileMap = {
     'settings': 'einstellungen',
     'events': 'termine',
     'kosi-station': 'kostensicherung-station',
+    'announcements-station': 'ankuendigungen-station',
 };
 
 /**

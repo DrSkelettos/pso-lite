@@ -9,6 +9,7 @@ save_file: mitarbeiter_innen
 ---
 
 <script src="{{ dir }}src/employees.js"></script>
+<script src="{{ dir }}src/station/announcements.js"></script>
 
 <div class="container-fluid">
     <div class="row">
@@ -45,6 +46,13 @@ save_file: mitarbeiter_innen
 
 <script>
     window.addEventListener('baseDataLoaded', () => {
-        fillEmployeesTable();
+        // Load announcements data so we can create announcements when saving absences
+        loadMultipleData(['announcements-station'], function(result) {
+            // Initialize empty object if not loaded
+            if (!window['announcements-station']) {
+                window['announcements-station'] = {};
+            }
+            fillEmployeesTable();
+        });
     });
 </script>

@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ankündigungen</title>
+
+    <link href="../../../../src/style.css" rel="stylesheet">
+
+    <script src="../../../../src/vendor/idb-keyval/umd.js"></script>
+    <link href="../../../../src/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="../../../../src/vendor/bootstrap/bootstrap.min.js"></script>
+    <link href="../../../../src/vendor/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+
+    <script src="../../../../src/data-directory.js"></script>
+    <script src="../../../../src/data-manager.js"></script>
+    <script src="../../../../src/helpers.js"></script>
+    <script src="../../../../src/user.js"></script>
+    <script src="../../../../src/init.js"></script>
+
+    <script>
+        init('Ankündigungen', '../../../../');
+
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('employees', 'mitarbeiter_innen');
+            await checkLogin('Ankündigungen', '../../../../');
+            window.dispatchEvent(new Event('baseDataLoaded'));
+        });
+    </script>
+
+    <style>        
+        @page {
+            size: A4 portrait;
+            margin: 8mm;
+        }
+
+        html {
+            font-size: 12px !important;
+            color: black !important;
+        }
+
+        body {
+            font-size: 12px !important;
+            color: black !important;
+            background: none !important;
+        }
+
+        a {
+            text-decoration: none;
+            color: black !important;
+            cursor: default !important;
+        }
+
+        @media print {
+            a {
+                text-decoration: none;
+                color: black !important;
+            }
+
+            .table {
+                font-size: inherit !important;
+            }
+
+            .table th,
+            .table td {
+                font-size: inherit !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Preview styles (when viewing in browser) */
+        @media screen {
+            body {
+                max-width: 210mm;
+                margin: 0 auto;
+                padding: 1rem;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    
+<script src="../../../../src/station/announcements.js"></script>
+
+<style>
+    @page {
+        size: A4 portrait;
+        margin: 15mm;
+    }
+
+    html {
+        font-size: 14px !important;
+        color: black !important;
+    }
+
+    body {
+        font-size: 14px !important;
+        color: black !important;
+        background: none !important;
+    }
+
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+    }
+
+    @media screen {
+        body {
+            max-width: 210mm;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+    }
+
+    .print-header {
+        margin-bottom: 2rem;
+        text-align: center;
+    }
+
+    .print-header h1 {
+        font-size: 24px !important;
+        margin-bottom: 0.5rem;
+    }
+
+    .announcements-list {
+        list-style-type: disc;
+        padding-left: 2rem;
+    }
+
+    .announcements-list li {
+        margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+</style>
+
+<div class="print-header">
+    <h1>Ankündigungen vom <span id="announcementDate"></span></h1>
+</div>
+
+<ul class="announcements-list" id="announcementsList">
+    <!-- Announcements will be added here -->
+</ul>
+
+<div id="noAnnouncements" class="text-center text-muted" style="display: none;">
+    Keine Ankündigungen für dieses Datum vorhanden.
+</div>
+
+<script>
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['announcements-station'], function (result) {
+            // Initialize empty object if not loaded
+            if (!window['announcements-station']) {
+                window['announcements-station'] = {};
+            }
+
+            // Get date from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const dateParam = urlParams.get('date');
+
+            let dateStr;
+            if (dateParam) {
+                // Check if it's German format (contains dots) or ISO format
+                if (dateParam.includes('.')) {
+                    // German format
+                    dateStr = dateParam;
+                } else {
+                    // ISO format
+                    dateStr = formatISOToGermanDate(dateParam);
+                }
+            } else {
+                // Default to next Sunday
+                const nextSunday = getNextAnnouncementSunday();
+                dateStr = formatDateToGerman(nextSunday);
+            }
+
+            // Update title
+            document.getElementById('announcementDate').textContent = dateStr;
+            document.title = `Ankündigungen vom ${dateStr}`;
+
+            // Render announcements
+            renderAnnouncements(dateStr);
+        });
+    });
+
+    function renderAnnouncements(dateStr) {
+        const list = document.getElementById('announcementsList');
+        const noAnnouncementsDiv = document.getElementById('noAnnouncements');
+
+        const entries = window['announcements-station']?.[dateStr] || [];
+
+        if (entries.length === 0) {
+            list.style.display = 'none';
+            noAnnouncementsDiv.style.display = 'block';
+            return;
+        }
+
+        noAnnouncementsDiv.style.display = 'none';
+        list.innerHTML = '';
+
+        entries.forEach(entry => {
+            if (entry.content && entry.content.trim()) {
+                const li = document.createElement('li');
+                li.textContent = entry.content;
+                list.appendChild(li);
+            }
+        });
+
+        // If all entries were empty, show no announcements message
+        if (list.children.length === 0) {
+            list.style.display = 'none';
+            noAnnouncementsDiv.style.display = 'block';
+        }
+    }
+</script>
+
+
+</body>
+
+</html>

@@ -47,7 +47,11 @@
             showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
             showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
             showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
-            showIfAuthorized('#navLinkStation', 'viewPatientsStation');
+            showIfAuthorized('#navLinkAnnouncementsStation', 'viewAnnouncementsStation');
+            // Show Station dropdown if user has any station-related rights
+            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation')) {
+                document.getElementById('navLinkStation').classList.remove('hidden');
+            }
             showIfAuthorized('#navLinkStationDivider', 'workloadStation');
         });
     </script>
@@ -87,6 +91,7 @@
                             <li><a class="dropdown-item hidden" id="navLinkTherapiesStation" href="../../sites/station/therapiezuordnung/index.html"><i class="bi bi-list-columns me-1"></i> Therapiezuordnung</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkPoststationaer" href="../../sites/station/poststationaer/index.html"><i class="bi bi-person-x me-1"></i> Poststationär</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkRoundsStation" href="../../sites/station/chefaerztinvisite/index.html"><i class="bi bi-eye me-1"></i> Chefärztinvisite</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkAnnouncementsStation" href="../../sites/station/ankuendigungen/index.html"><i class="bi bi-megaphone me-1"></i> Ankündigungen</a></li>
                             <li class="dropdown-divider hidden" id="navLinkStationDivider"></li>
                             <li><a class="dropdown-item hidden" id="navLinkWorkloadStation" href="../../sites/station/auslastung/index.html"><i class="bi bi-bar-chart me-1"></i> Auslastung</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkKosiStation" href="../../sites/station/kosi/index.html"><i class="bi bi-coin me-1"></i>Kostensicherung</a></li>
@@ -129,6 +134,7 @@
     <div class="container-fluid pb-3">
         
 <script src="../../src/employees.js"></script>
+<script src="../../src/station/announcements.js"></script>
 
 <div class="container-fluid">
     <div class="row">
@@ -248,6 +254,25 @@
                         </div>
                     </div>
 
+
+                    <div class="card  mb-3">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Ankündigungstexte</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label for="editEmployeeAnnouncementTextShort" class="form-label">Text für kurze Abwesenheiten (1-2 Tage)</label>
+                                <textarea class="form-control" id="editEmployeeAnnouncementTextShort" rows="2" placeholder="z.B. [NAME] ist am [DATUM] nicht im Haus."></textarea>
+                                <small class="text-muted">Verwenden Sie [DATUM] als Platzhalter für das Datum und [NAME] für den Namen.</small>
+                            </div>
+                            <div class="mb-0">
+                                <label for="editEmployeeAnnouncementTextLong" class="form-label">Text für längere Abwesenheiten (3+ Tage)</label>
+                                <textarea class="form-control" id="editEmployeeAnnouncementTextLong" rows="2" placeholder="z.B. [NAME] ist [DATUM] nicht im Haus."></textarea>
+                                <small class="text-muted">Verwenden Sie [DATUM] als Platzhalter für das Datum und [NAME] für den Namen.</small>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="card mb-3">
                         <div class="card-header">
                             <button type="button" class="btn btn-outline-primary btn-sm float-end" onclick="addAbsenceEntry()">
@@ -354,6 +379,18 @@
                                 <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditEmployees">
                                 <label class="form-check-label" for="editEmployeeRightsEditEmployees">Mitarbeiter:innen bearbeiten</label>
                             </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsViewAnnouncementsStation">
+                                <label class="form-check-label" for="editEmployeeRightsViewAnnouncementsStation">Station: Ankündigungen anzeigen</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditOwnAnnouncementsStation">
+                                <label class="form-check-label" for="editEmployeeRightsEditOwnAnnouncementsStation">Station: Eigene Ankündigungen bearbeiten</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditAllAnnouncementsStation">
+                                <label class="form-check-label" for="editEmployeeRightsEditAllAnnouncementsStation">Station: Alle Ankündigungen bearbeiten</label>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -381,7 +418,14 @@
 
 <script>
     window.addEventListener('baseDataLoaded', () => {
-        fillEmployeesTable();
+        // Load announcements data so we can create announcements when saving absences
+        loadMultipleData(['announcements-station'], function(result) {
+            // Initialize empty object if not loaded
+            if (!window['announcements-station']) {
+                window['announcements-station'] = {};
+            }
+            fillEmployeesTable();
+        });
     });
 </script>
     </div>

@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PSOrga - Ankündigungen</title>
+
+    
+    <link href="../../../src/style.css" rel="stylesheet">
+    
+
+    <script src="../../../src/vendor/idb-keyval/umd.js"></script>
+    <script src="../../../src/vendor/popperjs/popper.min.js"></script>
+    <link href="../../../src/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="../../../src/vendor/bootstrap/bootstrap.min.js"></script>
+    <link href="../../../src/vendor/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+
+    <script src="../../../src/data-manager.js"></script>
+    <script src="../../../src/data-directory.js"></script>
+    <script src="../../../src/helpers.js"></script>
+    <script src="../../../src/user.js"></script>
+    <script src="../../../src/init.js"></script>
+
+    <script>
+        // Add warning when user tries to close page with unsaved data
+        window.addEventListener('beforeunload', function (e) {
+            // Check if the data-changed element is visible (not having the d-none class)
+            if (!document.getElementById('data-changed').classList.contains('d-none')) {
+                // Standard way to show a confirmation dialog when closing the page
+                e.preventDefault();
+                e.returnValue = 'Es gibt ungespeicherte Änderungen. Möchten Sie die Seite wirklich verlassen?';
+                return e.returnValue;
+            }
+        });
+
+        init('Ankündigungen', '../../../');
+
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('employees', 'mitarbeiter_innen');
+            await checkLogin('Ankündigungen', '../../../');
+            window.dispatchEvent(new Event('baseDataLoaded'));
+
+            showIfAuthorized('#navLinkWorkloadStation', 'workloadStation');
+            showIfAuthorized('#navLinkKosiStation', 'kosiStation');
+            showIfAuthorized('#navLinkPatientsStation', 'viewPatientsStation');
+            showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
+            showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
+            showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
+            showIfAuthorized('#navLinkAnnouncementsStation', 'viewAnnouncementsStation');
+            // Show Station dropdown if user has any station-related rights
+            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation')) {
+                document.getElementById('navLinkStation').classList.remove('hidden');
+            }
+            showIfAuthorized('#navLinkStationDivider', 'workloadStation');
+        });
+    </script>
+</head>
+
+
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../../../index.html" style="margin-top:-4px;">
+                <img src="../../../src/images/psorga-white.svg" alt="PSOrga" height="20">
+            </a>
+
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item me-2">
+                    <a class="nav-link " href="../../../index.html">
+                        <i class="bi bi-house me-1 text-light"></i>
+                        Startseite
+                    </a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="nav-link" href="../../../sites/kalender/index.html">
+                        <i class="bi bi-calendar-date me-1 text-light"></i>
+                        Kalender
+                    </a>
+                </li>
+
+                <div class="dropdown hidden" id="navLinkStation">
+                    <li class="nav-item me-2">
+                        <a class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-hospital me-1 text-light"></i>
+                            Station
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item hidden" id="navLinkPatientsStation" href="../../../sites/station/belegung/index.html"><i class="bi bi-people me-1"></i>Belegung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkTherapiesStation" href="../../../sites/station/therapiezuordnung/index.html"><i class="bi bi-list-columns me-1"></i> Therapiezuordnung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkPoststationaer" href="../../../sites/station/poststationaer/index.html"><i class="bi bi-person-x me-1"></i> Poststationär</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkRoundsStation" href="../../../sites/station/chefaerztinvisite/index.html"><i class="bi bi-eye me-1"></i> Chefärztinvisite</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkAnnouncementsStation" href="../../../sites/station/ankuendigungen/index.html"><i class="bi bi-megaphone me-1"></i> Ankündigungen</a></li>
+                            <li class="dropdown-divider hidden" id="navLinkStationDivider"></li>
+                            <li><a class="dropdown-item hidden" id="navLinkWorkloadStation" href="../../../sites/station/auslastung/index.html"><i class="bi bi-bar-chart me-1"></i> Auslastung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkKosiStation" href="../../../sites/station/kosi/index.html"><i class="bi bi-coin me-1"></i>Kostensicherung</a></li>
+                        </ul>
+                    </li>
+                </div>
+            </ul>
+
+            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('announcements-station', 'ankuendigungen-station')">
+                <div class="d-inline-block pb-1">Speichern notwendig!</div>
+                <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
+            </div>
+
+            <ul class="navbar-nav ms-3 mb-2 mb-md-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Mehr</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="../../../sites/mitarbeiterinnen/index.html">
+                                <i class="bi bi-people me-1"></i>
+                                Mitarbeiter:innen
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="../../../sites/passwort-aendern/index.html">
+                                <i class="bi bi-key me-1"></i>
+                                Passwort ändern
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item" title="Ausloggen">
+                    <a class="nav-link" href="javascript:void(0);" style="margin-top:-3px; margin-bottom:-10px;" onclick="logout('../../../')">
+                        <i class="bi bi-x-circle text-light fs-5"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid pb-3">
+        
+<script src="../../../src/station/announcements.js"></script>
+
+<style>
+    .month-row {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+    .month-label {
+        min-width: 180px;
+        font-weight: bold;
+        padding-top: 0.5rem;
+    }
+    .date-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    .date-btn {
+        min-width: 120px;
+    }
+    .date-btn.has-announcements {
+        border-width: 2px;
+    }
+    .date-btn.next-announcement {
+        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.5);
+    }
+    .badge-unchecked {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        font-size: 0.7rem;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">Ankündigungen</h4>
+            <div>
+                <button type="button" id="addAnnouncementButton" class="btn btn-outline-primary hidden" onclick="showAddAnnouncementModal()">
+                    <i class="bi bi-plus-circle text-primary me-1"></i> Neue Ankündigung
+                </button>
+            </div>
+        </div>
+
+        <!-- Non-Sunday announcements -->
+        <div id="nonSundayAnnouncements" class="mb-4" style="display: none;">
+            <h5 class="text-muted mb-3">Sonstige Termine</h5>
+            <div id="nonSundayButtons" class="date-buttons mb-3">
+                <!-- Non-Sunday date buttons will be added here -->
+            </div>
+            <hr>
+        </div>
+
+        <!-- Sunday announcements by month -->
+        <div id="sundayAnnouncements">
+            <!-- Month rows will be added here dynamically -->
+        </div>
+    </div>
+</div>
+
+<!-- Add Announcement Modal -->
+<div class="modal fade" id="addAnnouncementModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Neue Ankündigung</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="newAnnouncementDate" class="form-label">Datum</label>
+                    <input type="date" class="form-control" id="newAnnouncementDate" required>
+                </div>
+                <div class="mb-3">
+                    <label for="newAnnouncementContent" class="form-label">Inhalt</label>
+                    <textarea class="form-control" id="newAnnouncementContent" rows="3" required></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                <button type="button" class="btn btn-primary" onclick="addNewAnnouncement()">Hinzufügen</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let viewOnlyMode = false;
+
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['announcements-station'], function (result) {
+            // Initialize empty object if not loaded
+            if (!window['announcements-station']) {
+                window['announcements-station'] = {};
+            }
+
+            // Check if user has only view rights
+            viewOnlyMode = hasOnlyViewAnnouncementRights();
+
+            renderAnnouncementsList();
+
+            // Show add button only for users with edit rights
+            if (authorize('editOwnAnnouncementsStation') || authorize('editAllAnnouncementsStation')) {
+                document.getElementById('addAnnouncementButton').classList.remove('hidden');
+            }
+        });
+    });
+
+    function renderAnnouncementsList() {
+        const container = document.getElementById('sundayAnnouncements');
+        container.innerHTML = '';
+
+        // Get current year and next year
+        const currentYear = new Date().getFullYear();
+        const years = [currentYear, currentYear + 1];
+
+        // Get all Sundays for both years
+        let allSundays = [];
+        years.forEach(year => {
+            allSundays = allSundays.concat(getSundaysForYear(year));
+        });
+
+        // Filter to show only future Sundays (from 2 months ago to 6 months ahead)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const twoMonthsAgo = new Date(today);
+        twoMonthsAgo.setMonth(today.getMonth() - 2);
+        const sixMonthsAhead = new Date(today);
+        sixMonthsAhead.setMonth(today.getMonth() + 6);
+
+        const relevantSundays = allSundays.filter(sunday => 
+            sunday >= twoMonthsAgo && sunday <= sixMonthsAhead
+        );
+
+        // Get next announcement Sunday
+        const nextSunday = getNextAnnouncementSunday();
+        const nextSundayStr = formatDateToGerman(nextSunday);
+
+        // Group by month
+        const groupedSundays = groupSundaysByMonth(relevantSundays);
+
+        // Render each month
+        for (const [monthLabel, sundays] of Object.entries(groupedSundays)) {
+            const monthRow = document.createElement('div');
+            monthRow.className = 'month-row';
+
+            const monthLabelDiv = document.createElement('div');
+            monthLabelDiv.className = 'month-label';
+            monthLabelDiv.textContent = monthLabel;
+            monthRow.appendChild(monthLabelDiv);
+
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'date-buttons';
+
+            sundays.forEach(sunday => {
+                const dateStr = formatDateToGerman(sunday);
+                const hasAnnouncements = window['announcements-station']?.[dateStr]?.length > 0;
+                const uncheckedCount = viewOnlyMode ? 0 : countUncheckedAnnouncements(dateStr);
+                const isNextSunday = dateStr === nextSundayStr;
+
+                const btnWrapper = document.createElement('div');
+                btnWrapper.className = 'position-relative';
+
+                const btn = document.createElement('button');
+                btn.className = 'btn date-btn';
+                
+                if (hasAnnouncements) {
+                    btn.classList.add('btn-primary', 'has-announcements');
+                } else {
+                    btn.classList.add('btn-outline-secondary');
+                }
+
+                if (isNextSunday) {
+                    btn.classList.add('next-announcement');
+                }
+
+                btn.innerHTML = `${getGermanWeekdayAbbr(sunday)} ${dateStr}`;
+                btn.onclick = () => navigateToDate(dateStr);
+
+                btnWrapper.appendChild(btn);
+
+                // Add unchecked badge if needed
+                if (uncheckedCount > 0) {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge bg-danger badge-unchecked rounded-pill';
+                    badge.textContent = uncheckedCount;
+                    btnWrapper.appendChild(badge);
+                }
+
+                buttonsDiv.appendChild(btnWrapper);
+            });
+
+            monthRow.appendChild(buttonsDiv);
+            container.appendChild(monthRow);
+        }
+
+        // Render non-Sunday announcements
+        renderNonSundayAnnouncements();
+    }
+
+    function renderNonSundayAnnouncements() {
+        const nonSundayDates = getNonSundayAnnouncementDates();
+        const container = document.getElementById('nonSundayAnnouncements');
+        const buttonsDiv = document.getElementById('nonSundayButtons');
+
+        if (nonSundayDates.length === 0) {
+            container.style.display = 'none';
+            return;
+        }
+
+        container.style.display = 'block';
+        buttonsDiv.innerHTML = '';
+
+        nonSundayDates.forEach(dateStr => {
+            const date = parseGermanDate(dateStr);
+            const uncheckedCount = viewOnlyMode ? 0 : countUncheckedAnnouncements(dateStr);
+
+            const btnWrapper = document.createElement('div');
+            btnWrapper.className = 'position-relative';
+
+            const btn = document.createElement('button');
+            btn.className = 'btn btn-warning date-btn';
+            btn.innerHTML = `${getGermanWeekdayAbbr(date)} ${dateStr}`;
+            btn.onclick = () => navigateToDate(dateStr);
+
+            btnWrapper.appendChild(btn);
+
+            if (uncheckedCount > 0) {
+                const badge = document.createElement('span');
+                badge.className = 'badge bg-danger badge-unchecked rounded-pill';
+                badge.textContent = uncheckedCount;
+                btnWrapper.appendChild(badge);
+            }
+
+            buttonsDiv.appendChild(btnWrapper);
+        });
+    }
+
+    function navigateToDate(dateStr) {
+        if (viewOnlyMode) {
+            // Go directly to print page
+            window.location.href = `ausdruck/index.html?date=${dateStr}`;
+        } else {
+            // Go to edit page
+            window.location.href = `bearbeiten/index.html?date=${dateStr}`;
+        }
+    }
+
+    function showAddAnnouncementModal() {
+        // Set default date to next Sunday
+        const nextSunday = getNextAnnouncementSunday();
+        document.getElementById('newAnnouncementDate').value = nextSunday.toISOString().split('T')[0];
+        document.getElementById('newAnnouncementContent').value = '';
+
+        const modal = new bootstrap.Modal(document.getElementById('addAnnouncementModal'));
+        modal.show();
+    }
+
+    function addNewAnnouncement() {
+        const dateInput = document.getElementById('newAnnouncementDate');
+        const contentInput = document.getElementById('newAnnouncementContent');
+
+        if (!dateInput.value || !contentInput.value.trim()) {
+            alert('Bitte füllen Sie alle Felder aus.');
+            return;
+        }
+
+        const dateStr = formatISOToGermanDate(dateInput.value);
+        const content = contentInput.value.trim();
+
+        // Add the announcement
+        addAnnouncementEntry(dateStr, {
+            content: content,
+            employee: window['user']?.key || null,
+            start_date: null,
+            end_date: null,
+            checked: false
+        });
+
+        // Close modal and refresh
+        bootstrap.Modal.getInstance(document.getElementById('addAnnouncementModal')).hide();
+        checkData();
+        renderAnnouncementsList();
+    }
+</script>
+
+    </div>
+
+</body>
+
+
+</html>

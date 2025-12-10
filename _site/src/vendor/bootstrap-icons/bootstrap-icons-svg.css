@@ -17,6 +17,10 @@
   filter: none;
 }
 
+.bi-megaphone::before { 
+  background-image: url("./svg/megaphone.svg"); 
+}
+
 .bi-person-x::before { 
   background-image: url("./svg/person-x.svg"); 
 }
@@ -103,6 +107,10 @@
 
 .bi-box-arrow-left::before { 
   background-image: url("./svg/box-arrow-left.svg"); 
+}
+
+.bi-arrow-left::before { 
+  background-image: url("./svg/arrow-left.svg"); 
 }
 
 .bi-x-lg::before { 

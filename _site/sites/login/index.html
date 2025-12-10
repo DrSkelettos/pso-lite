@@ -47,7 +47,11 @@
             showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
             showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
             showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
-            showIfAuthorized('#navLinkStation', 'viewPatientsStation');
+            showIfAuthorized('#navLinkAnnouncementsStation', 'viewAnnouncementsStation');
+            // Show Station dropdown if user has any station-related rights
+            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation')) {
+                document.getElementById('navLinkStation').classList.remove('hidden');
+            }
             showIfAuthorized('#navLinkStationDivider', 'workloadStation');
         });
     </script>

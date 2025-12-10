@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="de" data-bs-theme="light">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PSOrga - Ankündigung bearbeiten</title>
+
+    
+    <link href="../../../../src/style.css" rel="stylesheet">
+    
+
+    <script src="../../../../src/vendor/idb-keyval/umd.js"></script>
+    <script src="../../../../src/vendor/popperjs/popper.min.js"></script>
+    <link href="../../../../src/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
+    <script src="../../../../src/vendor/bootstrap/bootstrap.min.js"></script>
+    <link href="../../../../src/vendor/bootstrap-icons/bootstrap-icons-svg.css" rel="stylesheet">
+
+    <script src="../../../../src/data-manager.js"></script>
+    <script src="../../../../src/data-directory.js"></script>
+    <script src="../../../../src/helpers.js"></script>
+    <script src="../../../../src/user.js"></script>
+    <script src="../../../../src/init.js"></script>
+
+    <script>
+        // Add warning when user tries to close page with unsaved data
+        window.addEventListener('beforeunload', function (e) {
+            // Check if the data-changed element is visible (not having the d-none class)
+            if (!document.getElementById('data-changed').classList.contains('d-none')) {
+                // Standard way to show a confirmation dialog when closing the page
+                e.preventDefault();
+                e.returnValue = 'Es gibt ungespeicherte Änderungen. Möchten Sie die Seite wirklich verlassen?';
+                return e.returnValue;
+            }
+        });
+
+        init('Ankündigung bearbeiten', '../../../../');
+
+        window.addEventListener('directoryHandleInitialized', async function () {
+            await loadData('employees', 'mitarbeiter_innen');
+            await checkLogin('Ankündigung bearbeiten', '../../../../');
+            window.dispatchEvent(new Event('baseDataLoaded'));
+
+            showIfAuthorized('#navLinkWorkloadStation', 'workloadStation');
+            showIfAuthorized('#navLinkKosiStation', 'kosiStation');
+            showIfAuthorized('#navLinkPatientsStation', 'viewPatientsStation');
+            showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
+            showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
+            showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
+            showIfAuthorized('#navLinkAnnouncementsStation', 'viewAnnouncementsStation');
+            // Show Station dropdown if user has any station-related rights
+            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation')) {
+                document.getElementById('navLinkStation').classList.remove('hidden');
+            }
+            showIfAuthorized('#navLinkStationDivider', 'workloadStation');
+        });
+    </script>
+</head>
+
+
+
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="../../../../index.html" style="margin-top:-4px;">
+                <img src="../../../../src/images/psorga-white.svg" alt="PSOrga" height="20">
+            </a>
+
+            <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                <li class="nav-item me-2">
+                    <a class="nav-link " href="../../../../index.html">
+                        <i class="bi bi-house me-1 text-light"></i>
+                        Startseite
+                    </a>
+                </li>
+                <li class="nav-item me-2">
+                    <a class="nav-link" href="../../../../sites/kalender/index.html">
+                        <i class="bi bi-calendar-date me-1 text-light"></i>
+                        Kalender
+                    </a>
+                </li>
+
+                <div class="dropdown hidden" id="navLinkStation">
+                    <li class="nav-item me-2">
+                        <a class="nav-link dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-hospital me-1 text-light"></i>
+                            Station
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item hidden" id="navLinkPatientsStation" href="../../../../sites/station/belegung/index.html"><i class="bi bi-people me-1"></i>Belegung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkTherapiesStation" href="../../../../sites/station/therapiezuordnung/index.html"><i class="bi bi-list-columns me-1"></i> Therapiezuordnung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkPoststationaer" href="../../../../sites/station/poststationaer/index.html"><i class="bi bi-person-x me-1"></i> Poststationär</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkRoundsStation" href="../../../../sites/station/chefaerztinvisite/index.html"><i class="bi bi-eye me-1"></i> Chefärztinvisite</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkAnnouncementsStation" href="../../../../sites/station/ankuendigungen/index.html"><i class="bi bi-megaphone me-1"></i> Ankündigungen</a></li>
+                            <li class="dropdown-divider hidden" id="navLinkStationDivider"></li>
+                            <li><a class="dropdown-item hidden" id="navLinkWorkloadStation" href="../../../../sites/station/auslastung/index.html"><i class="bi bi-bar-chart me-1"></i> Auslastung</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkKosiStation" href="../../../../sites/station/kosi/index.html"><i class="bi bi-coin me-1"></i>Kostensicherung</a></li>
+                        </ul>
+                    </li>
+                </div>
+            </ul>
+
+            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('announcements-station', 'ankuendigungen-station')">
+                <div class="d-inline-block pb-1">Speichern notwendig!</div>
+                <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
+            </div>
+
+            <ul class="navbar-nav ms-3 mb-2 mb-md-0">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown" aria-expanded="false">Mehr</a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <a class="dropdown-item" href="../../../../sites/mitarbeiterinnen/index.html">
+                                <i class="bi bi-people me-1"></i>
+                                Mitarbeiter:innen
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="../../../../sites/passwort-aendern/index.html">
+                                <i class="bi bi-key me-1"></i>
+                                Passwort ändern
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item" title="Ausloggen">
+                    <a class="nav-link" href="javascript:void(0);" style="margin-top:-3px; margin-bottom:-10px;" onclick="logout('../../../../')">
+                        <i class="bi bi-x-circle text-light fs-5"></i>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container-fluid pb-3">
+        
+<script src="../../../../src/station/announcements.js"></script>
+
+<style>
+    .announcement-card {
+        margin-bottom: 1rem;
+    }
+    .announcement-card .card-body {
+        padding: 1rem;
+    }
+    .announcement-card.unchecked {
+        background-color: rgba(220, 53, 69, 0.05); /* Very light red background */
+    }
+    .announcement-card textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+    .announcement-card.readonly textarea {
+        background-color: #e9ecef;
+    }
+    .employee-badge {
+        font-size: 0.9rem;
+    }
+    .absence-info {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .absence-info .form-check {
+        margin-bottom: 0;
+    }
+</style>
+
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex align-items-center">
+                <a href="../index.html" class="btn btn-outline-secondary me-3">
+                    <i class="bi bi-arrow-left"></i>
+                </a>
+                <h4 class="mb-0">
+                    Ankündigungen vom 
+                    <input type="date" class="form-control d-inline-block" id="announcementDate" style="width: auto;" onchange="changeDateHandler()">
+                </h4>
+            </div>
+            <div>
+                <a href="#" id="printButton" class="btn btn-outline-primary me-2">
+                    <i class="bi bi-printer text-primary me-1"></i> Ausdruck
+                </a>
+                <button type="button" id="addEntryButton" class="btn btn-outline-primary hidden" onclick="addNewEntry()">
+                    <i class="bi bi-plus-circle text-primary me-1"></i> Eintrag hinzufügen
+                </button>
+            </div>
+        </div>
+
+        <div id="announcementsContainer">
+            <!-- Announcement cards will be added here -->
+        </div>
+
+        <div id="noAnnouncements" class="alert alert-info" style="display: none;">
+            Keine Ankündigungen für dieses Datum vorhanden.
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentDateStr = '';
+    let originalDateStr = '';
+
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['announcements-station'], function (result) {
+            // Initialize empty object if not loaded
+            if (!window['announcements-station']) {
+                window['announcements-station'] = {};
+            }
+
+            // Get date from URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const dateParam = urlParams.get('date');
+
+            if (dateParam) {
+                // Check if it's German format (contains dots) or ISO format
+                if (dateParam.includes('.')) {
+                    // German format
+                    currentDateStr = dateParam;
+                    document.getElementById('announcementDate').value = formatGermanToISODate(dateParam);
+                } else {
+                    // ISO format
+                    document.getElementById('announcementDate').value = dateParam;
+                    currentDateStr = formatISOToGermanDate(dateParam);
+                }
+                originalDateStr = currentDateStr;
+            } else {
+                // Default to next Sunday
+                const nextSunday = getNextAnnouncementSunday();
+                const isoDate = nextSunday.toISOString().split('T')[0];
+                document.getElementById('announcementDate').value = isoDate;
+                currentDateStr = formatDateToGerman(nextSunday);
+                originalDateStr = currentDateStr;
+            }
+
+            // Set date input readonly if user doesn't have edit all rights
+            if (!canEditAnnouncementDate()) {
+                document.getElementById('announcementDate').setAttribute('readonly', true);
+            }
+
+            // Update print button link
+            updatePrintButtonLink();
+
+            // Show add button if user has edit rights
+            if (authorize('editOwnAnnouncementsStation') || authorize('editAllAnnouncementsStation')) {
+                document.getElementById('addEntryButton').classList.remove('hidden');
+            }
+
+            renderAnnouncements();
+        });
+    });
+
+    function updatePrintButtonLink() {
+        const dateInput = document.getElementById('announcementDate');
+        const printButton = document.getElementById('printButton');
+        printButton.href = `../ausdruck/index.html?date=${dateInput.value}`;
+    }
+
+    function changeDateHandler() {
+        const dateInput = document.getElementById('announcementDate');
+        const newDateStr = formatISOToGermanDate(dateInput.value);
+
+        // If there are entries for the old date, ask if they should be moved
+        const oldEntries = window['announcements-station']?.[currentDateStr] || [];
+        
+        if (oldEntries.length > 0 && newDateStr !== currentDateStr) {
+            if (confirm(`Möchten Sie alle ${oldEntries.length} Einträge vom ${currentDateStr} auf den ${newDateStr} verschieben?`)) {
+                // Move entries to new date
+                if (!window['announcements-station'][newDateStr]) {
+                    window['announcements-station'][newDateStr] = [];
+                }
+                window['announcements-station'][newDateStr] = window['announcements-station'][newDateStr].concat(oldEntries);
+                delete window['announcements-station'][currentDateStr];
+                checkData();
+            } else {
+                // Revert date change
+                dateInput.value = formatGermanToISODate(currentDateStr);
+                return;
+            }
+        }
+
+        currentDateStr = newDateStr;
+        updatePrintButtonLink();
+        
+        // Update URL without reload (use German format)
+        const newUrl = `${window.location.pathname}?date=${newDateStr}`;
+        window.history.replaceState({}, '', newUrl);
+        
+        renderAnnouncements();
+    }
+
+    function renderAnnouncements() {
+        const container = document.getElementById('announcementsContainer');
+        const noAnnouncementsDiv = document.getElementById('noAnnouncements');
+        container.innerHTML = '';
+
+        const entries = window['announcements-station']?.[currentDateStr] || [];
+
+        if (entries.length === 0) {
+            noAnnouncementsDiv.style.display = 'block';
+            return;
+        }
+
+        noAnnouncementsDiv.style.display = 'none';
+
+        entries.forEach((entry, index) => {
+            const canEdit = canEditAnnouncement(entry);
+            const employeeName = entry.employee ? (window['employees']?.[entry.employee]?.name || entry.employee) : 'Unbekannt';
+            const isChecked = entry.checked || false;
+
+            const card = document.createElement('div');
+            card.className = `card announcement-card ${canEdit ? '' : 'readonly'} ${!isChecked ? 'unchecked' : ''}`;
+
+            const cardBody = document.createElement('div');
+            cardBody.className = 'card-body';
+
+            // Header with employee info and delete button
+            const header = document.createElement('div');
+            header.className = 'd-flex justify-content-between align-items-start mb-2';
+
+            const employeeInfo = document.createElement('div');
+            
+            const employeeBadge = document.createElement('span');
+            employeeBadge.className = 'badge bg-secondary employee-badge me-2';
+            employeeBadge.textContent = employeeName;
+            employeeInfo.appendChild(employeeBadge);
+
+            if (entry.start_date && entry.end_date) {
+                const absenceInfo = document.createElement('div');
+                absenceInfo.className = 'absence-info';
+                
+                const dateInfo = document.createElement('small');
+                dateInfo.className = 'text-muted';
+                if (entry.start_date === entry.end_date) {
+                    dateInfo.textContent = `Abwesenheit: ${entry.start_date}`;
+                } else {
+                    dateInfo.textContent = `Abwesenheit: ${entry.start_date} - ${entry.end_date}`;
+                }
+                absenceInfo.appendChild(dateInfo);
+
+                // Add checkbox inline with dates
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = 'form-check';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'form-check-input';
+                checkbox.id = `checked-${index}`;
+                checkbox.checked = isChecked;
+                checkbox.disabled = !canEdit;
+                checkbox.onchange = () => updateEntryChecked(index, checkbox.checked);
+
+                const checkboxLabel = document.createElement('label');
+                checkboxLabel.className = 'form-check-label';
+                checkboxLabel.setAttribute('for', `checked-${index}`);
+                checkboxLabel.textContent = 'Geprüft';
+
+                checkboxDiv.appendChild(checkbox);
+                checkboxDiv.appendChild(checkboxLabel);
+                absenceInfo.appendChild(checkboxDiv);
+
+                employeeInfo.appendChild(absenceInfo);
+            } else {
+                // No absence dates, add checkbox separately
+                const checkboxDiv = document.createElement('div');
+                checkboxDiv.className = 'form-check mt-2';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'form-check-input';
+                checkbox.id = `checked-${index}`;
+                checkbox.checked = isChecked;
+                checkbox.disabled = !canEdit;
+                checkbox.onchange = () => updateEntryChecked(index, checkbox.checked);
+
+                const checkboxLabel = document.createElement('label');
+                checkboxLabel.className = 'form-check-label';
+                checkboxLabel.setAttribute('for', `checked-${index}`);
+                checkboxLabel.textContent = 'Geprüft';
+
+                checkboxDiv.appendChild(checkbox);
+                checkboxDiv.appendChild(checkboxLabel);
+                employeeInfo.appendChild(checkboxDiv);
+            }
+
+            header.appendChild(employeeInfo);
+
+            if (canEdit) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'btn btn-sm btn-outline-danger';
+                deleteBtn.innerHTML = '<i class="bi bi-trash text-danger"></i>';
+                deleteBtn.onclick = () => deleteEntry(index);
+                header.appendChild(deleteBtn);
+            }
+
+            cardBody.appendChild(header);
+
+            // Content textarea
+            const textarea = document.createElement('textarea');
+            textarea.className = 'form-control mb-2';
+            textarea.value = entry.content || '';
+            textarea.disabled = !canEdit;
+            textarea.onchange = () => updateEntryContent(index, textarea.value);
+            cardBody.appendChild(textarea);
+
+            card.appendChild(cardBody);
+            container.appendChild(card);
+        });
+    }
+
+    function updateEntryContent(index, content) {
+        if (window['announcements-station']?.[currentDateStr]?.[index]) {
+            window['announcements-station'][currentDateStr][index].content = content;
+            checkData();
+        }
+    }
+
+    function updateEntryChecked(index, checked) {
+        if (window['announcements-station']?.[currentDateStr]?.[index]) {
+            window['announcements-station'][currentDateStr][index].checked = checked;
+            
+            // Update visual feedback - add/remove unchecked class
+            const cards = document.querySelectorAll('.announcement-card');
+            if (cards[index]) {
+                if (checked) {
+                    cards[index].classList.remove('unchecked');
+                } else {
+                    cards[index].classList.add('unchecked');
+                }
+            }
+            
+            checkData();
+        }
+    }
+
+    function deleteEntry(index) {
+        if (confirm('Möchten Sie diesen Eintrag wirklich löschen?')) {
+            removeAnnouncementEntry(currentDateStr, index);
+            checkData();
+            renderAnnouncements();
+        }
+    }
+
+    function addNewEntry() {
+        if (!window['announcements-station'][currentDateStr]) {
+            window['announcements-station'][currentDateStr] = [];
+        }
+
+        window['announcements-station'][currentDateStr].push({
+            content: '',
+            employee: window['user']?.key || null,
+            start_date: null,
+            end_date: null,
+            checked: false
+        });
+
+        checkData();
+        renderAnnouncements();
+
+        // Focus the new textarea
+        const textareas = document.querySelectorAll('.announcement-card textarea');
+        if (textareas.length > 0) {
+            textareas[textareas.length - 1].focus();
+        }
+    }
+</script>
+
+    </div>
+
+</body>
+
+
+</html>
