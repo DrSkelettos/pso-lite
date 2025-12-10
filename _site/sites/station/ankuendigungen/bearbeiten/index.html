@@ -53,7 +53,8 @@
             if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation')) {
                 document.getElementById('navLinkStation').classList.remove('hidden');
             }
-            showIfAuthorized('#navLinkStationDivider', 'workloadStation');
+            showIfAuthorized('#navLinkStationDivider1', 'viewAnnouncementsStation');
+            showIfAuthorized('#navLinkStationDivider2', 'workloadStation');
         });
     </script>
 </head>
@@ -92,9 +93,10 @@
                             <li><a class="dropdown-item hidden" id="navLinkTherapiesStation" href="../../../../sites/station/therapiezuordnung/index.html"><i class="bi bi-list-columns me-1"></i> Therapiezuordnung</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkPoststationaer" href="../../../../sites/station/poststationaer/index.html"><i class="bi bi-person-x me-1"></i> Poststationär</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkRoundsStation" href="../../../../sites/station/chefaerztinvisite/index.html"><i class="bi bi-eye me-1"></i> Chefärztinvisite</a></li>
+                            <li class="dropdown-divider hidden" id="navLinkStationDivider1"></li>
                             <li><a class="dropdown-item hidden" id="navLinkAnnouncementsStation" href="../../../../sites/station/ankuendigungen/index.html"><i class="bi bi-megaphone me-1"></i> Ankündigungen</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkAbsencesStation" href="../../../../sites/station/abwesenheiten/index.html"><i class="bi bi-calendar-x me-1"></i> Abwesenheiten</a></li>
-                            <li class="dropdown-divider hidden" id="navLinkStationDivider"></li>
+                            <li class="dropdown-divider hidden" id="navLinkStationDivider2"></li>
                             <li><a class="dropdown-item hidden" id="navLinkWorkloadStation" href="../../../../sites/station/auslastung/index.html"><i class="bi bi-bar-chart me-1"></i> Auslastung</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkKosiStation" href="../../../../sites/station/kosi/index.html"><i class="bi bi-coin me-1"></i>Kostensicherung</a></li>
                         </ul>

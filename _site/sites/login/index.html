@@ -53,7 +53,8 @@
             if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation')) {
                 document.getElementById('navLinkStation').classList.remove('hidden');
             }
-            showIfAuthorized('#navLinkStationDivider', 'workloadStation');
+            showIfAuthorized('#navLinkStationDivider1', 'viewAnnouncementsStation');
+            showIfAuthorized('#navLinkStationDivider2', 'workloadStation');
         });
     </script>
 </head>

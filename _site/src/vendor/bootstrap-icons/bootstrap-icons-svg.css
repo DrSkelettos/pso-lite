@@ -29,6 +29,10 @@
   background-image: url("./svg/calendar-date.svg"); 
 }
 
+.bi-calendar-x::before { 
+  background-image: url("./svg/calendar-x.svg"); 
+}
+
 .bi-bar-chart::before { 
   background-image: url("./svg/bar-chart.svg"); 
 }
