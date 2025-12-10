@@ -1,0 +1,18 @@
+{
+  "plans": {
+    "default": {
+      "title": "Normaler Therapieplan"
+    },
+    "absence_kaz": {
+      "title": "Abwesenheit Fr. Kaz",
+      "employee": "Kaz"
+    },
+    "special": {
+      "title": "Spezialplan"
+    }
+  },
+  "station": {
+    "2025-51": "default",
+    "2025-50": "absence_kaz"
+  }
+}
