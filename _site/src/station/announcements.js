@@ -119,6 +119,32 @@ function removeAnnouncementEntry(announcementDateStr, index) {
 }
 
 /**
+ * Remove announcement entries for a specific employee and date range
+ * @param {string} announcementDateStr - Announcement date in German format
+ * @param {string} employeeKey - Employee key
+ * @param {string} startDate - Start date in German format
+ * @param {string} endDate - End date in German format
+ */
+function removeAnnouncementEntriesForEmployee(announcementDateStr, employeeKey, startDate, endDate) {
+    if (!window['announcements-station']?.[announcementDateStr]) return;
+
+    // Find and remove matching entries
+    const entries = window['announcements-station'][announcementDateStr];
+    for (let i = entries.length - 1; i >= 0; i--) {
+        if (entries[i].employee === employeeKey && 
+            entries[i].start_date === startDate && 
+            entries[i].end_date === endDate) {
+            entries.splice(i, 1);
+        }
+    }
+
+    // Remove the date array if empty
+    if (window['announcements-station'][announcementDateStr].length === 0) {
+        delete window['announcements-station'][announcementDateStr];
+    }
+}
+
+/**
  * Get all Sundays for a given year
  * @param {number} year - The year
  * @returns {Date[]} - Array of Sunday dates

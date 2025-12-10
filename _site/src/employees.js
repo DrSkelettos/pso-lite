@@ -243,8 +243,25 @@ async function saveEmployeeEdit() {
     const now = new Date();
     now.setHours(0, 0, 0, 0); // Normalize to start of day
 
-    // Track announcements to create
+    // Track announcements to create and remove
     const announcementsToCreate = [];
+    const announcementsToRemove = [];
+
+    // First, collect all current announcements for this employee that are for future dates
+    if (oldEmployee.absences && typeof removeAnnouncementEntriesForEmployee === 'function') {
+        oldEmployee.absences.forEach(oldAbsence => {
+            const oldEndDate = parseGermanDate(oldAbsence.end);
+            // Only consider announcements for future absences
+            if (oldEndDate >= now && oldAbsence.announcement) {
+                announcementsToRemove.push({
+                    announcementDate: oldAbsence.announcement,
+                    startDate: oldAbsence.start,
+                    endDate: oldAbsence.end,
+                    employeeKey: oldKey
+                });
+            }
+        });
+    }
 
     absencesList.querySelectorAll('.list-group-item').forEach(absenceDiv => {
         const startInput = absenceDiv.querySelector('.absence-start');
@@ -280,12 +297,24 @@ async function saveEmployeeEdit() {
             });
 
             // Queue announcement creation
-            announcementsToCreate.push({
+            const newAnnouncement = {
                 announcementDate: announcementDateStr,
                 startDate: absenceStartStr,
                 endDate: absenceEndStr,
                 employeeKey: oldKey !== newKey ? newKey : oldKey
-            });
+            };
+            announcementsToCreate.push(newAnnouncement);
+
+            // Remove this from the removal list if it matches an old announcement
+            const removalIndex = announcementsToRemove.findIndex(old => 
+                old.announcementDate === announcementDateStr &&
+                old.startDate === absenceStartStr &&
+                old.endDate === absenceEndStr &&
+                old.employeeKey === oldKey
+            );
+            if (removalIndex !== -1) {
+                announcementsToRemove.splice(removalIndex, 1);
+            }
         }
     });
 
@@ -338,37 +367,22 @@ async function saveEmployeeEdit() {
         window['employees'][oldKey] = updatedEmployee;
     }
 
-    // Create announcements for absences (if announcements.js is loaded)
-    let announcementsCreated = false;
-    if (typeof addAnnouncementEntry === 'function' && typeof generateAnnouncementContent === 'function') {
+    // Queue announcement changes for manual saving
+    if (typeof removeAnnouncementEntriesForEmployee === 'function' && typeof addAnnouncementEntry === 'function') {
         // Initialize announcements data if not loaded
         if (!window['announcements-station']) {
             window['announcements-station'] = {};
         }
 
-        announcementsToCreate.forEach(announcement => {
-            const content = generateAnnouncementContent(
-                announcement.employeeKey,
-                announcement.startDate,
-                announcement.endDate
-            );
+        // Store the changes to apply later when saving
+        window['pendingAnnouncementChanges'] = {
+            toRemove: announcementsToRemove,
+            toCreate: announcementsToCreate
+        };
 
-            // Only create announcement if there's content (employee has template)
-            if (content) {
-                addAnnouncementEntry(announcement.announcementDate, {
-                    content: content,
-                    employee: announcement.employeeKey,
-                    start_date: announcement.startDate,
-                    end_date: announcement.endDate,
-                    checked: false
-                });
-                announcementsCreated = true;
-            }
-        });
-
-        // Save announcements data if any were created (use saveFile directly to avoid resetting checkData)
-        if (announcementsCreated) {
-            saveFile('ankuendigungen-station', window['announcements-station']);
+        // Mark announcements data as changed so it gets saved with the "Speichern notwendig" button
+        if (announcementsToRemove.length > 0 || announcementsToCreate.length > 0) {
+            setOriginalData('announcements-station');
         }
     }
 

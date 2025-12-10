@@ -45,6 +45,65 @@ save_file: mitarbeiter_innen
 {% include "mitarbeiterinnen/editEmployee.html" %}
 
 <script>
+    // Override saveData function for mitarbeiterinnen page
+    const originalSaveData = window.saveData;
+    window.saveData = async function(objectName, fileName) {
+        if (objectName === 'employees') {
+            // Apply pending announcement changes before saving
+            if (window['pendingAnnouncementChanges']) {
+                // Remove old announcements (only future ones)
+                window['pendingAnnouncementChanges'].toRemove.forEach(old => {
+                    if (typeof removeAnnouncementEntriesForEmployee === 'function') {
+                        removeAnnouncementEntriesForEmployee(old.announcementDate, old.employeeKey, old.startDate, old.endDate);
+                    }
+                });
+
+                // Create new announcements
+                window['pendingAnnouncementChanges'].toCreate.forEach(announcement => {
+                    if (typeof generateAnnouncementContent === 'function' && typeof addAnnouncementEntry === 'function') {
+                        const content = generateAnnouncementContent(
+                            announcement.employeeKey,
+                            announcement.startDate,
+                            announcement.endDate
+                        );
+
+                        // Only create announcement if there's content (employee has template)
+                        if (content) {
+                            addAnnouncementEntry(announcement.announcementDate, {
+                                content: content,
+                                employee: announcement.employeeKey,
+                                start_date: announcement.startDate,
+                                end_date: announcement.endDate,
+                                checked: false
+                            });
+                        }
+                    }
+                });
+
+                // Clear pending changes
+                delete window['pendingAnnouncementChanges'];
+            }
+            
+            // Save employees data
+            await saveFile('mitarbeiter_innen', window['employees']);
+            setOriginalData('employees');
+            
+            // Save announcements data if it has changed
+            if (original['announcements-station'] !== JSON.stringify(window['announcements-station'])) {
+                await saveFile('ankuendigungen-station', window['announcements-station']);
+                setOriginalData('announcements-station');
+            }
+            
+            // Hide the save button
+            if (document.getElementById("data-changed")) {
+                document.getElementById("data-changed").classList.add("d-none");
+            }
+        } else {
+            // Use original saveData for other data types
+            return originalSaveData(objectName, fileName);
+        }
+    };
+
     window.addEventListener('baseDataLoaded', () => {
         // Load announcements data so we can create announcements when saving absences
         loadMultipleData(['announcements-station'], function(result) {
@@ -52,6 +111,8 @@ save_file: mitarbeiter_innen
             if (!window['announcements-station']) {
                 window['announcements-station'] = {};
             }
+            // Set initial state for announcements data
+            setOriginalData('announcements-station');
             fillEmployeesTable();
         });
     });
