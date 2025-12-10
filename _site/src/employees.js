@@ -388,24 +388,12 @@ async function saveEmployeeEdit() {
     });
 
     // Handle therapy plan assignment changes
-    const oldPlanKey = getEmployeeTherapyPlan(oldKey);
-    if (window['therapieplaene'] && window['therapieplaene'].plans) {
-        // Remove employee from old plan if different
-        if (oldPlanKey && oldPlanKey !== selectedTherapyPlan) {
-            delete window['therapieplaene'].plans[oldPlanKey].employee;
-        }
-        
-        // Assign employee to new plan
-        if (selectedTherapyPlan && window['therapieplaene'].plans[selectedTherapyPlan]) {
-            window['therapieplaene'].plans[selectedTherapyPlan].employee = newKey;
-        }
-        
-        // Update therapy plan associations based on absences
-        const planKey = selectedTherapyPlan || oldPlanKey;
-        if (planKey) {
-            updateTherapyPlanAssociations(newKey, oldEmployee.absences, absences, planKey);
-            setOriginalData('therapieplaene');
-        }
+    const oldPlanKey = oldEmployee.therapyPlan || null;
+    const planKey = selectedTherapyPlan || oldPlanKey;
+    
+    // Update therapy plan associations based on absences if employee has a plan
+    if (planKey && window['therapieplaene']) {
+        updateTherapyPlanAssociations(newKey, oldEmployee.absences, absences, planKey);
     }
 
     // Create updated employee data
@@ -419,6 +407,7 @@ async function saveEmployeeEdit() {
         needsToChangePassword: oldEmployee.needsToChangePassword,
         announcementTextShort: announcementTextShort || undefined,
         announcementTextLong: announcementTextLong || undefined,
+        therapyPlan: selectedTherapyPlan || undefined,
     };
 
     // If password is set, hash it
@@ -600,16 +589,19 @@ function fillAbsencesTable(numRows = 20) {
  */
 function populateTherapyPlanDropdown(empKey) {
     const dropdown = document.getElementById('editEmployeeTherapyPlan');
-    const therapyPlanCard = document.getElementById('therapyPlanCard');
     
     // Clear existing options except the first one
     while (dropdown.options.length > 1) {
         dropdown.remove(1);
     }
+
+    // Check if therapy plans are loaded
+    if (!window['therapieplaene'] || !window['therapieplaene'].plans) {
+        return;
+    }
         
     // Add plan options (skip 'default')
     const plans = window['therapieplaene'].plans;
-    let currentPlanKey = '';
     
     for (const [planKey, plan] of Object.entries(plans)) {
         if (planKey === 'default') continue;
@@ -618,12 +610,11 @@ function populateTherapyPlanDropdown(empKey) {
         option.value = planKey;
         option.textContent = plan.title;
         dropdown.appendChild(option);
-        
-        // Check if this employee is assigned to this plan
-        if (plan.employee === empKey) {
-            currentPlanKey = planKey;
-        }
     }
+    
+    // Get current plan from employee object
+    const employee = window['employees'][empKey];
+    const currentPlanKey = employee?.therapyPlan || '';
     
     // Set the current selection
     dropdown.value = currentPlanKey;
@@ -649,14 +640,8 @@ function updateTherapyPlanCheckboxVisibility(hasTherapyPlan) {
  * @returns {string|null} - Plan key or null
  */
 function getEmployeeTherapyPlan(empKey) {
-    if (!window['therapieplaene'] || !window['therapieplaene'].plans) return null;
-    
-    for (const [planKey, plan] of Object.entries(window['therapieplaene'].plans)) {
-        if (planKey !== 'default' && plan.employee === empKey) {
-            return planKey;
-        }
-    }
-    return null;
+    const employee = window['employees']?.[empKey];
+    return employee?.therapyPlan || null;
 }
 
 /**
