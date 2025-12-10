@@ -145,6 +145,10 @@
   background-image: url("./svg/hospital.svg"); 
 }
 
+.bi-clipboard-check::before { 
+  background-image: url("./svg/clipboard-check.svg"); 
+}
+
 /* Bootstrap theme color classes */
 .text-primary .bi::before,
 .text-primary[class^="bi-"]::before,

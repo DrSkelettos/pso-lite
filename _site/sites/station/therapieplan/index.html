@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PSOrga - Poststationär</title>
+    <title>PSOrga - Therapieplan</title>
 
     
     <link href="../../../src/style.css" rel="stylesheet">
@@ -34,11 +34,11 @@
             }
         });
 
-        init('Poststationär', '../../../');
+        init('Therapieplan', '../../../');
 
         window.addEventListener('directoryHandleInitialized', async function () {
             await loadData('employees', 'mitarbeiter_innen');
-            await checkLogin('Poststationär', '../../../');
+            await checkLogin('Therapieplan', '../../../');
             window.dispatchEvent(new Event('baseDataLoaded'));
 
             showIfAuthorized('#navLinkWorkloadStation', 'workloadStation');
@@ -106,7 +106,7 @@
                 </div>
             </ul>
 
-            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('poststationaer', 'poststationaer')">
+            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('therapieplaene', 'therapieplaene')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
@@ -139,172 +139,213 @@
     </nav>
     <div class="container-fluid pb-3">
         
-<script src="../../../src/station/poststationaer.js"></script>
+<script src="../../../src/station/announcements.js"></script>
 
 <style>
-    .table-bordered tr.border-bottom-3 {
-        border-bottom-width: 3px !important;
+    .week-current {
+        background-color: rgba(13, 110, 253, 0.1) !important;
     }
 </style>
 
-<table id="poststationaerTable" class="table table-sm table-bordered table-hover mx-auto" style="width: auto;">
-    <thead>
-        <tr class="text-center table-light">
-            <th width="250" class="text-start">Patient:in</th>
-            <th width="50">GR</th>
-            <th width="50">MT</th>
-            <th width="50">GT</th>
-            <th width="50">KT</th>
-            <th width="100">Ende</th>
-            <th width="50">Aktion</th>
-        </tr>
-    </thead>
-    <tbody>
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col">
+            <h1>Therapieplan</h1>
+        </div>
+    </div>
 
-    </tbody>
-</table>
-
-<div class="text-center mt-4">
-    <button type="button" class="btn btn-outline-primary me-2" onclick="saveData('poststationaer', 'poststationaer')">
-        <i class="bi bi-floppy text-primary me-1"></i> Daten speichern
-    </button>
-    <button type="button hidden" id="therapiezuordnungButton" class="btn btn-outline-primary me-2" onclick="location.href='../../../sites/station/therapiezuordnung/index.html'">
-        <i class="bi bi-list-columns text-primary me-1"></i> Therapiezuordnung
-    </button>
-    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPatientModal">
-        <i class="bi bi-plus-circle text-primary me-1"></i> Patient:in hinzufügen
-    </button>
-</div>
-
-<!-- Add Patient Modal -->
-<div class="modal fade" id="addPatientModal" tabindex="-1" aria-labelledby="addPatientModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addPatientModalLabel">Neue:n poststationäre:n Patient:in hinzufügen</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="addPatientForm">
-                    <div class="mb-3">
-                        <label for="patientName" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="patientName" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="patientGR" class="form-label">Gruppentherapie</label>
-                        <select class="form-select" id="patientGR">
-                            <option value="">Nicht zugeordnet</option>
-                            <option value="A">Gruppe A</option>
-                            <option value="B">Gruppe B</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="patientMT" class="form-label">Musiktherapie</label>
-                        <select class="form-select" id="patientMT">
-                            <option value="">Nicht zugeordnet</option>
-                            <option value="1">Gruppe 1</option>
-                            <option value="2">Gruppe 2</option>
-                            <option value="3">Gruppe 3</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="patientGT" class="form-label">Gestaltungstherapie</label>
-                        <select class="form-select" id="patientGT">
-                            <option value="">Nicht zugeordnet</option>
-                            <option value="1">Gruppe 1</option>
-                            <option value="2">Gruppe 2</option>
-                            <option value="3">Gruppe 3</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="patientKT" class="form-label">Körper- und Tanztherapie</label>
-                        <select class="form-select" id="patientKT">
-                            <option value="">Nicht zugeordnet</option>
-                            <option value="1">Gruppe 1</option>
-                            <option value="2">Gruppe 2</option>
-                            <option value="3">Gruppe 3</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="patientEnd" class="form-label">Enddatum</label>
-                        <input type="date" class="form-control" id="patientEnd" required>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                <button type="button" class="btn btn-primary" onclick="addPatient()">Speichern</button>
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Wochenübersicht</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-bordered table-hover mb-0" id="therapyPlanTable">
+                        <thead>
+                            <tr>
+                                <th width="80" class="text-center">KW</th>
+                                <th width="200">Zeitraum</th>
+                                <th>Aktiver Therapieplan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="therapyPlanTableBody">
+                            <!-- Rows will be added dynamically -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    
-    // Handle Enter key press in form inputs
-    document.getElementById('addPatientForm').addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault(); 
-            addPatient(); 
-        }
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['therapieplaene'], function (result) {
+            // Initialize empty object if not loaded
+            if (!window['therapieplaene']) {
+                window['therapieplaene'] = { plans: { default: { title: 'Normaler Therapieplan' } }, station: {} };
+            }
+            if (!window['therapieplaene'].station) {
+                window['therapieplaene'].station = {};
+            }
+
+            renderTherapyPlanTable();
+        });
     });
 
-    // Reset form when modal is hidden
-    document.getElementById('addPatientModal').addEventListener('hidden.bs.modal', function () {
-        document.getElementById('addPatientForm').reset();
-    });
+    function renderTherapyPlanTable() {
+        const tbody = document.getElementById('therapyPlanTableBody');
+        tbody.innerHTML = '';
 
-    function addPatient() {
-        const form = document.getElementById('addPatientForm');
-        if (!form.checkValidity()) {
-            form.reportValidity();
-            return;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const currentWeek = getCalendarWeek(today);
+        const currentWeekYear = getWeekYear(today);
+
+        // Calculate weeks to show: 2 weeks back, rest of year + min 25 weeks ahead
+        const weeks = getWeeksToDisplay(today);
+
+        weeks.forEach(({ year, week }) => {
+            const monday = getMondayOfWeek(year, week);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+
+            const weekKey = `${year}-${week}`;
+            const currentPlanKey = window['therapieplaene'].station[weekKey] || 'default';
+            const currentPlan = window['therapieplaene'].plans[currentPlanKey] || window['therapieplaene'].plans['default'];
+
+            const tr = document.createElement('tr');
+            
+            // Highlight current week
+            if (year === currentWeekYear && week === currentWeek) {
+                tr.classList.add('week-current');
+            }
+
+            // KW column
+            const tdKW = document.createElement('td');
+            tdKW.className = 'text-center';
+            tdKW.textContent = week;
+            tr.appendChild(tdKW);
+
+            // Date range column
+            const tdDates = document.createElement('td');
+            tdDates.textContent = `${formatDateShort(monday)} - ${formatDateShort(sunday)}`;
+            tr.appendChild(tdDates);
+
+            // Plan column with dropdown
+            const tdPlan = document.createElement('td');
+            
+            if (authorize('editTherapyplanStation')) {
+                const select = document.createElement('select');
+                select.className = 'form-select form-select-sm';
+                select.dataset.weekKey = weekKey;
+
+                // Add options
+                for (const [planKey, plan] of Object.entries(window['therapieplaene'].plans)) {
+                    const option = document.createElement('option');
+                    option.value = planKey;
+                    option.textContent = plan.title;
+                    if (planKey === currentPlanKey) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                }
+
+                select.addEventListener('change', function() {
+                    updateWeekPlan(this.dataset.weekKey, this.value);
+                });
+
+                tdPlan.appendChild(select);
+            } else {
+                tdPlan.textContent = currentPlan?.title || 'Normaler Therapieplan';
+            }
+            
+            tr.appendChild(tdPlan);
+            tbody.appendChild(tr);
+        });
+    }
+
+    function getWeeksToDisplay(today) {
+        const weeks = [];
+        const currentWeek = getCalendarWeek(today);
+        const currentYear = getWeekYear(today);
+
+        // Start 2 weeks back
+        let startDate = new Date(today);
+        startDate.setDate(today.getDate() - 14);
+
+        // End at least 25 weeks ahead or end of year, whichever is later
+        const minEndDate = new Date(today);
+        minEndDate.setDate(today.getDate() + 25 * 7);
+        
+        const endOfYear = new Date(currentYear, 11, 31);
+        const endDate = minEndDate > endOfYear ? minEndDate : endOfYear;
+
+        // Collect all weeks
+        const seenWeeks = new Set();
+        const current = new Date(startDate);
+
+        while (current <= endDate) {
+            const week = getCalendarWeek(current);
+            const year = getWeekYear(current);
+            const key = `${year}-${week}`;
+
+            if (!seenWeeks.has(key)) {
+                seenWeeks.add(key);
+                weeks.push({ year, week });
+            }
+
+            current.setDate(current.getDate() + 7);
         }
 
-        const name = document.getElementById('patientName').value;
-        const gr = document.getElementById('patientGR').value;
-        const mt = document.getElementById('patientMT').value;
-        const gt = document.getElementById('patientGT').value;
-        const kt = document.getElementById('patientKT').value;
-        const endDate = document.getElementById('patientEnd').value;
+        return weeks;
+    }
 
-        // Convert ISO date to German format
-        const [year, month, day] = endDate.split('-');
-        const formattedEndDate = `${day}.${month}.${year}`;
+    function getMondayOfWeek(year, week) {
+        // Find first Thursday of the year (ISO week date system)
+        const jan4 = new Date(year, 0, 4);
+        const dayOfWeek = jan4.getDay() || 7;
+        const firstMonday = new Date(jan4);
+        firstMonday.setDate(jan4.getDate() - dayOfWeek + 1);
 
-        // Find next available ID
-        const nextId = Math.max(...Object.keys(window['poststationaer']).map(Number), 0) + 1;
+        // Add weeks
+        const targetMonday = new Date(firstMonday);
+        targetMonday.setDate(firstMonday.getDate() + (week - 1) * 7);
 
-        // Create new poststationaer entry
-        window['poststationaer'][nextId] = {
-            name: name,
-            end: formattedEndDate
-        };
+        return targetMonday;
+    }
 
-        // Add optional therapy groups if selected
-        if (gr) window['poststationaer'][nextId].gr = gr;
-        if (mt) window['poststationaer'][nextId].mt = mt;
-        if (gt) window['poststationaer'][nextId].gt = gt;
-        if (kt) window['poststationaer'][nextId].kt = kt;
+    function getWeekYear(date) {
+        const target = new Date(date.valueOf());
+        target.setHours(0, 0, 0, 0);
+        const dayNr = (date.getDay() + 6) % 7;
+        target.setDate(target.getDate() - dayNr + 3);
+        return target.getFullYear();
+    }
 
-        // Close modal
-        bootstrap.Modal.getInstance(document.getElementById('addPatientModal')).hide();
+    function formatDateShort(date) {
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        return `${day}.${month}.`;
+    }
 
-        // Refresh table
+    function updateWeekPlan(weekKey, planKey) {
+        if (!window['therapieplaene'].station) {
+            window['therapieplaene'].station = {};
+        }
+
+        if (planKey === 'default') {
+            // Remove entry if setting to default
+            delete window['therapieplaene'].station[weekKey];
+        } else {
+            window['therapieplaene'].station[weekKey] = planKey;
+        }
+
         checkData();
-        fillPoststationaerTable();
     }
 </script>
 
-<script>
-    window.addEventListener('baseDataLoaded', async function () {
-        loadMultipleData(['patients-station', 'poststationaer'], function (result) {
-            fillPoststationaerTable();
-
-            showIfAuthorized('#therapiezuordnungButton', 'editTherapiesStation');
-        });
-    });
-</script>
     </div>
 
 </body>

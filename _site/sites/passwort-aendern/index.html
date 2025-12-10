@@ -49,8 +49,9 @@
             showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
             showIfAuthorized('#navLinkAnnouncementsStation', 'viewAnnouncementsStation');
             showIfAuthorized('#navLinkAbsencesStation', 'viewAnnouncementsStation');
+            showIfAuthorized('#navLinkTherapyplanStation', 'editTherapyplanStation');
             // Show Station dropdown if user has any station-related rights
-            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation')) {
+            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation') || authorize('editTherapyplanStation')) {
                 document.getElementById('navLinkStation').classList.remove('hidden');
             }
             showIfAuthorized('#navLinkStationDivider1', 'viewAnnouncementsStation');

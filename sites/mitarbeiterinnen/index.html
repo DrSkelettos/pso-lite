@@ -93,6 +93,12 @@ save_file: mitarbeiter_innen
                 await saveFile('ankuendigungen-station', window['announcements-station']);
                 setOriginalData('announcements-station');
             }
+
+            // Save therapy plans data if it has changed
+            if (original['therapieplaene'] !== JSON.stringify(window['therapieplaene'])) {
+                await saveFile('therapieplaene', window['therapieplaene']);
+                setOriginalData('therapieplaene');
+            }
             
             // Hide the save button
             if (document.getElementById("data-changed")) {
@@ -105,14 +111,18 @@ save_file: mitarbeiter_innen
     };
 
     window.addEventListener('baseDataLoaded', () => {
-        // Load announcements data so we can create announcements when saving absences
-        loadMultipleData(['announcements-station'], function(result) {
-            // Initialize empty object if not loaded
+        // Load announcements and therapy plans data
+        loadMultipleData(['announcements-station', 'therapieplaene'], function(result) {
+            // Initialize empty objects if not loaded
             if (!window['announcements-station']) {
                 window['announcements-station'] = {};
             }
-            // Set initial state for announcements data
+            if (!window['therapieplaene']) {
+                window['therapieplaene'] = { plans: { default: { title: 'Normaler Therapieplan' } }, station: {} };
+            }
+            // Set initial state for data
             setOriginalData('announcements-station');
+            setOriginalData('therapieplaene');
             fillEmployeesTable();
         });
     });

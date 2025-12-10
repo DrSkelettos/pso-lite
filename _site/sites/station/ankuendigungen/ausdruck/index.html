@@ -87,6 +87,7 @@
 <body>
     
 <script src="../../../../src/station/announcements.js"></script>
+<script src="../../../../src/helpers.js"></script>
 
 <style>
     @page {
@@ -138,7 +139,23 @@
         margin-bottom: 1rem;
         line-height: 1.5;
     }
+
+    .therapy-plan-section {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        border: 2px solid #000;
+        text-align: center;
+    }
+
+    .therapy-plan-section h2 {
+        font-size: 18px !important;
+        margin: 0;
+    }
 </style>
+
+<div class="therapy-plan-section" id="therapyPlanSection" style="display: none;">
+    <h2>Gültiger Therapieplan: <span id="therapyPlanTitle"></span></h2>
+</div>
 
 <div class="print-header">
     <h1>Ankündigungen vom <span id="announcementDate"></span></h1>
@@ -154,7 +171,7 @@
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        loadMultipleData(['announcements-station'], function (result) {
+        loadMultipleData(['announcements-station', 'therapieplaene'], function (result) {
             // Initialize empty object if not loaded
             if (!window['announcements-station']) {
                 window['announcements-station'] = {};
@@ -165,29 +182,77 @@
             const dateParam = urlParams.get('date');
 
             let dateStr;
+            let announcementDate;
             if (dateParam) {
                 // Check if it's German format (contains dots) or ISO format
                 if (dateParam.includes('.')) {
                     // German format
                     dateStr = dateParam;
+                    announcementDate = parseGermanDate(dateParam);
                 } else {
                     // ISO format
                     dateStr = formatISOToGermanDate(dateParam);
+                    announcementDate = new Date(dateParam);
                 }
             } else {
                 // Default to next Sunday
                 const nextSunday = getNextAnnouncementSunday();
                 dateStr = formatDateToGerman(nextSunday);
+                announcementDate = nextSunday;
             }
 
             // Update title
             document.getElementById('announcementDate').textContent = dateStr;
             document.title = `Ankündigungen vom ${dateStr}`;
 
+            // Render therapy plan section
+            renderTherapyPlan(announcementDate);
+
             // Render announcements
             renderAnnouncements(dateStr);
         });
     });
+
+    function renderTherapyPlan(announcementDate) {
+        if (!window['therapieplaene'] || !window['therapieplaene'].plans) return;
+
+        // Determine which week to show the plan for
+        // For Sunday announcements: week after the Sunday (Monday's week)
+        // For mid-week announcements: same week as the announcement
+        const dayOfWeek = announcementDate.getDay();
+        
+        let targetDate;
+        if (dayOfWeek === 0) {
+            // Sunday - use the Monday after (next week)
+            targetDate = new Date(announcementDate);
+            targetDate.setDate(announcementDate.getDate() + 1);
+        } else {
+            // Mid-week - use the same week
+            targetDate = announcementDate;
+        }
+
+        const week = getCalendarWeek(targetDate);
+        const year = getWeekYear(targetDate);
+        const weekKey = `${year}-${week}`;
+
+        // Get the plan for this week
+        const planKey = window['therapieplaene'].station?.[weekKey] || 'default';
+        const plan = window['therapieplaene'].plans[planKey];
+
+        // Only show if not default plan
+        if (planKey !== 'default' && plan) {
+            document.getElementById('therapyPlanTitle').textContent = plan.title;
+            document.getElementById('therapyPlanSection').style.display = 'block';
+        }
+    }
+
+    function getWeekYear(date) {
+        const target = new Date(date.valueOf());
+        target.setHours(0, 0, 0, 0);
+        const dayNr = (date.getDay() + 6) % 7;
+        target.setDate(target.getDate() - dayNr + 3);
+        return target.getFullYear();
+    }
 
     function renderAnnouncements(dateStr) {
         const list = document.getElementById('announcementsList');
