@@ -328,6 +328,7 @@ async function saveFile(fileName, data, ignoreBackup = false) {
 
 /**
  * Creates a timestamped backup of JSON data in a date-based directory
+ * Also updates backup.json to track the last 10 backups for each file
  * @param {string} fileName - Name of the file to backup (with .json extension)
  * @param {string} dataString - JSON string data to backup
  * @returns {Promise<string>} Path to the created backup file
@@ -395,7 +396,13 @@ async function backupFile(fileName, dataString) {
             try {
                 await writable.write(dataString);
                 await writable.close();
-                return `${backupDirName}/${dateDirName}/${backupFileName}`;
+                
+                const backupPath = `${backupDirName}/${dateDirName}/${backupFileName}`;
+                
+                // Update backup tracking
+                await updateBackupTracking(sourceFileName, backupPath, now);
+                
+                return backupPath;
             } catch (error) {
                 await writable.close().catch(() => { });
                 throw new Error(`Fehler beim Schreiben der Backup-Datei: ${error.message}`);
@@ -405,6 +412,70 @@ async function backupFile(fileName, dataString) {
         }
     } catch (error) {
         throw new Error(`Backup fehlgeschlagen: ${error.message}`);
+    }
+}
+
+/**
+ * Updates backup.json to track the last 10 backups for each file
+ * @param {string} fileName - Name of the original file (with .json extension)
+ * @param {string} backupPath - Path to the backup file
+ * @param {Date} timestamp - Timestamp of the backup
+ */
+async function updateBackupTracking(fileName, backupPath, timestamp) {
+    try {
+        // Load existing backup tracking data
+        let backupTracking = {};
+        try {
+            const backupTrackingHandle = await directoryHandle.getFileHandle('backup.json');
+            const file = await backupTrackingHandle.getFile();
+            const contents = await file.text();
+            if (contents.trim()) {
+                backupTracking = JSON.parse(contents);
+            }
+        } catch (error) {
+            // File doesn't exist yet, start with empty object
+            if (error.name !== 'NotFoundError') {
+                console.warn('Error reading backup.json:', error);
+            }
+        }
+
+        // Initialize array for this file if it doesn't exist
+        if (!backupTracking[fileName]) {
+            backupTracking[fileName] = [];
+        }
+
+        // Add new backup entry
+        backupTracking[fileName].unshift({
+            path: backupPath,
+            timestamp: timestamp.toISOString(),
+            date: timestamp.toLocaleString('de-DE', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            })
+        });
+
+        // Keep only the last 10 backups
+        backupTracking[fileName] = backupTracking[fileName].slice(0, 10);
+
+        // Save updated tracking data
+        const trackingJson = JSON.stringify(backupTracking, null, 2);
+        const trackingFileHandle = await directoryHandle.getFileHandle('backup.json', { create: true });
+        const writable = await trackingFileHandle.createWritable();
+        
+        try {
+            await writable.write(trackingJson);
+            await writable.close();
+        } catch (error) {
+            await writable.close().catch(() => {});
+            throw error;
+        }
+    } catch (error) {
+        console.error('Failed to update backup tracking:', error);
+        // Don't throw - backup was successful even if tracking failed
     }
 }
 
@@ -505,6 +576,88 @@ async function createCompleteBackup() {
             success: false,
             error: error.message
         };
+    }
+}
+
+/**
+ * Loads backup tracking data from backup.json
+ * @returns {Promise<Object>} Backup tracking data organized by file name
+ */
+async function loadBackupTracking() {
+    try {
+        if (!directoryHandle) {
+            throw new Error('Kein Verzeichnis ausgewählt');
+        }
+
+        const backupTrackingHandle = await directoryHandle.getFileHandle('backup.json');
+        const file = await backupTrackingHandle.getFile();
+        const contents = await file.text();
+        
+        if (!contents.trim()) {
+            return {};
+        }
+        
+        return JSON.parse(contents);
+    } catch (error) {
+        if (error.name === 'NotFoundError') {
+            return {}; // No backups yet
+        }
+        throw new Error(`Fehler beim Laden der Backup-Informationen: ${error.message}`);
+    }
+}
+
+/**
+ * Restores a backup file by copying it to the main data directory
+ * @param {string} backupPath - Path to the backup file (e.g., "backups/2026-03-20/belegung-station-143022.json")
+ * @param {string} targetFileName - Name of the target file to restore to (e.g., "belegung-station.json")
+ * @returns {Promise<boolean>} Success status
+ */
+async function restoreBackup(backupPath, targetFileName) {
+    try {
+        if (!directoryHandle) {
+            throw new Error('Kein Verzeichnis ausgewählt');
+        }
+
+        // Check write permission
+        if (!(await verifyPermission(directoryHandle, true))) {
+            throw new Error('Keine Schreibberechtigung für das Verzeichnis');
+        }
+
+        // Parse the backup path (e.g., "backups/2026-03-20/belegung-station-143022.json")
+        const pathParts = backupPath.split('/');
+        if (pathParts.length !== 3) {
+            throw new Error('Ungültiger Backup-Pfad');
+        }
+
+        const [backupDir, dateDir, backupFileName] = pathParts;
+
+        // Navigate to the backup file
+        const backupDirHandle = await directoryHandle.getDirectoryHandle(backupDir);
+        const dateDirHandle = await backupDirHandle.getDirectoryHandle(dateDir);
+        const backupFileHandle = await dateDirHandle.getFileHandle(backupFileName);
+        
+        // Read backup file contents
+        const backupFile = await backupFileHandle.getFile();
+        const backupContents = await backupFile.text();
+
+        // Ensure target file name has .json extension
+        const targetFile = targetFileName.endsWith('.json') ? targetFileName : `${targetFileName}.json`;
+
+        // Write to the main data file (this will trigger a new backup via saveFile)
+        // We use ignoreBackup=true to avoid creating a backup of the restore operation
+        const targetFileHandle = await directoryHandle.getFileHandle(targetFile, { create: true });
+        const writable = await targetFileHandle.createWritable();
+
+        try {
+            await writable.write(backupContents);
+            await writable.close();
+            return true;
+        } catch (error) {
+            await writable.close().catch(() => {});
+            throw error;
+        }
+    } catch (error) {
+        throw new Error(`Fehler beim Wiederherstellen der Datei: ${error.message}`);
     }
 }
 

@@ -17,140 +17,156 @@
   filter: none;
 }
 
-.bi-megaphone::before { 
-  background-image: url("./svg/megaphone.svg"); 
+.bi-megaphone::before {
+  background-image: url("./svg/megaphone.svg");
 }
 
-.bi-person-x::before { 
-  background-image: url("./svg/person-x.svg"); 
+.bi-person-x::before {
+  background-image: url("./svg/person-x.svg");
 }
 
-.bi-calendar-date::before { 
-  background-image: url("./svg/calendar-date.svg"); 
+.bi-calendar-date::before {
+  background-image: url("./svg/calendar-date.svg");
 }
 
-.bi-calendar-x::before { 
-  background-image: url("./svg/calendar-x.svg"); 
+.bi-calendar-x::before {
+  background-image: url("./svg/calendar-x.svg");
 }
 
-.bi-bar-chart::before { 
-  background-image: url("./svg/bar-chart.svg"); 
+.bi-bar-chart::before {
+  background-image: url("./svg/bar-chart.svg");
 }
 
-.bi-eye::before { 
-  background-image: url("./svg/eye.svg"); 
+.bi-eye::before {
+  background-image: url("./svg/eye.svg");
 }
 
-.bi-floppy::before { 
-  background-image: url("./svg/floppy.svg"); 
+.bi-floppy::before {
+  background-image: url("./svg/floppy.svg");
 }
 
-.bi-floppy-fill::before { 
-  background-image: url("./svg/floppy-fill.svg"); 
+.bi-floppy-fill::before {
+  background-image: url("./svg/floppy-fill.svg");
 }
 
-.bi-printer::before { 
-  background-image: url("./svg/printer.svg"); 
+.bi-printer::before {
+  background-image: url("./svg/printer.svg");
 }
 
-.bi-house::before { 
-  background-image: url("./svg/house.svg"); 
+.bi-house::before {
+  background-image: url("./svg/house.svg");
 }
 
-.bi-list-columns::before { 
-  background-image: url("./svg/list-columns.svg"); 
+.bi-list-columns::before {
+  background-image: url("./svg/list-columns.svg");
 }
 
-.bi-pencil::before { 
-  background-image: url("./svg/pencil.svg"); 
+.bi-pencil::before {
+  background-image: url("./svg/pencil.svg");
 }
 
-.bi-pencil-square::before { 
-  background-image: url("./svg/pencil-square.svg"); 
+.bi-pencil-square::before {
+  background-image: url("./svg/pencil-square.svg");
 }
 
-.bi-people::before { 
-  background-image: url("./svg/people.svg"); 
+.bi-people::before {
+  background-image: url("./svg/people.svg");
 }
 
-.bi-plus-circle::before { 
-  background-image: url("./svg/plus-circle.svg"); 
+.bi-plus-circle::before {
+  background-image: url("./svg/plus-circle.svg");
 }
 
-.bi-plus-lg::before { 
-  background-image: url("./svg/plus-lg.svg"); 
+.bi-plus-lg::before {
+  background-image: url("./svg/plus-lg.svg");
 }
 
-.bi-trash::before { 
-  background-image: url("./svg/trash.svg"); 
+.bi-trash::before {
+  background-image: url("./svg/trash.svg");
 }
 
-.bi-cash-coin::before { 
-  background-image: url("./svg/cash-coin.svg"); 
+.bi-cash-coin::before {
+  background-image: url("./svg/cash-coin.svg");
 }
 
-.bi-copy::before { 
-  background-image: url("./svg/copy.svg"); 
+.bi-copy::before {
+  background-image: url("./svg/copy.svg");
 }
 
-.bi-coin::before { 
-  background-image: url("./svg/coin.svg"); 
+.bi-coin::before {
+  background-image: url("./svg/coin.svg");
 }
 
-.bi-info-circle::before { 
-  background-image: url("./svg/info-circle.svg"); 
+.bi-info-circle::before {
+  background-image: url("./svg/info-circle.svg");
 }
 
-.bi-info-square::before { 
-  background-image: url("./svg/info-square.svg"); 
+.bi-info-square::before {
+  background-image: url("./svg/info-square.svg");
 }
 
-.bi-info-square-fill::before { 
-  background-image: url("./svg/info-square-fill.svg"); 
+.bi-info-square-fill::before {
+  background-image: url("./svg/info-square-fill.svg");
 }
 
-.bi-box-arrow-left::before { 
-  background-image: url("./svg/box-arrow-left.svg"); 
+.bi-box-arrow-left::before {
+  background-image: url("./svg/box-arrow-left.svg");
 }
 
-.bi-arrow-left::before { 
-  background-image: url("./svg/arrow-left.svg"); 
+.bi-arrow-left::before {
+  background-image: url("./svg/arrow-left.svg");
 }
 
-.bi-x-lg::before { 
-  background-image: url("./svg/x-lg.svg"); 
+.bi-arrow-counterclockwise::before {
+  background-image: url("./svg/arrow-counterclockwise.svg");
 }
 
-.bi-x::before { 
-  background-image: url("./svg/x.svg"); 
+.bi-x-lg::before {
+  background-image: url("./svg/x-lg.svg");
 }
 
-.bi-x-circle::before { 
-  background-image: url("./svg/x-circle.svg"); 
+.bi-x::before {
+  background-image: url("./svg/x.svg");
 }
 
-.bi-x-circle-fill::before { 
-  background-image: url("./svg/x-circle-fill.svg"); 
+.bi-x-circle::before {
+  background-image: url("./svg/x-circle.svg");
 }
 
-.bi-key::before { 
-  background-image: url("./svg/key.svg"); 
+.bi-x-circle-fill::before {
+  background-image: url("./svg/x-circle-fill.svg");
 }
 
-.bi-key-fill::before { 
-  background-image: url("./svg/key-fill.svg"); 
+.bi-key::before {
+  background-image: url("./svg/key.svg");
 }
 
-.bi-hospital::before { 
-  background-image: url("./svg/hospital.svg"); 
+.bi-key-fill::before {
+  background-image: url("./svg/key-fill.svg");
 }
 
-.bi-clipboard-check::before { 
-  background-image: url("./svg/clipboard-check.svg"); 
+.bi-hospital::before {
+  background-image: url("./svg/hospital.svg");
 }
 
-.bi-gear::before { 
-  background-image: url("./svg/gear.svg"); 
+.bi-clipboard-check::before {
+  background-image: url("./svg/clipboard-check.svg");
+}
+
+.bi-gear::before {
+  background-image: url("./svg/gear.svg");
+}
+
+.bi-clock-history::before {
+  background-image: url("./svg/clock-history.svg");
+}
+
+.bi-exclamation-triangle::before {
+  background-image: url("./svg/exclamation-triangle.svg");
+}
+
+.bi-file-earmark::before {
+  background-image: url("./svg/file-earmark.svg");
 }
 
 /* Bootstrap theme color classes */

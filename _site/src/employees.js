@@ -79,6 +79,7 @@ function editEmployee(empKey) {
     document.getElementById('editEmployeeRightsEditOwnAnnouncementsStation').checked = employee.rights?.editOwnAnnouncementsStation || false;
     document.getElementById('editEmployeeRightsEditAllAnnouncementsStation').checked = employee.rights?.editAllAnnouncementsStation || false;
     document.getElementById('editEmployeeRightsEditTherapyplanStation').checked = employee.rights?.editTherapyplanStation || false;
+    document.getElementById('editEmployeeRightsRestoreBackups').checked = employee.rights?.restoreBackups || false;
 
     // Set therapy plan dropdown
     populateTherapyPlanDropdown(empKey);
@@ -283,6 +284,7 @@ async function saveEmployeeEdit() {
     rights.editOwnAnnouncementsStation = document.getElementById('editEmployeeRightsEditOwnAnnouncementsStation').checked;
     rights.editAllAnnouncementsStation = document.getElementById('editEmployeeRightsEditAllAnnouncementsStation').checked;
     rights.editTherapyplanStation = document.getElementById('editEmployeeRightsEditTherapyplanStation').checked;
+    rights.restoreBackups = document.getElementById('editEmployeeRightsRestoreBackups').checked;
 
     // Get therapy plan selection
     const selectedTherapyPlan = document.getElementById('editEmployeeTherapyPlan').value;
