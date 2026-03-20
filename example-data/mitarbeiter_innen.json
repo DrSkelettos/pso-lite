@@ -1,0 +1,126 @@
+{
+  "LS": {
+    "name": "LS",
+    "username": "LS",
+    "patients": 2,
+    "absences": [
+      {
+        "start": "17.12.2025",
+        "end": "17.12.2025",
+        "announcement": "07.12.2025",
+        "planned": false
+      },
+      {
+        "start": "22.12.2025",
+        "end": "23.12.2025",
+        "announcement": "14.12.2025",
+        "planned": false
+      }
+    ],
+    "rights": {
+      "viewPatientsStation": true,
+      "editPatientsStation": true,
+      "viewTherapiesStation": true,
+      "editTherapiesStation": true,
+      "viewRoundsStation": true,
+      "editRoundsStation": true,
+      "workloadStation": true,
+      "kosiStation": true,
+      "editEvents": true,
+      "editEmployees": true,
+      "viewAnnouncementsStation": true,
+      "editOwnAnnouncementsStation": true,
+      "editAllAnnouncementsStation": true,
+      "editTherapyplanStation": true
+    },
+    "passwordHash": "sha256$9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+    "announcementTextShort": "Herr Schäfer ist [DATUM] nicht im Haus.",
+    "announcementTextLong": "Herr Schäfer ist [DATUM] nicht im Haus. Die Einzel werden vertreten.",
+    "key": "LS",
+    "dashboardSettings": {
+      "showChefaerztinvisite": false,
+      "showAbwesenheiten": false
+    }
+  },
+  "Ulu": {
+    "name": "Ulu",
+    "patients": 6
+  },
+  "CP": {
+    "name": "CP",
+    "patients": -1
+  },
+  "EM": {
+    "name": "Em",
+    "patients": 3,
+    "absences": [
+      {
+        "start": "30.06.2025",
+        "end": "18.07.2025",
+        "announcement": null,
+        "planned": false
+      }
+    ]
+  },
+  "RAD": {
+    "name": "Rad",
+    "username": "",
+    "patients": 4,
+    "absences": [
+      {
+        "start": "15.07.2025",
+        "end": "16.07.2025",
+        "announcement": null,
+        "planned": false
+      }
+    ],
+    "rights": {
+      "editEmployees": false,
+      "viewPatientsStation": false,
+      "editPatientsStation": false,
+      "viewTherapiesStation": false,
+      "editTherapiesStation": false,
+      "kosiStation": false
+    }
+  },
+  "Sa": {
+    "name": "Sa",
+    "username": "Sa",
+    "patients": 3,
+    "needsToChangePassword": true
+  },
+  "Kazi": {
+    "name": "Fr. Kazi",
+    "username": "KAZ",
+    "patients": 6,
+    "absences": [
+      {
+        "start": "17.12.2025",
+        "end": "19.12.2025",
+        "announcement": "07.12.2025",
+        "planned": false
+      }
+    ],
+    "rights": {
+      "viewPatientsStation": false,
+      "editPatientsStation": false,
+      "viewTherapiesStation": false,
+      "editTherapiesStation": false,
+      "viewRoundsStation": false,
+      "editRoundsStation": false,
+      "workloadStation": false,
+      "kosiStation": false,
+      "editEvents": false,
+      "editEmployees": false,
+      "viewAnnouncementsStation": true,
+      "editOwnAnnouncementsStation": true,
+      "editAllAnnouncementsStation": false,
+      "editTherapyplanStation": false
+    },
+    "passwordHash": "sha256$9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+    "needsToChangePassword": false,
+    "announcementTextShort": "[NAME] ist [DATUM] nicht im Haus.",
+    "announcementTextLong": "[NAME] ist [DATUM] nicht im Haus.",
+    "therapyPlan": "absence_kaz"
+  }
+}

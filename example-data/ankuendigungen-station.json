@@ -1,0 +1,36 @@
+{
+  "13.12.2025": [
+    {
+      "content": "Test",
+      "employee": "LS",
+      "start_date": null,
+      "end_date": null,
+      "checked": true
+    }
+  ],
+  "14.12.2025": [
+    {
+      "content": "Herr Schäfer ist am 22.12.2025 und 23.12.2025 nicht im Haus.",
+      "employee": "LS",
+      "start_date": "22.12.2025",
+      "end_date": "23.12.2025",
+      "checked": false
+    }
+  ],
+  "07.12.2025": [
+    {
+      "content": "Herr Schäfer ist am 17.12.2025 nicht im Haus.",
+      "employee": "LS",
+      "start_date": "17.12.2025",
+      "end_date": "17.12.2025",
+      "checked": false
+    },
+    {
+      "content": "Fr. Kazi ist vom 17.12.2025 bis zum 19.12.2025 nicht im Haus.",
+      "employee": "Kazi",
+      "start_date": "17.12.2025",
+      "end_date": "19.12.2025",
+      "checked": false
+    }
+  ]
+}

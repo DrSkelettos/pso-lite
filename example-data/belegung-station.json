@@ -1,0 +1,286 @@
+{
+  "1": {
+    "name": "Fr. Müller",
+    "group": "1-A",
+    "admission": "01.01.2025",
+    "discharge": "01.05.2025",
+    "employees": [
+      {
+        "employee": "LS",
+        "start": "01.01.2025"
+      },
+      {
+        "employee": "CP",
+        "start": "01.03.2025",
+        "end": "14.03.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "103-T",
+        "start": "01.01.2025",
+        "end": "02.03.2025"
+      },
+      {
+        "room": "109-F",
+        "start": "02.03.2025"
+      }
+    ]
+  },
+  "3": {
+    "name": "Hr. Meier",
+    "group": "2-B",
+    "admission": "26.02.2025",
+    "discharge": "09.07.2025",
+    "employees": [
+      {
+        "employee": "CP",
+        "start": "26.02.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "104-F",
+        "start": "26.02.2025"
+      }
+    ]
+  },
+  "4": {
+    "name": "Hr. Westernhagen",
+    "group": "3-A",
+    "admission": "16.02.2025",
+    "discharge": "22.07.2025",
+    "misc": "XXL",
+    "discharge_mode": "pGR; af",
+    "employees": [
+      {
+        "employee": "LS",
+        "start": "16.02.2025"
+      },
+      {
+        "employee": "Ulu",
+        "start": "10.07.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "116-T",
+        "start": "16.02.2025"
+      }
+    ]
+  },
+  "5": {
+    "name": "Hr. Schmidt",
+    "group": "2-B",
+    "admission": "11.03.2025",
+    "discharge": "18.03.2025",
+    "employees": [
+      {
+        "employee": "LS",
+        "start": "11.03.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "104-T",
+        "start": "11.03.2025"
+      }
+    ]
+  },
+  "6": {
+    "name": "Fr. Hammerman",
+    "group": "1-A",
+    "admission": "12.03.2025",
+    "employees": [
+      {
+        "employee": "LS",
+        "start": "12.03.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "103-F",
+        "start": "12.03.2025"
+      }
+    ],
+    "additionalContent": {
+      "weightAdmission": "51",
+      "bmiAdmission": "14,1",
+      "minWeight": "",
+      "targetWeight": "54,8",
+      "motivationPhaseEnd": "2025-11-20",
+      "warnings": "Gelbe Karte 12.11."
+    },
+    "id": "6"
+  },
+  "7": {
+    "name": "Hr. Müller-Schulzinski",
+    "group": "1-B",
+    "admission": "16.07.2025",
+    "employees": [
+      {
+        "employee": "LS",
+        "start": "16.07.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "119-T",
+        "start": "16.07.2025"
+      }
+    ],
+    "id": "7"
+  },
+  "8": {
+    "name": "Hr. Messerschmidt",
+    "group": "3-B",
+    "admission": "08.07.2025",
+    "discharge": "15.07.2025",
+    "employees": [
+      {
+        "employee": "LS",
+        "start": "08.07.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "109-F",
+        "start": "08.07.2025"
+      }
+    ]
+  },
+  "9": {
+    "name": "Hr. Schulte",
+    "group": "2-A",
+    "admission": "09.07.2025",
+    "employees": [
+      {
+        "employee": "EM",
+        "start": "09.07.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "104-F",
+        "start": "09.07.2025"
+      }
+    ],
+    "misc": "",
+    "id": "9"
+  },
+  "10": {
+    "name": "Hr. Test",
+    "group": "1-B",
+    "admission": "15.07.2025",
+    "employees": [
+      {
+        "employee": "Kaz",
+        "start": "15.07.2025"
+      },
+      {
+        "employee": "LS",
+        "start": "21.07.2025",
+        "end": "27.07.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "110-T",
+        "start": "15.07.2025"
+      }
+    ]
+  },
+  "11": {
+    "name": "Hr. Heinrich",
+    "group": "1-A",
+    "admission": "09.07.2025",
+    "employees": [
+      {
+        "employee": "Kaz",
+        "start": "09.07.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "109-T",
+        "start": "09.07.2025"
+      }
+    ],
+    "misc": "",
+    "id": "11"
+  },
+  "12": {
+    "name": "Hr. Friedrich",
+    "group": "3-A",
+    "admission": "08.07.2025",
+    "employees": [
+      {
+        "employee": "CP",
+        "start": "08.07.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "119-T",
+        "start": "08.07.2025"
+      }
+    ],
+    "id": "12"
+  },
+  "13": {
+    "name": "Fr. Meier",
+    "group": "2-B",
+    "admission": "02.07.2025",
+    "employees": [
+      {
+        "employee": "Kaz",
+        "start": "02.07.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "120-F",
+        "start": "02.07.2025"
+      }
+    ],
+    "misc": "",
+    "id": "13"
+  },
+  "14": {
+    "name": "Fr. Müller",
+    "group": "2-A",
+    "admission": "02.07.2025",
+    "employees": [
+      {
+        "employee": "Ulu",
+        "start": "02.07.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "121-T",
+        "start": "02.07.2025"
+      }
+    ],
+    "misc": "",
+    "id": "14"
+  },
+  "15": {
+    "name": "X",
+    "group": "",
+    "admission": "25.07.2025",
+    "employees": [
+      {
+        "employee": "Ulu",
+        "start": "25.07.2025"
+      }
+    ],
+    "rooms": [
+      {
+        "room": "115-F",
+        "start": "25.07.2025"
+      }
+    ],
+    "misc": ""
+  }
+}

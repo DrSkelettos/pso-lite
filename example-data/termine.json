@@ -1,0 +1,10 @@
+{
+  "event_1752173802820": {
+    "id": "event_1752173802820",
+    "title": "Test",
+    "start": "2025-07-10",
+    "end": "2025-07-11",
+    "allDay": true,
+    "color": "indigo"
+  }
+}

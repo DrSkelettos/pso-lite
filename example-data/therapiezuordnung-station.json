@@ -1,0 +1,71 @@
+{
+  "1": {
+    "at": "X",
+    "pmr": ">",
+    "haltungsschule": "X",
+    "asst": "",
+    "skt": "X",
+    "biographiearbeit": "X",
+    "kreativ_einzel": "M Mo. 14:00",
+    "einzel_physio": "Di. 11:00"
+  },
+  "2": {
+    "at": "X",
+    "pmr": "",
+    "haltungsschule": "X",
+    "asst": "X",
+    "skt": "",
+    "biographiearbeit": "",
+    "einzel_physio": "Mi. 09:00"
+  },
+  "3": {
+    "at": "",
+    "pmr": "",
+    "haltungsschule": "(X)",
+    "asst": "",
+    "skt": "",
+    "biographiearbeit": "",
+    "kreativ_einzel": "",
+    "einzel_physio": ""
+  },
+  "4": {
+    "at": "",
+    "pmr": "X",
+    "haltungsschule": "",
+    "asst": "X",
+    "skt": "",
+    "biographiearbeit": "X",
+    "kreativ_einzel": "G Do. 10:30",
+    "einzel_physio": ""
+  },
+  "6": {
+    "at": "",
+    "pmr": "X",
+    "haltungsschule": "",
+    "asst": "",
+    "skt": "",
+    "biographiearbeit": "",
+    "kreativ_einzel": "",
+    "einzel_physio": "Do 9:00"
+  },
+  "8": {
+    "at": "",
+    "pmr": "",
+    "haltungsschule": "",
+    "asst": "",
+    "skt": "X",
+    "biographiearbeit": "",
+    "kreativ_einzel": "",
+    "einzel_physio": ""
+  },
+  "9": {
+    "at": "",
+    "pmr": "",
+    "haltungsschule": "",
+    "asst": "",
+    "skt": "X",
+    "biographiearbeit": "",
+    "kreativ_einzel": "M Fr 08:00",
+    "einzel_physio": ""
+  }
+}
