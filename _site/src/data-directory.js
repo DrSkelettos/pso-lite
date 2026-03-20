@@ -170,6 +170,18 @@ async function requestDirectory() {
             if (validation.valid) {
                 directoryHandle = dirHandle;
                 await saveDirectoryHandle(dirHandle);
+                
+                // Create complete backup of all JSON files (once per day)
+                try {
+                    const backupResult = await createCompleteBackup();
+                    if (backupResult.success && !backupResult.skipped) {
+                        console.log(`Complete backup created successfully for ${backupResult.date}`);
+                    }
+                } catch (error) {
+                    console.error('Failed to create complete backup:', error);
+                    // Don't block navigation if backup fails
+                }
+                
                 window.setTimeout(() => location.href = "../../index.html", 1000);
                 return true;
             } else {
@@ -301,8 +313,9 @@ async function saveFile(fileName, data, ignoreBackup = false) {
             await file.write(jsonString);
             await file.close();
 
+            // Backup the newly saved data (not the old data)
             if (!ignoreBackup)
-                await backupFile(fileName);
+                await backupFile(fileName, jsonString);
         } catch (error) {
             // Try to close the file even if write fails
             try { await file.close(); } catch (e) { }
@@ -314,14 +327,19 @@ async function saveFile(fileName, data, ignoreBackup = false) {
 }
 
 /**
- * Creates a timestamped backup of a JSON file in a date-based directory
- * @param {string} fileName - Name of the file to backup (without .json extension)
+ * Creates a timestamped backup of JSON data in a date-based directory
+ * @param {string} fileName - Name of the file to backup (with .json extension)
+ * @param {string} dataString - JSON string data to backup
  * @returns {Promise<string>} Path to the created backup file
  * @throws {Error} If backup creation fails
  */
-async function backupFile(fileName) {
+async function backupFile(fileName, dataString) {
     if (!fileName || typeof fileName !== 'string') {
         throw new Error('Ungültiger Dateiname');
+    }
+
+    if (!dataString || typeof dataString !== 'string') {
+        throw new Error('Keine Daten zum Sichern angegeben');
     }
 
     // Ensure fileName has .json extension
@@ -333,9 +351,9 @@ async function backupFile(fileName) {
             throw new Error('Kein Verzeichnis ausgewählt');
         }
 
-        // Check read permission for source file
+        // Check write permission
         if (!(await verifyPermission(directoryHandle, true))) {
-            throw new Error('Keine Leseberechtigung für das Verzeichnis');
+            throw new Error('Keine Schreibberechtigung für das Verzeichnis');
         }
 
         // Get current date and time for backup naming
@@ -369,19 +387,13 @@ async function backupFile(fileName) {
             throw new Error(`Datumsspezifisches Backup-Verzeichnis konnte nicht erstellt werden: ${error.message}`);
         }
 
-        // Read the source file
-        let sourceFileHandle;
+        // Create the backup file with the new data
         try {
-            sourceFileHandle = await directoryHandle.getFileHandle(sourceFileName);
-            const sourceFile = await sourceFileHandle.getFile();
-            const contents = await sourceFile.text();
-
-            // Create the backup file
             const backupFileHandle = await dateDirHandle.getFileHandle(backupFileName, { create: true });
             const writable = await backupFileHandle.createWritable();
 
             try {
-                await writable.write(contents);
+                await writable.write(dataString);
                 await writable.close();
                 return `${backupDirName}/${dateDirName}/${backupFileName}`;
             } catch (error) {
@@ -389,13 +401,110 @@ async function backupFile(fileName) {
                 throw new Error(`Fehler beim Schreiben der Backup-Datei: ${error.message}`);
             }
         } catch (error) {
-            if (error.name === 'NotFoundError') {
-                throw new Error(`Quelldatei nicht gefunden: ${sourceFileName}`);
-            }
-            throw new Error(`Fehler beim Lesen der Quelldatei: ${error.message}`);
+            throw new Error(`Fehler beim Erstellen der Backup-Datei: ${error.message}`);
         }
     } catch (error) {
         throw new Error(`Backup fehlgeschlagen: ${error.message}`);
+    }
+}
+
+/**
+ * Creates a complete backup of all JSON files in the data directory
+ * Saves to ./backups/complete/YYYY-MM-DD/
+ * Only creates one backup per day
+ * @returns {Promise<Object>} Result object with success status and details
+ */
+async function createCompleteBackup() {
+    try {
+        // Check if directory handle is available
+        if (!directoryHandle) {
+            throw new Error('Kein Verzeichnis ausgewählt');
+        }
+
+        // Check write permission
+        if (!(await verifyPermission(directoryHandle, true))) {
+            throw new Error('Keine Schreibberechtigung für das Verzeichnis');
+        }
+
+        // Get current date for backup folder
+        const now = new Date();
+        const dateStr = now.toISOString().split('T')[0]; // YYYY-MM-DD
+
+        // Create backup directory structure: backups/complete/YYYY-MM-DD
+        const backupDirHandle = await directoryHandle.getDirectoryHandle('backups', { create: true });
+        const completeDirHandle = await backupDirHandle.getDirectoryHandle('complete', { create: true });
+        
+        // Check if backup for today already exists
+        let dateDirHandle;
+        try {
+            dateDirHandle = await completeDirHandle.getDirectoryHandle(dateStr, { create: false });
+            // Directory exists, check if it has files
+            const entries = [];
+            for await (const entry of dateDirHandle.values()) {
+                if (entry.kind === 'file') {
+                    entries.push(entry.name);
+                }
+            }
+            if (entries.length > 0) {
+                console.log(`Complete backup for ${dateStr} already exists, skipping.`);
+                return { success: true, skipped: true, date: dateStr };
+            }
+        } catch (error) {
+            // Directory doesn't exist, create it
+            dateDirHandle = await completeDirHandle.getDirectoryHandle(dateStr, { create: true });
+        }
+
+        // Get all JSON files in the root directory
+        const jsonFiles = [];
+        for await (const entry of directoryHandle.values()) {
+            if (entry.kind === 'file' && entry.name.endsWith('.json')) {
+                jsonFiles.push(entry.name);
+            }
+        }
+
+        // Backup each JSON file
+        const backedUpFiles = [];
+        const failedFiles = [];
+
+        for (const fileName of jsonFiles) {
+            try {
+                const fileHandle = await directoryHandle.getFileHandle(fileName);
+                const file = await fileHandle.getFile();
+                const contents = await file.text();
+
+                // Create backup file
+                const backupFileHandle = await dateDirHandle.getFileHandle(fileName, { create: true });
+                const writable = await backupFileHandle.createWritable();
+
+                try {
+                    await writable.write(contents);
+                    await writable.close();
+                    backedUpFiles.push(fileName);
+                } catch (error) {
+                    await writable.close().catch(() => {});
+                    throw error;
+                }
+            } catch (error) {
+                console.error(`Failed to backup ${fileName}:`, error);
+                failedFiles.push({ fileName, error: error.message });
+            }
+        }
+
+        console.log(`Complete backup created: ${backedUpFiles.length} files backed up to backups/complete/${dateStr}`);
+        
+        return {
+            success: failedFiles.length === 0,
+            date: dateStr,
+            backedUpFiles,
+            failedFiles,
+            skipped: false
+        };
+    } catch (error) {
+        console.error('Error creating complete backup:', error);
+        return {
+            success: false,
+            error: error.message
+        };
     }
 }
 
