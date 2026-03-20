@@ -392,10 +392,44 @@
                         <div class="card-header">
                             <h5 class="card-title mb-0">Behandlungsdaten</h5>
                         </div>
-                        <div class="card-body">
-                            <div class="">
+                        <div class="card-body" id="editEmployeeAssignments-link">
+                            <a href="javascript:void(0);" onclick="document.getElementById('editEmployeeAssignments').style.display = 'block'; document.getElementById('editEmployeeAssignments-link').style.display = 'none';">
+                                Hier klicken, um Zuordnungen anzuzeigen.
+                            </a>
+                        </div>
+                        <div class="card-body" id="editEmployeeAssignments" style="display: none;">
+                            <div class="mb-3">
                                 <label for="editEmployeePatients" class="form-label">Einzelpat.</label>
                                 <input type="number" class="form-control" id="editEmployeePatients" min="0" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editEmployeeMedicalCare" class="form-label">Medizinische Versorgung</label>
+                                <select class="form-select" id="editEmployeeMedicalCare">
+                                    <option value="">/</option>
+                                    <option value="Station Gruppe 1">Station Gruppe 1</option>
+                                    <option value="Station Gruppe 2">Station Gruppe 2</option>
+                                    <option value="Station Gruppe 3">Station Gruppe 3</option>
+                                    <option value="Tagesklinik">Tagesklinik</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="editEmployeeMedicalCareBackup" class="form-label">Medizinische Versorgung (Vertretung)</label>
+                                <select class="form-select" id="editEmployeeMedicalCareBackup">
+                                    <option value="">/</option>
+                                    <option value="Station Gruppe 1">Station Gruppe 1</option>
+                                    <option value="Station Gruppe 2">Station Gruppe 2</option>
+                                    <option value="Station Gruppe 3">Station Gruppe 3</option>
+                                    <option value="Tagesklinik">Tagesklinik</option>
+                                </select>
+                            </div>
+                            <div class="mb-0">
+                                <label for="editEmployeeGroupTherapy" class="form-label">Gruppenpsychotherapie</label>
+                                <select class="form-select" id="editEmployeeGroupTherapy">
+                                    <option value="">/</option>
+                                    <option value="Station Gruppe A">Station Gruppe A</option>
+                                    <option value="Station Gruppe B">Station Gruppe B</option>
+                                    <option value="Tagesklinik">Tagesklinik</option>
+                                </select>
                             </div>
                         </div>
                     </div>

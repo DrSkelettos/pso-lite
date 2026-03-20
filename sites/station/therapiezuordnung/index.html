@@ -10,6 +10,7 @@ save_file: therapiezuordnung-station
 
 <script src="{{ dir }}src/station/patients.js"></script>
 <script src="{{ dir }}src/station/therapies.js"></script>
+<script src="{{ dir }}src/station/therapies-helpers.js"></script>
 
 <style>
     .table-bordered tr.border-bottom-3 {
@@ -38,6 +39,7 @@ save_file: therapiezuordnung-station
             <th width="50">Therapeut:in</th>
             <th width="50">Therapieplan</th>
             <th width="50" class="border-end-3">Gruppentherapie</th>
+            <th width="50" class="border-end-3">Cafeteria</th>
             <th width="50">AT</th>
             <th width="50" class="border-end-3">PMR</th>
             <th width="50" class="border-end-3">Haltungsschule</th>
@@ -53,13 +55,13 @@ save_file: therapiezuordnung-station
         <!-- Head: New Patients -->
         <tr class="table-secondary no-hover">
             <td class="patient-count text-center fw-bold" id="new-count">0</td>
-            <td class="fw-bold" colspan="14">Neuaufnahmen</td>
+            <td class="fw-bold" colspan="15">Neuaufnahmen</td>
         </tr>
         <!-- Body: New Patients -->
 
         <!-- Divider -->
         <tr height="10">
-            <td colspan="15"></td>
+            <td colspan="16"></td>
         </tr>
     </tbody>
 
@@ -67,7 +69,7 @@ save_file: therapiezuordnung-station
         <!-- Head: Group 1 -->
         <tr class="table-secondary no-hover">
             <td class="patient-count text-center fw-bold" id="group1-count">0</td>
-            <td colspan="14">
+            <td colspan="15" id="group1-header">
                 <span class="fw-bold">Gruppe 1</span>
                 (Essstörungen und Adipositas | KT + GT | Em/Sa)
             </td>
@@ -76,7 +78,7 @@ save_file: therapiezuordnung-station
 
         <!-- Divider -->
         <tr height="10">
-            <td colspan="15"></td>
+            <td colspan="16"></td>
         </tr>
     </tbody>
 
@@ -84,7 +86,7 @@ save_file: therapiezuordnung-station
         <!-- Head: Group 2 -->
         <tr class="table-secondary no-hover">
             <td class="patient-count text-center fw-bold" id="group2-count">0</td>
-            <td colspan="14">
+            <td colspan="15" id="group2-header">
                 <span class="fw-bold">Gruppe 2</span>
                 (Arbeitspsychosomatik, Stress und Belastungsstörungen | MT + GT | Sa/Rad)
             </td>
@@ -93,7 +95,7 @@ save_file: therapiezuordnung-station
 
         <!-- Divider -->
         <tr height="10">
-            <td colspan="15"></td>
+            <td colspan="16"></td>
         </tr>
     </tbody>
 
@@ -101,7 +103,7 @@ save_file: therapiezuordnung-station
         <!-- Head: Group 3 -->
         <tr class="table-secondary no-hover">
             <td class="patient-count text-center fw-bold" id="group3-count">0</td>
-            <td colspan="14">
+            <td colspan="15" id="group3-header">
                 <span class="fw-bold">Gruppe 3</span>
                 (Psychokardiologie und somatische Belastungsstörungen | KT + MT | Rad/Em)
             </td>
@@ -112,6 +114,7 @@ save_file: therapiezuordnung-station
     <tfoot>
         <tr class="table-secondary fw-bold text-center no-hover">
             <td colspan="6" class="border-end-3 text-start">Plätze</td>
+            <td id="maxNum-cafeteria" class="border-end-3">6</td>
             <td id="maxNum-at">12</td>
             <td id="maxNum-pmr" class="border-end-3">12</td>
             <td id="maxNum-haltungsschule" class="border-end-3">3</td>
@@ -124,31 +127,32 @@ save_file: therapiezuordnung-station
         </tr>
         <tr class="text-center no-hover">
             <td colspan="6" class="text-start border-end-3">Davon besetzt</td>
-            <td id="num-at"></td>
-            <td id="num-pmr" class="border-end-3 bg-light"></td>
-            <td id="num-haltungsschule" class="border-end-3"></td>
-            <td id="num-asst" class="bg-light"></td>
-            <td id="num-skt"></td>
-            <td id="num-biographiearbeit" class="border-end-3 bg-light"></td>
-            <td id="num-group-a" class="border-end-3"></td>
-            <td id="num-group-b" class="border-end-3 bg-light"></td>
-            <td id="num-total"></td>
+            <td id="num-cafeteria" class="border-end-3"></td>
+            <td id="num-at" class="bg-light"></td>
+            <td id="num-pmr" class="border-end-3"></td>
+            <td id="num-haltungsschule" class="border-end-3 bg-light"></td>
+            <td id="num-asst"></td>
+            <td id="num-skt" class="bg-light"></td>
+            <td id="num-biographiearbeit" class="border-end-3"></td>
+            <td id="num-group-a" class="border-end-3 bg-light"></td>
+            <td id="num-group-b" class="border-end-3"></td>
+            <td id="num-total" class="bg-light"></td>
         </tr>
         <tr class="text-center no-hover">
             <td colspan="6" class="text-start border-end-3">Davon Frei</td>
-            <td id="free-at"></td>
-            <td id="free-pmr" class="border-end-3 bg-light"></td>
-            <td id="free-haltungsschule" class="border-end-3"></td>
-            <td id="free-asst" class="bg-light"></td>
-            <td id="free-skt"></td>
-            <td id="free-biographiearbeit" class="border-end-3 bg-light"></td>
-            <td class="border-end-3"><small>Sa/Ulu</small></td>
-            <td class="border-end-3 bg-light"><small>Em/Rad</small></td>
-            <td></td>
+            <td id="free-cafeteria" class="border-end-3"></td>
+            <td id="free-at" class="bg-light"></td>
+            <td id="free-pmr" class="border-end-3"></td>
+            <td id="free-haltungsschule" class="border-end-3 bg-light"></td>
+            <td id="free-asst"></td>
+            <td id="free-skt" class="bg-light"></td>
+            <td id="free-biographiearbeit" class="border-end-3"></td>
+            <td class="border-end-3 bg-light"><small id="group-a-employees">Sa/Ulu</small></td>
+            <td class="border-end-3"><small id="group-b-employees">Em/Rad</small></td>
+            <td class="bg-light"></td>
         </tr>
     </tfoot>
 </table>
-
 
 <div class="text-center mt-4">
     <button type="button" class="btn btn-outline-primary me-2 hidden" id="saveButton"
@@ -167,7 +171,7 @@ save_file: therapiezuordnung-station
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        loadMultipleData(['patients-station', 'rooms-station', 'therapies-station'], function (result) {
+        loadMultipleData(['patients-station', 'rooms-station', 'therapies-station', 'therapies-settings', 'employees'], function (result) {
         fillTherapyTable();
 
         showIfAuthorized('#saveButton', 'editTherapiesStation');

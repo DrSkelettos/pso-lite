@@ -81,6 +81,11 @@ function editEmployee(empKey) {
     document.getElementById('editEmployeeRightsEditTherapyplanStation').checked = employee.rights?.editTherapyplanStation || false;
     document.getElementById('editEmployeeRightsRestoreBackups').checked = employee.rights?.restoreBackups || false;
 
+    // Set station assignments
+    document.getElementById('editEmployeeMedicalCare').value = employee.medicalCare || '';
+    document.getElementById('editEmployeeMedicalCareBackup').value = employee.medicalCareBackup || '';
+    document.getElementById('editEmployeeGroupTherapy').value = employee.groupTherapy || '';
+
     // Set therapy plan dropdown
     populateTherapyPlanDropdown(empKey);
 
@@ -286,6 +291,11 @@ async function saveEmployeeEdit() {
     rights.editTherapyplanStation = document.getElementById('editEmployeeRightsEditTherapyplanStation').checked;
     rights.restoreBackups = document.getElementById('editEmployeeRightsRestoreBackups').checked;
 
+    // Get station assignments
+    const medicalCare = document.getElementById('editEmployeeMedicalCare').value;
+    const medicalCareBackup = document.getElementById('editEmployeeMedicalCareBackup').value;
+    const groupTherapy = document.getElementById('editEmployeeGroupTherapy').value;
+
     // Get therapy plan selection
     const selectedTherapyPlan = document.getElementById('editEmployeeTherapyPlan').value;
 
@@ -410,6 +420,9 @@ async function saveEmployeeEdit() {
         announcementTextShort: announcementTextShort || undefined,
         announcementTextLong: announcementTextLong || undefined,
         therapyPlan: selectedTherapyPlan || undefined,
+        medicalCare: medicalCare,
+        medicalCareBackup: medicalCareBackup,
+        groupTherapy: groupTherapy
     };
 
     // If password is set, hash it

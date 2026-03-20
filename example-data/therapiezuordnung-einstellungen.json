@@ -1,0 +1,11 @@
+{
+  "thresholds": {
+    "at": 12,
+    "pmr": 12,
+    "haltungsschule": 3,
+    "asst": 12,
+    "skt": 6,
+    "biographiearbeit": 7,
+    "cafeteria": 7
+  }
+}

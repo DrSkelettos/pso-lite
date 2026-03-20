@@ -10,6 +10,7 @@ function fillTherapyTable() {
 
     // Therapy counts
     const therapyCounts = {
+        cafeteria: 0,
         at: 0,
         pmr: 0,
         haltungsschule: 0,
@@ -89,19 +90,19 @@ function fillTherapyTable() {
         // Get therapy data
         const therapyData = window['therapies-station'][patient.id] || {};
 
-        // Standard therapies
-        const standardTherapies = ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'];
+        // Standard therapies (cafeteria added before at)
+        const standardTherapies = ['cafeteria', 'at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'];
         standardTherapies.forEach((therapy, index) => {
             const td = document.createElement('td');
             const classes = [];
 
-            // Add border class
-            if (index === 1 || index === 2 || index === 5) {
+            // Add border class (cafeteria, pmr, haltungsschule, biographiearbeit)
+            if (index === 0 || index === 2 || index === 3 || index === 6) {
                 classes.push('border-end-3');
             }
 
-            // Add bg-light to odd-numbered columns (PMR, ASST, Biographiearbeit)
-            if (index === 1 || index === 3 || index === 5) {
+            // Add bg-light to alternating columns (PMR, Haltungsschule, SKT)
+            if (index === 1 || index === 3 || index === 5 || index === 7) {
                 classes.push('bg-light');
             }
 
@@ -116,7 +117,7 @@ function fillTherapyTable() {
 
         // Column 10: Kreativ-Einzel
         const tdKreativ = document.createElement('td');
-        tdKreativ.className = 'border-end-3';
+        tdKreativ.className = 'border-end-3 bg-light';
         const smallKreativ = document.createElement('small');
         smallKreativ.textContent = therapyData.kreativ_einzel || '';
         tdKreativ.appendChild(smallKreativ);
@@ -126,7 +127,7 @@ function fillTherapyTable() {
 
         // Column 11: Einzel-Physiotherapie
         const tdPhysio = document.createElement('td');
-        tdPhysio.className = 'border-end-3 bg-light';
+        tdPhysio.className = 'border-end-3';
         const smallPhysio = document.createElement('small');
         smallPhysio.textContent = therapyData.einzel_physio || '';
         tdPhysio.appendChild(smallPhysio);
@@ -136,6 +137,7 @@ function fillTherapyTable() {
 
         // Column 12: Discharge date
         const tdDischarge = document.createElement('td');
+        tdDischarge.className = 'bg-light';
         tdDischarge.textContent = patient.discharge || '';
         row.appendChild(tdDischarge);
 
@@ -152,8 +154,8 @@ function fillTherapyTable() {
         else if (groupLetter == 'B')
             groupBCount++;
 
-        // Count standard therapies
-        ['at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'].forEach(therapy => {
+        // Count standard therapies (including cafeteria)
+        ['cafeteria', 'at', 'pmr', 'haltungsschule', 'asst', 'skt', 'biographiearbeit'].forEach(therapy => {
             if (therapyData[therapy] === 'X') {
                 therapyCounts[therapy]++;
             }
@@ -234,7 +236,7 @@ function fillTherapyTable() {
         divider.className = 'no-hover';
         const td = document.createElement('td');
         td.height = 10;
-        td.colSpan = 15;
+        td.colSpan = 16;
         divider.appendChild(td);
         section.appendChild(divider);
     });
@@ -254,7 +256,31 @@ function fillTherapyTable() {
         if (countCell) countCell.textContent = count;
     });
 
+    // Load thresholds from settings or use defaults
+    const settings = window['therapies-settings'] || {};
+    console.log('Loaded therapies-settings:', settings);
+    const thresholds = settings.thresholds || {
+        cafeteria: 6,
+        at: 12,
+        pmr: 12,
+        haltungsschule: 3,
+        asst: 12,
+        skt: 6,
+        biographiearbeit: 6
+    };
+    console.log('Using thresholds:', thresholds);
+
+    // Update threshold values in footer
+    document.getElementById('maxNum-cafeteria').textContent = thresholds.cafeteria;
+    document.getElementById('maxNum-at').textContent = thresholds.at;
+    document.getElementById('maxNum-pmr').textContent = thresholds.pmr;
+    document.getElementById('maxNum-haltungsschule').textContent = thresholds.haltungsschule;
+    document.getElementById('maxNum-asst').textContent = thresholds.asst;
+    document.getElementById('maxNum-skt').textContent = thresholds.skt;
+    document.getElementById('maxNum-biographiearbeit').textContent = thresholds.biographiearbeit;
+
     // Update therapy counts in footer
+    document.getElementById('num-cafeteria').textContent = therapyCounts.cafeteria;
     document.getElementById('num-at').textContent = therapyCounts.at;
     document.getElementById('num-pmr').textContent = therapyCounts.pmr;
     document.getElementById('num-haltungsschule').textContent = therapyCounts.haltungsschule;
@@ -266,10 +292,18 @@ function fillTherapyTable() {
     document.getElementById('num-total').textContent = groupACount + groupBCount;
 
     // Calculate and update free slots
-    document.getElementById('free-at').textContent = document.getElementById('maxNum-at').textContent - therapyCounts.at;
-    document.getElementById('free-pmr').textContent = document.getElementById('maxNum-pmr').textContent - therapyCounts.pmr;
-    document.getElementById('free-haltungsschule').textContent = document.getElementById('maxNum-haltungsschule').textContent - therapyCounts.haltungsschule;
-    document.getElementById('free-asst').textContent = document.getElementById('maxNum-asst').textContent - therapyCounts.asst;
-    document.getElementById('free-skt').textContent = document.getElementById('maxNum-skt').textContent - therapyCounts.skt;
-    document.getElementById('free-biographiearbeit').textContent = document.getElementById('maxNum-biographiearbeit').textContent - therapyCounts.biographiearbeit;
+    document.getElementById('free-cafeteria').textContent = thresholds.cafeteria - therapyCounts.cafeteria;
+    document.getElementById('free-at').textContent = thresholds.at - therapyCounts.at;
+    document.getElementById('free-pmr').textContent = thresholds.pmr - therapyCounts.pmr;
+    document.getElementById('free-haltungsschule').textContent = thresholds.haltungsschule - therapyCounts.haltungsschule;
+    document.getElementById('free-asst').textContent = thresholds.asst - therapyCounts.asst;
+    document.getElementById('free-skt').textContent = thresholds.skt - therapyCounts.skt;
+    document.getElementById('free-biographiearbeit').textContent = thresholds.biographiearbeit - therapyCounts.biographiearbeit;
+
+    // Update employee assignments dynamically from employee data
+    if (typeof updateEmployeeAssignments === 'function') {
+        updateEmployeeAssignments();
+    } else {
+        console.warn('updateEmployeeAssignments function not found');
+    }
 }
