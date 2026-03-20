@@ -93,16 +93,15 @@ function fillKosiTable() {
                 return false;
             });
             
-            // Add change event to save date changes
-            kooubInput.addEventListener('change', function() {
+            // Add blur event to save date changes (fires when user leaves the field)
+            kooubInput.addEventListener('blur', function() {
+                const patId = this.dataset.patientId;
+                if (!window['kosi-station'][patId]) window['kosi-station'][patId] = {};
+                
                 if (this.value) {
                     // Convert ISO date to German format
                     const isoDate = this.value;
                     const germanDate = formatISOToGermanDate(isoDate);
-                    
-                    // Save to kosi data
-                    const patId = this.dataset.patientId;
-                    if (!window['kosi-station'][patId]) window['kosi-station'][patId] = {};
                     
                     // Reset Verlängerung checkboxes when KOÜB date changes
                     if (window['kosi-station'][patId].koueb !== germanDate) {
@@ -111,11 +110,16 @@ function fillKosiTable() {
                     }
                     
                     window['kosi-station'][patId].koueb = germanDate;
-                    
-                    // Refresh the row to update styling and Verlängerung checkboxes
-                    fillKosiTable();
-                    checkData();
+                } else {
+                    // Date was cleared - remove koueb and Verlängerung data
+                    if (window['kosi-station'][patId].koueb) delete window['kosi-station'][patId].koueb;
+                    if (window['kosi-station'][patId].verl1) delete window['kosi-station'][patId].verl1;
+                    if (window['kosi-station'][patId].verl2) delete window['kosi-station'][patId].verl2;
                 }
+                
+                // Refresh the row to update styling and Verlängerung checkboxes
+                fillKosiTable();
+                checkData();
             });
             
             // Set KOÜB date if available
