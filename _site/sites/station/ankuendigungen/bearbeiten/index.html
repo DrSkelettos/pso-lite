@@ -407,11 +407,30 @@
             header.appendChild(employeeInfo);
 
             if (canEdit) {
+                const actionWrapper = document.createElement('div');
+                actionWrapper.className = 'btn-group btn-group-sm';
+
+                const moveUpBtn = document.createElement('button');
+                moveUpBtn.className = 'btn btn-sm btn-outline-secondary';
+                moveUpBtn.innerHTML = '<i class="bi bi-arrow-up"></i>';
+                moveUpBtn.disabled = index === 0;
+                moveUpBtn.onclick = () => moveEntry(index, -1);
+
+                const moveDownBtn = document.createElement('button');
+                moveDownBtn.className = 'btn btn-sm btn-outline-secondary';
+                moveDownBtn.innerHTML = '<i class="bi bi-arrow-down"></i>';
+                moveDownBtn.disabled = index === entries.length - 1;
+                moveDownBtn.onclick = () => moveEntry(index, 1);
+
                 const deleteBtn = document.createElement('button');
                 deleteBtn.className = 'btn btn-sm btn-outline-danger';
                 deleteBtn.innerHTML = '<i class="bi bi-trash text-danger"></i>';
                 deleteBtn.onclick = () => deleteEntry(index);
-                header.appendChild(deleteBtn);
+
+                actionWrapper.appendChild(moveUpBtn);
+                actionWrapper.appendChild(moveDownBtn);
+                actionWrapper.appendChild(deleteBtn);
+                header.appendChild(actionWrapper);
             }
 
             cardBody.appendChild(header);
@@ -460,6 +479,19 @@
             checkData();
             renderAnnouncements();
         }
+    }
+
+    function moveEntry(index, direction) {
+        const entries = window['announcements-station']?.[currentDateStr];
+        if (!entries) return;
+
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= entries.length) return;
+
+        const [entry] = entries.splice(index, 1);
+        entries.splice(newIndex, 0, entry);
+        checkData();
+        renderAnnouncements();
     }
 
     function addNewEntry() {

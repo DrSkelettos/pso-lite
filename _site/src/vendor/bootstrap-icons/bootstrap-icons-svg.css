@@ -117,6 +117,14 @@
   background-image: url("./svg/arrow-left.svg");
 }
 
+.bi-arrow-up::before {
+  background-image: url("./svg/arrow-up.svg");
+}
+
+.bi-arrow-down::before {
+  background-image: url("./svg/arrow-down.svg");
+}
+
 .bi-arrow-counterclockwise::before {
   background-image: url("./svg/arrow-counterclockwise.svg");
 }
