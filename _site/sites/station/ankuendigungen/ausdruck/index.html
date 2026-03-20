@@ -86,8 +86,9 @@
 
 <body>
     
-<script src="../../../../src/station/announcements.js"></script>
 <script src="../../../../src/helpers.js"></script>
+<script src="../../../../src/station/announcements.js"></script>
+<script src="../../../../src/station/announcements-markdown.js"></script>
 
 <style>
     @page {
@@ -139,6 +140,14 @@
 
     .announcements-list li {
         margin-bottom: 1rem;
+        line-height: 1.5;
+    }
+
+    .announcements-sublist {
+        margin-top: 0.4rem;
+    }
+    .announcements-sublist li {
+        margin-bottom: 0.4rem;
         line-height: 1.5;
     }
 
@@ -276,10 +285,11 @@
         noAnnouncementsDiv.style.display = 'none';
         list.innerHTML = '';
 
+        console.log("Entries:", entries);
         entries.forEach(entry => {
             if (entry.content && entry.content.trim()) {
                 const li = document.createElement('li');
-                li.textContent = entry.content;
+                li.innerHTML = formatAnnouncementContent(entry.content);
                 list.appendChild(li);
             }
         });
