@@ -65,6 +65,10 @@
 {% if include_navigation %}
 
 <body>
+    {% if include_loading %}
+    {% include "loading-overlay.html" %}
+    {% endif %}
+    
     <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
         <div class="container-fluid">
             <a class="navbar-brand" href="{{ dir }}index.html" style="margin-top:-4px;">

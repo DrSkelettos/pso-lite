@@ -65,6 +65,11 @@ async function loadMultipleData(dataNames, callback) {
             }
         }
 
+        // Hide loading overlay after data loading completes
+        if (typeof window.hideLoadingOverlay === 'function') {
+            window.hideLoadingOverlay();
+        }
+        
         return result;
     } catch (error) {
         console.error('Error in loadMultipleData:', error);
