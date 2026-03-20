@@ -93,7 +93,7 @@ function fillPatientData(row, patient) {
     };
 
     // Fill in basic data
-    const nameContainer = document.createElement('div');
+    const nameContainer = document.createElement('span');
 
     // Add name as clickable link
     if (authorize('editPatientsStation')) {
@@ -312,6 +312,7 @@ function fillPatientsTable() {
         if (row) {
             fillPatientData(row, patientsByRooms[roomId].current);
             fillPlannedPatientData(row, patientsByRooms[roomId].planned);
+            renderRoomOverlaps(row, patientsByRooms[roomId].currentOverlaps);
         }
     }
 }
@@ -379,7 +380,8 @@ function getPatientsByRooms() {
             const roomId = `${roomKey}-${spaceKey}`;
             patientsByRooms[roomId] = {
                 current: null,
-                planned: null
+                planned: null,
+                currentOverlaps: []
             };
         }
     }
@@ -389,7 +391,12 @@ function getPatientsByRooms() {
         const patient = current[patientId];
         const activeRoom = getActiveRoom(patient);
         if (activeRoom && activeRoom in patientsByRooms) {
-            patientsByRooms[activeRoom].current = { ...patient, id: patientId };
+            const roomEntry = patientsByRooms[activeRoom];
+            if (!roomEntry.current) {
+                roomEntry.current = { ...patient, id: patientId };
+            } else {
+                roomEntry.currentOverlaps.push({ ...patient, id: patientId });
+            }
         }
     }
 
@@ -403,6 +410,43 @@ function getPatientsByRooms() {
     }
 
     return patientsByRooms;
+}
+
+function renderRoomOverlaps(row, overlapPatients) {
+    if (!overlapPatients || overlapPatients.length === 0) return;
+
+    const roomCell = row.querySelector('.data-name');
+    if (!roomCell) return;
+
+    const container = document.createElement('span');
+    container.className = 'float-end text-warning d-inline-flex align-items-center gap-1';
+
+    const icon = document.createElement('i');
+    icon.className = 'bi bi-exclamation-triangle';
+    container.appendChild(icon);
+
+    overlapPatients.forEach((patient, index) => {
+        const nameNode = authorize('editPatientsStation') ? document.createElement('a') : document.createElement('span');
+        nameNode.textContent = patient.name || '';
+        if (authorize('editPatientsStation')) {
+            nameNode.href = '#';
+            nameNode.classList.add('text-decoration-none', 'text-warning');
+            nameNode.onclick = (e) => {
+                e.preventDefault();
+                editPatient(patient.id);
+            };
+        }
+
+        if (index > 0) {
+            const separator = document.createElement('span');
+            separator.textContent = ', ';
+            container.appendChild(separator);
+        }
+
+        container.appendChild(nameNode);
+    });
+
+    roomCell.appendChild(container);
 }
 
 let currentTableDate = new Date();
