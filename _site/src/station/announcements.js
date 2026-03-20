@@ -4,15 +4,15 @@
 
 /**
  * Calculate the announcement date for an absence
- * - 1-3 days absence: announce 2 Sundays before
- * - 4+ days absence: announce 3 Sundays before
+ * - 1-5 days absence: announce 2 Sundays before
+ * - 6+ days absence: announce 3 Sundays before
  * @param {Date} startDate - Start date of the absence
  * @param {Date} endDate - End date of the absence
  * @returns {Date} - The Sunday to announce
  */
 function calculateAnnouncementDate(startDate, endDate) {
     const days = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-    const weeksBeforeAnnouncement = days <= 3 ? 2 : 3;
+    const weeksBeforeAnnouncement = days <= 5 ? 2 : 3;
 
     // Find the Monday of the week containing the start date
     const startDayOfWeek = startDate.getDay();
