@@ -200,17 +200,19 @@ function formatDateForCalendar(date) {
 }
 
 function getMondayOfWeek(year, week) {
-    // Create a date for January 1st of the given year
-    const date = new Date(year, 0, 1);
+    // ISO 8601: Week 1 is the week with the first Thursday of the year
+    // Create January 4th (always in week 1)
+    const jan4 = new Date(year, 0, 4);
     
-    // Find the first Monday of the year
-    const dayOfWeek = date.getDay();
-    const daysToMonday = dayOfWeek === 0 ? 1 : (8 - dayOfWeek);
-    const firstMonday = new Date(year, 0, daysToMonday);
+    // Find Monday of week 1 (go back to Monday from Jan 4th)
+    const dayOfWeek = jan4.getDay();
+    const daysFromMonday = (dayOfWeek === 0 ? 6 : dayOfWeek - 1);
+    const week1Monday = new Date(jan4);
+    week1Monday.setDate(jan4.getDate() - daysFromMonday);
     
     // Add (week - 1) weeks to get to the desired week
-    const targetMonday = new Date(firstMonday);
-    targetMonday.setDate(firstMonday.getDate() + (week - 1) * 7);
+    const targetMonday = new Date(week1Monday);
+    targetMonday.setDate(week1Monday.getDate() + (week - 1) * 7);
     
     return targetMonday;
 }
