@@ -773,14 +773,39 @@ function populateRoundsTable(rounds, hideInternal = false) {
             if (!hideInternal) {
                 const weekCell = row.insertCell();
                 weekCell.classList.add('text-center');
-                weekCell.textContent = calculatePatientWeek(patient.admission, parseGermanDate(rounds.date));
+                const weekNumber = parseInt(calculatePatientWeek(patient.admission, parseGermanDate(rounds.date)));
+                weekCell.textContent = weekNumber.toString();
+                
+                // Bold if week > 5 and no discharge date and no E-Modus
+                if (weekNumber > 5 && !patient.discharge && !patient.discharge_mode) {
+                    weekCell.style.fontWeight = 'bold';
+                }
             }
 
             // Discharge date cell
             if (!hideInternal) {
                 const dischargeCell = row.insertCell();
                 dischargeCell.classList.add('text-center');
-                dischargeCell.textContent = patient.discharge || '';
+                
+                // Check if week > 5 and no discharge date and no E-Modus - add "?"
+                const weekNumber = parseInt(calculatePatientWeek(patient.admission, parseGermanDate(rounds.date)));
+                if (weekNumber > 5 && !patient.discharge && !patient.discharge_mode) {
+                    dischargeCell.textContent = '?';
+                } else {
+                    dischargeCell.textContent = patient.discharge || '';
+                    
+                    // Bold if discharge date is in current or next week
+                    if (patient.discharge) {
+                        const dischargeDate = parseGermanDate(patient.discharge);
+                        const roundsDate = parseGermanDate(rounds.date);
+                        const daysDiff = Math.floor((dischargeDate - roundsDate) / (24 * 60 * 60 * 1000));
+                        
+                        // Bold if discharge is within 0-13 days (current week + next week)
+                        if (daysDiff >= 0 && daysDiff <= 13) {
+                            dischargeCell.style.fontWeight = 'bold';
+                        }
+                    }
+                }
             }
 
             // Discharge mode cell
@@ -843,12 +868,36 @@ function populateRoundsTable(rounds, hideInternal = false) {
         // Therapy week cell
         const weekCell = row.insertCell();
         weekCell.classList.add('text-center');
-        weekCell.textContent = calculatePatientWeek(patient.admission, parseGermanDate(rounds.date));
+        const weekNumber = parseInt(calculatePatientWeek(patient.admission, parseGermanDate(rounds.date)));
+        weekCell.textContent = weekNumber.toString();
+        
+        // Bold if week > 5 and no discharge date and no E-Modus
+        if (weekNumber > 5 && !patient.discharge && !patient.discharge_mode) {
+            weekCell.style.fontWeight = 'bold';
+        }
 
         // Discharge date cell
         const dischargeCell = row.insertCell();
         dischargeCell.classList.add('text-center');
-        dischargeCell.textContent = patient.discharge || '';
+        
+        // Check if week > 5 and no discharge date and no E-Modus - add "?"
+        if (weekNumber > 5 && !patient.discharge && !patient.discharge_mode) {
+            dischargeCell.textContent = '?';
+        } else {
+            dischargeCell.textContent = patient.discharge || '';
+            
+            // Bold if discharge date is in current or next week
+            if (patient.discharge) {
+                const dischargeDate = parseGermanDate(patient.discharge);
+                const roundsDate = parseGermanDate(rounds.date);
+                const daysDiff = Math.floor((dischargeDate - roundsDate) / (24 * 60 * 60 * 1000));
+                
+                // Bold if discharge is within 0-13 days (current week + next week)
+                if (daysDiff >= 0 && daysDiff <= 13) {
+                    dischargeCell.style.fontWeight = 'bold';
+                }
+            }
+        }
 
         // Discharge mode cell
         const dischargeModeCell = row.insertCell();
