@@ -25,6 +25,11 @@ dir: ./
         </div>
     </div>
 
+    <!-- Unplanned Absences Alert -->
+    <div id="unplannedAbsencesAlert" class="alert alert-warning mb-5 text-center cursor-pointer hidden" onclick="window.location.href='sites/station/abwesenheiten-planen/index.html';">
+        Es gibt <strong id="unplannedAbsencesCount">0</strong> ungeplante Abwesenheit(en), die in den nächsten 7 Tagen angekündigt werden.
+    </div>
+
     <!-- LINKS -->
     <div class="hidden flex-wrap gap-3" id="dashboardLinks">
 
@@ -144,8 +149,60 @@ dir: ./
             if (window['user'].needsToChangePassword) {
                 document.getElementById('passwordChangeAlert').classList.remove('hidden');
             }
+
+            // Check for unplanned absences
+            if (authorize('editPatientsStation')) {
+                checkUnplannedAbsences();
+            }
         });
     });
+
+    function checkUnplannedAbsences() {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const sevenDaysFromNow = new Date(today);
+        sevenDaysFromNow.setDate(today.getDate() + 7);
+
+        let unplannedCount = 0;
+        console.log("Checking unplanned absences...");
+        console.log("Today:", today);
+        console.log("Seven days from now:", sevenDaysFromNow);
+
+        Object.values(window['employees'] || {}).forEach(employee => {
+            if (!employee.absences) return;
+
+            const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
+
+            absencesArray.forEach(absence => {
+                // Skip if already planned
+                if (absence.planned) return;
+
+                // Skip if no announcement date
+                if (!absence.announcement) return;
+
+                const announcementDate = parseGermanDate(absence.announcement);
+                const sevenDaysBeforeAnnouncement = new Date(announcementDate);
+                sevenDaysBeforeAnnouncement.setDate(announcementDate.getDate() - 7);
+
+                // Check if announcement is within the next 7 days
+                if (today >= sevenDaysBeforeAnnouncement) {
+                    // Check if absence is longer than 1 day
+                    const startDate = parseGermanDate(absence.start);
+                    const endDate = parseGermanDate(absence.end);
+                    const days = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+
+                    if (days > 1) {
+                        unplannedCount++;
+                    }
+                }
+            });
+        });
+
+        if (unplannedCount > 0) {
+            document.getElementById('unplannedAbsencesCount').textContent = unplannedCount;
+            document.getElementById('unplannedAbsencesAlert').classList.remove('hidden');
+        }
+    }
 
     function applyDashboardSettings() {
         const user = window['user'];

@@ -1,0 +1,157 @@
+---
+layout: layout.html
+active_abwesenheiten: active
+title: Abwesenheiten planen
+include_navigation: true
+dir: ../../../
+---
+
+<script src="{{ dir }}src/employees.js"></script>
+
+<div class="container-fluid my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1>Abwesenheiten planen</h1>
+        </div>
+        <div>
+            <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='../abwesenheiten/index.html'">
+                <i class="bi bi-arrow-left text-light me-1"></i> Zurück
+            </button>
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        Hier sehen Sie alle anstehenden Abwesenheiten. Klicken Sie auf eine Abwesenheit, um die Vertretung zu planen.
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Anstehende Abwesenheiten</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Mitarbeiter:in</th>
+                        <th>Von</th>
+                        <th>Bis</th>
+                        <th>Dauer</th>
+                        <th>Ankündigung</th>
+                        <th>Status</th>
+                        <th>Aktion</th>
+                    </tr>
+                </thead>
+                <tbody id="absencesTableBody">
+                    <!-- Absences will be added here -->
+                </tbody>
+            </table>
+            <div id="noAbsences" class="text-center text-muted py-4" style="display: none;">
+                Keine anstehenden Abwesenheiten gefunden.
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['employees', 'patients-station'], function (result) {
+            renderAbsences();
+        });
+    });
+
+    function renderAbsences() {
+        const tbody = document.getElementById('absencesTableBody');
+        const noAbsencesDiv = document.getElementById('noAbsences');
+        tbody.innerHTML = '';
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const absences = [];
+
+        // Collect all absences
+        Object.entries(window['employees'] || {}).forEach(([empKey, employee]) => {
+            if (!employee.absences) return;
+
+            const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
+            
+            absencesArray.forEach(absence => {
+                const startDate = parseGermanDate(absence.start);
+                const endDate = parseGermanDate(absence.end);
+                
+                // Only show future absences longer than 1 day
+                if (endDate >= today) {
+                    const days = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                    if (days > 1) {
+                        absences.push({
+                            employeeKey: empKey,
+                            employeeName: employee.name,
+                            absence: absence,
+                            startDate: startDate,
+                            endDate: endDate,
+                            days: days
+                        });
+                    }
+                }
+            });
+        });
+
+        // Sort by start date
+        absences.sort((a, b) => a.startDate - b.startDate);
+
+        if (absences.length === 0) {
+            noAbsencesDiv.style.display = 'block';
+            return;
+        }
+
+        absences.forEach(item => {
+            const tr = document.createElement('tr');
+            
+            // Employee name
+            const tdName = document.createElement('td');
+            tdName.textContent = item.employeeName;
+            tr.appendChild(tdName);
+
+            // Start date
+            const tdStart = document.createElement('td');
+            tdStart.textContent = item.absence.start;
+            tr.appendChild(tdStart);
+
+            // End date
+            const tdEnd = document.createElement('td');
+            tdEnd.textContent = item.absence.end;
+            tr.appendChild(tdEnd);
+
+            // Duration
+            const tdDuration = document.createElement('td');
+            tdDuration.textContent = `${item.days} Tag${item.days > 1 ? 'e' : ''}`;
+            tr.appendChild(tdDuration);
+
+            // Announcement date
+            const tdAnnouncement = document.createElement('td');
+            tdAnnouncement.textContent = item.absence.announcement || '-';
+            tr.appendChild(tdAnnouncement);
+
+            // Status
+            const tdStatus = document.createElement('td');
+            if (item.absence.planned) {
+                tdStatus.innerHTML = '<span class="badge bg-success">Geplant</span>';
+            } else {
+                tdStatus.innerHTML = '<span class="badge bg-warning text-dark">Ungeplant</span>';
+            }
+            tr.appendChild(tdStatus);
+
+            // Action button
+            const tdAction = document.createElement('td');
+            const btn = document.createElement('a');
+            btn.className = 'btn btn-sm btn-primary';
+            btn.href = `planen/index.html?employee=${encodeURIComponent(item.employeeKey)}&start=${encodeURIComponent(item.absence.start)}&end=${encodeURIComponent(item.absence.end)}`;
+            btn.innerHTML = '<i class="bi bi-calendar-check text-light me-1"></i>Planen';
+            tdAction.appendChild(btn);
+            tr.appendChild(tdAction);
+
+            tbody.appendChild(tr);
+        });
+    }
+</script>

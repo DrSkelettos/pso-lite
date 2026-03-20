@@ -172,9 +172,9 @@ function fillPatientData(row, patient) {
         // Combine additional employees and misc info
         let miscContent = [];
 
-        // Add additional employees
+        // Add additional employees (deduplicated)
         if (patient.employees.length > 1) {
-            const additionalEmployees = patient.employees.slice(1).map(emp => emp.employee);
+            const additionalEmployees = [...new Set(patient.employees.slice(1).map(emp => emp.employee))];
             miscContent.push(additionalEmployees.join(', '));
         }
 
@@ -234,9 +234,9 @@ function fillPlannedPatientData(row, patient) {
         // Combine additional employees and misc info
         let miscContent = [];
 
-        // Add additional employees
+        // Add additional employees (deduplicated)
         if (patient.employees.length > 1) {
-            const additionalEmployees = patient.employees.slice(1).map(emp => emp.employee);
+            const additionalEmployees = [...new Set(patient.employees.slice(1).map(emp => emp.employee))];
             miscContent.push(additionalEmployees.join(', '));
         }
 

@@ -32,12 +32,18 @@ dir: ../../../
     }
 </style>
 
-<div class="container-fluid">
-    <div class="row mb-3">
-        <div class="col">
+<div class="container-fluid">    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
             <h1>Abwesenheiten</h1>
         </div>
+        <div>
+            <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='../abwesenheiten-planen/index.html'">
+                <i class="bi bi-calendar-date text-light me-1"></i> Planen
+            </button>
+        </div>
     </div>
+
 
     <!-- Sunday buttons by month -->
     <div id="sundayButtons">

@@ -1,0 +1,397 @@
+---
+layout: layout.html
+active_abwesenheiten: active
+title: Abwesenheit planen
+include_navigation: true
+dir: ../../../../
+save_data: patients-station
+save_file: belegung-station
+---
+
+<script src="{{ dir }}src/station/patients.js"></script>
+<script src="{{ dir }}src/employees.js"></script>
+<script src="{{ dir }}src/station/workload.js"></script>
+
+<div class="container-fluid my-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-1">Abwesenheit planen</h2>
+            <p class="text-muted mb-0">
+                <strong id="employeeName"></strong> |
+                <span id="absenceDates"></span>
+                (<span id="absenceDuration"></span>)
+            </p>
+        </div>
+        <div>
+            <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='../index.html'">
+                <i class="bi bi-arrow-left text-light me-1"></i>Zurück
+            </button>
+        </div>
+    </div>
+
+    <!-- Patient List -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Patient:innen während der Abwesenheit</h5>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-sm table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Patient:in</th>
+                        <th>Gruppe</th>
+                        <th>Aufnahme</th>
+                        <th>Entlassung</th>
+                        <th>Vertretung</th>
+                    </tr>
+                </thead>
+                <tbody id="patientsTableBody">
+                    <!-- Patients will be added here -->
+                </tbody>
+            </table>
+            <div id="noPatients" class="text-center text-muted py-4" style="display: none;">
+                Keine Patient:innen während dieser Abwesenheit.
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Capacity (weekly) -->
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered mb-0" id="absenceWorkloadTable">
+            <thead class="table-light">
+                <tr class="border-bottom-3" id="absenceWeekHeaderRow">
+                    <th width="160" class="text-nowrap border-end-3" style="position: sticky; left: 0; z-index: 1;">
+                        Mitarbeiter:in
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="absenceWorkloadTableBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    let currentEmployeeKey = '';
+    let absenceStart = '';
+    let absenceEnd = '';
+    let absenceStartDate = null;
+    let absenceEndDate = null;
+    let affectedPatients = [];
+    let availableEmployees = [];
+    let absenceWeeks = [];
+    const originalSaveData = window.saveData;
+
+    window.addEventListener('baseDataLoaded', async function () {
+        loadMultipleData(['employees', 'patients-station'], function (result) {
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            currentEmployeeKey = urlParams.get('employee');
+            absenceStart = urlParams.get('start');
+            absenceEnd = urlParams.get('end');
+
+            if (!currentEmployeeKey || !absenceStart || !absenceEnd) {
+                alert('Ungültige Parameter');
+                window.location.href = '../index.html';
+                return;
+            }
+
+            absenceStartDate = parseGermanDate(absenceStart);
+            absenceEndDate = parseGermanDate(absenceEnd);
+
+            const employee = window['employees'][currentEmployeeKey];
+            if (!employee) {
+                alert('Mitarbeiter:in nicht gefunden');
+                window.location.href = '../index.html';
+                return;
+            }
+
+            // Update header
+            document.getElementById('employeeName').textContent = employee.name;
+            document.getElementById('absenceDates').textContent = `${absenceStart} - ${absenceEnd}`;
+            const days = Math.round((absenceEndDate - absenceStartDate) / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById('absenceDuration').textContent = `${days} Tag${days > 1 ? 'e' : ''}`;
+
+            // Get available employees (max patients != -1)
+            availableEmployees = Object.entries(window['employees'])
+                .filter(([key, emp]) => emp.patients !== -1 && key !== currentEmployeeKey)
+                .map(([key, emp]) => ({ key, name: emp.name, maxPatients: emp.patients || 0 }));
+
+            // Find affected patients
+            findAffectedPatients();
+
+            // Build absence weeks
+            absenceWeeks = getAbsenceWeeks(absenceStartDate, absenceEndDate);
+
+            // Render
+            renderPatients();
+            renderAbsenceWorkloadTable();
+
+            setOriginalData('patients-station');
+            setOriginalData('employees');
+        });
+    });
+
+    function findAffectedPatients() {
+        affectedPatients = [];
+
+        Object.entries(window['patients-station'] || {}).forEach(([patId, patient]) => {
+            if (!patient.employees || patient.employees.length === 0) return;
+
+            const admissionDate = patient.admission ? parseGermanDate(patient.admission) : null;
+            const dischargeDate = patient.discharge ? parseGermanDate(patient.discharge) : null;
+
+            if (admissionDate && admissionDate > absenceStartDate) return;
+            if (dischargeDate && dischargeDate < absenceStartDate) return;
+
+            // Check if patient has the absent employee during the absence period
+            const hasAbsentEmployee = patient.employees.some(emp => {
+                if (emp.employee !== currentEmployeeKey) return false;
+
+                const empStart = parseGermanDate(emp.start);
+                const empEnd = emp.end ? parseGermanDate(emp.end) : new Date(2099, 11, 31);
+
+                // Check if employee assignment overlaps with absence
+                return empStart <= absenceEndDate && empEnd >= absenceStartDate;
+            });
+
+            if (hasAbsentEmployee) {
+                // Find existing backup employee if any
+                let backupEmployee = null;
+                patient.employees.forEach(emp => {
+                    if (emp.employee === currentEmployeeKey) return;
+
+                    const empStart = parseGermanDate(emp.start);
+                    const empEnd = emp.end ? parseGermanDate(emp.end) : new Date(2099, 11, 31);
+
+                    // Check if this is a backup during the absence period
+                    if (empStart <= absenceEndDate && empEnd >= absenceStartDate) {
+                        backupEmployee = emp.employee;
+                    }
+                });
+
+                affectedPatients.push({
+                    id: patId,
+                    name: patient.name,
+                    group: patient.group,
+                    admission: patient.admission,
+                    discharge: patient.discharge,
+                    backupEmployee: backupEmployee
+                });
+            }
+        });
+    }
+
+    function getAbsenceWeeks(startDate, endDate) {
+        const weeks = [];
+        const seen = new Set();
+        const cursor = new Date(startDate);
+
+        while (cursor <= endDate) {
+            const week = getCalendarWeek(cursor);
+            const year = getWeekYear(cursor);
+            const key = `${year}-${week}`;
+
+            if (!seen.has(key)) {
+                weeks.push({ year, week });
+                seen.add(key);
+            }
+
+            cursor.setDate(cursor.getDate() + 7);
+        }
+
+        return weeks;
+    }
+
+    function renderPatients() {
+        const tbody = document.getElementById('patientsTableBody');
+        const noPatients = document.getElementById('noPatients');
+        tbody.innerHTML = '';
+
+        if (affectedPatients.length === 0) {
+            noPatients.style.display = 'block';
+            return;
+        }
+
+        affectedPatients.forEach(patient => {
+            const tr = document.createElement('tr');
+
+            // Name
+            const tdName = document.createElement('td');
+            tdName.textContent = patient.name;
+            tr.appendChild(tdName);
+
+            // Group
+            const tdGroup = document.createElement('td');
+            tdGroup.textContent = patient.group || '-';
+            tr.appendChild(tdGroup);
+
+            // Admission
+            const tdAdmission = document.createElement('td');
+            tdAdmission.textContent = patient.admission || '-';
+            tr.appendChild(tdAdmission);
+
+            // Discharge
+            const tdDischarge = document.createElement('td');
+            tdDischarge.textContent = patient.discharge || '-';
+            tr.appendChild(tdDischarge);
+
+            // Backup dropdown
+            const tdBackup = document.createElement('td');
+            const select = document.createElement('select');
+            select.className = 'form-select form-select-sm';
+            select.dataset.patientId = patient.id;
+            select.onchange = () => {
+                patient.backupEmployee = select.value;
+                applyBackupAssignments();
+                renderAbsenceWorkloadTable();
+            };
+
+            // Add empty option
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            emptyOption.textContent = '-- Keine Vertretung --';
+            select.appendChild(emptyOption);
+
+            // Add employee options
+            availableEmployees.forEach(emp => {
+                const option = document.createElement('option');
+                option.value = emp.key;
+                option.textContent = `${emp.key} - ${emp.name}`;
+                if (patient.backupEmployee === emp.key) {
+                    option.selected = true;
+                }
+                select.appendChild(option);
+            });
+
+            tdBackup.appendChild(select);
+            tr.appendChild(tdBackup);
+
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderAbsenceWorkloadTable() {
+        const headerRow = document.getElementById('absenceWeekHeaderRow');
+        const tbody = document.getElementById('absenceWorkloadTableBody');
+
+        headerRow.querySelectorAll('th:not(:first-child)').forEach(th => th.remove());
+        tbody.innerHTML = '';
+
+        absenceWeeks.forEach(({ year, week }) => {
+            const th = document.createElement('th');
+            th.className = 'text-center border-bottom-3';
+            th.innerHTML = `KW${week}<br><small class='fw-normal'>${getWeekDateRange(year, week)}</small>`;
+            headerRow.appendChild(th);
+        });
+
+        availableEmployees.forEach(emp => {
+            const row = document.createElement('tr');
+            const th = document.createElement('th');
+            th.className = 'text-nowrap border-end-3';
+            th.style.position = 'sticky';
+            th.style.left = '0';
+            th.style.zIndex = '1';
+
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = emp.key;
+            th.appendChild(nameSpan);
+
+            const patientCountSpan = document.createElement('small');
+            patientCountSpan.className = 'float-end text-muted fw-normal';
+            patientCountSpan.textContent = `${emp.maxPatients} P.`;
+            th.appendChild(patientCountSpan);
+
+            row.appendChild(th);
+
+            absenceWeeks.forEach(({ year, week }) => {
+                const thursday = getThursdayOfWeek(year, week);
+                const mondayOfWeek = new Date(thursday);
+                mondayOfWeek.setDate(thursday.getDate() - 3);
+
+                const countData = countPatientsForEmployee(emp.key, thursday);
+                const td = document.createElement('td');
+                td.className = 'text-center';
+
+                if (isEmployeeAbsentMajority(emp.key, mondayOfWeek)) {
+                    td.classList.add('bg-secondary-striped');
+                }
+
+                const maxPatients = emp.maxPatients || 0;
+                const warningThreshold = maxPatients < 6 ? maxPatients + 1 : maxPatients + 2;
+                const dangerThreshold = warningThreshold + 1;
+
+                if (countData.count >= dangerThreshold) {
+                    td.classList.add('text-danger');
+                } else if (countData.count >= warningThreshold) {
+                    td.classList.add('text-warning');
+                } else if (countData.count < maxPatients) {
+                    td.classList.add('text-success');
+                }
+
+                td.textContent = countData.count;
+                if (countData.patients.length > 0) {
+                    td.title = countData.patients.sort().join('\n');
+                }
+
+                row.appendChild(td);
+            });
+
+            tbody.appendChild(row);
+        });
+    }
+
+    function applyBackupAssignments() {
+        const allAssigned = affectedPatients.length === 0
+            ? false
+            : affectedPatients.every(patient => patient.backupEmployee);
+
+        affectedPatients.forEach(patient => {
+            const patientRecord = window['patients-station'][patient.id];
+            if (!patientRecord) return;
+
+            if (!patientRecord.employees) patientRecord.employees = [];
+
+            patientRecord.employees = patientRecord.employees.filter(emp => {
+                if (emp.employee === currentEmployeeKey) return true;
+
+                const empStart = parseGermanDate(emp.start);
+                const empEnd = emp.end ? parseGermanDate(emp.end) : new Date(2099, 11, 31);
+
+                return !(empStart <= absenceEndDate && empEnd >= absenceStartDate);
+            });
+
+            if (patient.backupEmployee) {
+                patientRecord.employees.push({
+                    employee: patient.backupEmployee,
+                    start: absenceStart,
+                    end: absenceEnd
+                });
+            }
+        });
+
+        const employee = window['employees'][currentEmployeeKey];
+        if (employee?.absences) {
+            const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
+            const absence = absencesArray.find(a => a.start === absenceStart && a.end === absenceEnd);
+            if (absence) {
+                absence.planned = allAssigned;
+            }
+        }
+
+        checkData();
+    }
+
+    function getWeekYear(date) {
+        const target = new Date(date.valueOf());
+        target.setHours(0, 0, 0, 0);
+        const dayNr = (date.getDay() + 6) % 7;
+        target.setDate(target.getDate() - dayNr + 3);
+        return target.getFullYear();
+    }
+
+    window.saveData = async function (objectName, fileName) {
+        await originalSaveData(objectName, fileName);
+        await originalSaveData('employees', 'mitarbeiter_innen');
+    };
+</script>

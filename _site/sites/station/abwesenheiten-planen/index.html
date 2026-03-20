@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PSOrga - Abwesenheiten</title>
+    <title>PSOrga - Abwesenheiten planen</title>
 
     
     <link href="../../../src/style.css" rel="stylesheet">
@@ -34,11 +34,11 @@
             }
         });
 
-        init('Abwesenheiten', '../../../');
+        init('Abwesenheiten planen', '../../../');
 
         window.addEventListener('directoryHandleInitialized', async function () {
             await loadData('employees', 'mitarbeiter_innen');
-            await checkLogin('Abwesenheiten', '../../../');
+            await checkLogin('Abwesenheiten planen', '../../../');
             window.dispatchEvent(new Event('baseDataLoaded'));
 
             showIfAuthorized('#navLinkWorkloadStation', 'workloadStation');
@@ -154,126 +154,153 @@
     </nav>
     <div class="container-fluid pb-3">
         
-<script src="../../../src/station/announcements.js"></script>
+<script src="../../../src/employees.js"></script>
 
-<style>
-    .month-row {
-        display: flex;
-        align-items: flex-start;
-        margin-bottom: 1rem;
-    }
-    .month-label {
-        min-width: 180px;
-        font-weight: bold;
-        padding-top: 0.5rem;
-    }
-    .date-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
-    .date-btn {
-        min-width: 120px;
-    }
-    .date-btn.next-sunday {
-        box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.5);
-    }
-</style>
-
-<div class="container-fluid">    
+<div class="container-fluid my-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1>Abwesenheiten</h1>
+            <h1>Abwesenheiten planen</h1>
         </div>
         <div>
-            <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='../abwesenheiten-planen/index.html'">
-                <i class="bi bi-calendar-date text-light me-1"></i> Planen
+            <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='../abwesenheiten/index.html'">
+                <i class="bi bi-arrow-left text-light me-1"></i> Zurück
             </button>
         </div>
     </div>
 
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle me-2"></i>
+        Hier sehen Sie alle anstehenden Abwesenheiten. Klicken Sie auf eine Abwesenheit, um die Vertretung zu planen.
+    </div>
 
-    <!-- Sunday buttons by month -->
-    <div id="sundayButtons">
-        <!-- Month rows will be added here dynamically -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Anstehende Abwesenheiten</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Mitarbeiter:in</th>
+                        <th>Von</th>
+                        <th>Bis</th>
+                        <th>Dauer</th>
+                        <th>Ankündigung</th>
+                        <th>Status</th>
+                        <th>Aktion</th>
+                    </tr>
+                </thead>
+                <tbody id="absencesTableBody">
+                    <!-- Absences will be added here -->
+                </tbody>
+            </table>
+            <div id="noAbsences" class="text-center text-muted py-4" style="display: none;">
+                Keine anstehenden Abwesenheiten gefunden.
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     window.addEventListener('baseDataLoaded', async function () {
-        renderSundayButtons();
+        loadMultipleData(['employees', 'patients-station'], function (result) {
+            renderAbsences();
+        });
     });
 
-    function renderSundayButtons() {
-        const container = document.getElementById('sundayButtons');
-        container.innerHTML = '';
+    function renderAbsences() {
+        const tbody = document.getElementById('absencesTableBody');
+        const noAbsencesDiv = document.getElementById('noAbsences');
+        tbody.innerHTML = '';
 
-        // Get current year and next year
-        const currentYear = new Date().getFullYear();
-        const years = [currentYear, currentYear + 1];
-
-        // Get all Sundays for both years
-        let allSundays = [];
-        years.forEach(year => {
-            allSundays = allSundays.concat(getSundaysForYear(year));
-        });
-
-        // Filter to show only future Sundays (from 2 months ago to 6 months ahead)
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const twoMonthsAgo = new Date(today);
-        twoMonthsAgo.setMonth(today.getMonth() - 2);
-        const sixMonthsAhead = new Date(today);
-        sixMonthsAhead.setMonth(today.getMonth() + 6);
 
-        const relevantSundays = allSundays.filter(sunday => 
-            sunday >= twoMonthsAgo && sunday <= sixMonthsAhead
-        );
+        const absences = [];
 
-        // Get next Sunday
-        const nextSunday = getNextAnnouncementSunday();
-        const nextSundayStr = formatDateToGerman(nextSunday);
+        // Collect all absences
+        Object.entries(window['employees'] || {}).forEach(([empKey, employee]) => {
+            if (!employee.absences) return;
 
-        // Group by month
-        const groupedSundays = groupSundaysByMonth(relevantSundays);
-
-        // Render each month
-        for (const [monthLabel, sundays] of Object.entries(groupedSundays)) {
-            const monthRow = document.createElement('div');
-            monthRow.className = 'month-row';
-
-            const monthLabelDiv = document.createElement('div');
-            monthLabelDiv.className = 'month-label';
-            monthLabelDiv.textContent = monthLabel;
-            monthRow.appendChild(monthLabelDiv);
-
-            const buttonsDiv = document.createElement('div');
-            buttonsDiv.className = 'date-buttons';
-
-            sundays.forEach(sunday => {
-                const dateStr = formatDateToGerman(sunday);
-                const isNextSunday = dateStr === nextSundayStr;
-
-                const btn = document.createElement('button');
-                btn.className = 'btn btn-outline-secondary date-btn';
-
-                if (isNextSunday) {
-                btn.className = 'btn btn-primary date-btn';
+            const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
+            
+            absencesArray.forEach(absence => {
+                const startDate = parseGermanDate(absence.start);
+                const endDate = parseGermanDate(absence.end);
+                
+                // Only show future absences longer than 1 day
+                if (endDate >= today) {
+                    const days = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                    if (days > 1) {
+                        absences.push({
+                            employeeKey: empKey,
+                            employeeName: employee.name,
+                            absence: absence,
+                            startDate: startDate,
+                            endDate: endDate,
+                            days: days
+                        });
+                    }
                 }
-
-                btn.innerHTML = `${getGermanWeekdayAbbr(sunday)} ${dateStr}`;
-                btn.onclick = () => navigateToDate(dateStr);
-
-                buttonsDiv.appendChild(btn);
             });
+        });
 
-            monthRow.appendChild(buttonsDiv);
-            container.appendChild(monthRow);
+        // Sort by start date
+        absences.sort((a, b) => a.startDate - b.startDate);
+
+        if (absences.length === 0) {
+            noAbsencesDiv.style.display = 'block';
+            return;
         }
-    }
 
-    function navigateToDate(dateStr) {
-        window.location.href = `ausdruck/index.html?date=${dateStr}`;
+        absences.forEach(item => {
+            const tr = document.createElement('tr');
+            
+            // Employee name
+            const tdName = document.createElement('td');
+            tdName.textContent = item.employeeName;
+            tr.appendChild(tdName);
+
+            // Start date
+            const tdStart = document.createElement('td');
+            tdStart.textContent = item.absence.start;
+            tr.appendChild(tdStart);
+
+            // End date
+            const tdEnd = document.createElement('td');
+            tdEnd.textContent = item.absence.end;
+            tr.appendChild(tdEnd);
+
+            // Duration
+            const tdDuration = document.createElement('td');
+            tdDuration.textContent = `${item.days} Tag${item.days > 1 ? 'e' : ''}`;
+            tr.appendChild(tdDuration);
+
+            // Announcement date
+            const tdAnnouncement = document.createElement('td');
+            tdAnnouncement.textContent = item.absence.announcement || '-';
+            tr.appendChild(tdAnnouncement);
+
+            // Status
+            const tdStatus = document.createElement('td');
+            if (item.absence.planned) {
+                tdStatus.innerHTML = '<span class="badge bg-success">Geplant</span>';
+            } else {
+                tdStatus.innerHTML = '<span class="badge bg-warning text-dark">Ungeplant</span>';
+            }
+            tr.appendChild(tdStatus);
+
+            // Action button
+            const tdAction = document.createElement('td');
+            const btn = document.createElement('a');
+            btn.className = 'btn btn-sm btn-primary';
+            btn.href = `planen/index.html?employee=${encodeURIComponent(item.employeeKey)}&start=${encodeURIComponent(item.absence.start)}&end=${encodeURIComponent(item.absence.end)}`;
+            btn.innerHTML = '<i class="bi bi-calendar-check text-light me-1"></i>Planen';
+            tdAction.appendChild(btn);
+            tr.appendChild(tdAction);
+
+            tbody.appendChild(tr);
+        });
     }
 </script>
 

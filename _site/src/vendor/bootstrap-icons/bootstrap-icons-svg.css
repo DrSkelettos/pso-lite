@@ -33,6 +33,10 @@
   background-image: url("./svg/calendar-x.svg");
 }
 
+.bi-calendar-check::before {
+  background-image: url("./svg/calendar-check.svg");
+}
+
 .bi-bar-chart::before {
   background-image: url("./svg/bar-chart.svg");
 }
