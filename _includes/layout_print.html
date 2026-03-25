@@ -85,6 +85,10 @@
 </head>
 
 <body>
+    {% if include_loading %}
+    {% include "loading-overlay.html" %}
+    {% endif %}
+
     {{ content}}
 
 </body>

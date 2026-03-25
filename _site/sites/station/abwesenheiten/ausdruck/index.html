@@ -86,6 +86,44 @@
 
 <body>
     
+    <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style="background-color: rgba(255, 255, 255, 0.95); z-index: 9999;">
+    <div class="text-center">
+        <!-- <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Laden...</span>
+        </div>
+        <h4 class="text-primary">Inhalt wird geladen</h4> -->
+    </div>
+</div>
+
+<script>
+    // Set a 3-second timeout to reload the page if loading doesn't complete
+    const loadingTimeout = setTimeout(function() {
+        console.warn('Loading timeout reached - reloading page');
+        window.location.reload();
+    }, 2000);
+
+    // Store timeout ID globally so it can be cleared when loading completes
+    window.loadingTimeout = loadingTimeout;
+
+    // Function to hide the loading overlay
+    window.hideLoadingOverlay = function() {
+        // Clear the timeout
+        if (window.loadingTimeout) {
+            clearTimeout(window.loadingTimeout);
+            window.loadingTimeout = null;
+        }
+        
+        // Remove the overlay
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+            overlay.remove();
+        }
+    };
+</script>
+
+    
+
+    
 <script src="../../../../src/station/announcements.js"></script>
 
 <style>
@@ -171,20 +209,25 @@
 </div>
 
 <script>
-    window.addEventListener('baseDataLoaded', async function () {
+    window.addEventListener('baseDataLoaded', async function()
+    {
         // Get date from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const dateParam = urlParams.get('date');
 
         let sundayDate;
-        if (dateParam) {
+        if (dateParam)
+        {
             // Check if it's German format (contains dots) or ISO format
-            if (dateParam.includes('.')) {
+            if (dateParam.includes('.'))
+            {
                 sundayDate = parseGermanDate(dateParam);
-            } else {
+            } else
+            {
                 sundayDate = new Date(dateParam);
             }
-        } else {
+        } else
+        {
             // Default to next Sunday
             sundayDate = getNextAnnouncementSunday();
         }
@@ -202,9 +245,13 @@
 
         // Render absences
         renderAbsences(sundayDate);
+
+        // Hide Loading overlay
+        window.hideLoadingOverlay();
     });
 
-    function renderAbsences(sundayDate) {
+    function renderAbsences(sundayDate)
+    {
         const tbody = document.getElementById('absencesBody');
         const table = document.getElementById('absencesTable');
         const noAbsencesDiv = document.getElementById('noAbsences');
@@ -217,10 +264,12 @@
         // Collect all relevant absences
         const absences = [];
 
-        Object.entries(window['employees']).forEach(([empKey, employee]) => {
+        Object.entries(window['employees']).forEach(([empKey, employee]) =>
+        {
             if (!employee.absences) return;
 
-            employee.absences.forEach(absence => {
+            employee.absences.forEach(absence =>
+            {
                 const startDate = parseGermanDate(absence.start);
                 const endDate = parseGermanDate(absence.end);
                 const announcementDate = absence.announcement ? parseGermanDate(absence.announcement) : null;
@@ -228,9 +277,10 @@
                 // Check conditions:
                 // 1. Announcement date must be set and <= the Sunday date (already announced)
                 // 2. End date must be >= Monday after Sunday (not yet in the past)
-                if (announcementDate && 
-                    announcementDate <= sundayDate && 
-                    endDate >= mondayAfterSunday) {
+                if (announcementDate &&
+                    announcementDate <= sundayDate &&
+                    endDate >= mondayAfterSunday)
+                {
                     absences.push({
                         name: employee.name,
                         startDate: startDate,
@@ -242,14 +292,16 @@
             });
         });
 
-        if (absences.length === 0) {
+        if (absences.length === 0)
+        {
             table.style.display = 'none';
             noAbsencesDiv.style.display = 'block';
             return;
         }
 
         // Sort by start date, then by name
-        absences.sort((a, b) => {
+        absences.sort((a, b) =>
+        {
             const dateCompare = a.startDate - b.startDate;
             if (dateCompare !== 0) return dateCompare;
             return a.name.localeCompare(b.name);
@@ -258,9 +310,10 @@
         noAbsencesDiv.style.display = 'none';
         tbody.innerHTML = '';
 
-        absences.forEach(absence => {
+        absences.forEach(absence =>
+        {
             const tr = document.createElement('tr');
-            
+
             const tdName = document.createElement('td');
             tdName.textContent = absence.name;
             tr.appendChild(tdName);
@@ -277,7 +330,6 @@
         });
     }
 </script>
-
 
 </body>
 

@@ -3,6 +3,7 @@ layout: layout.html
 active_abwesenheiten: active
 title: Abwesenheiten
 include_navigation: true
+include_loading: true
 dir: ../../../
 ---
 
@@ -54,6 +55,7 @@ dir: ../../../
 <script>
     window.addEventListener('baseDataLoaded', async function () {
         renderSundayButtons();
+        hideLoadingOverlay();
     });
 
     function renderSundayButtons() {

@@ -1,5 +1,6 @@
 ---
 layout: layout_print.html
+include_loading: true
 title: Abwesenheiten
 dir: ../../../../
 page_size: A4 portrait
@@ -91,20 +92,25 @@ page_width: 210mm
 </div>
 
 <script>
-    window.addEventListener('baseDataLoaded', async function () {
+    window.addEventListener('baseDataLoaded', async function()
+    {
         // Get date from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const dateParam = urlParams.get('date');
 
         let sundayDate;
-        if (dateParam) {
+        if (dateParam)
+        {
             // Check if it's German format (contains dots) or ISO format
-            if (dateParam.includes('.')) {
+            if (dateParam.includes('.'))
+            {
                 sundayDate = parseGermanDate(dateParam);
-            } else {
+            } else
+            {
                 sundayDate = new Date(dateParam);
             }
-        } else {
+        } else
+        {
             // Default to next Sunday
             sundayDate = getNextAnnouncementSunday();
         }
@@ -122,9 +128,13 @@ page_width: 210mm
 
         // Render absences
         renderAbsences(sundayDate);
+
+        // Hide Loading overlay
+        window.hideLoadingOverlay();
     });
 
-    function renderAbsences(sundayDate) {
+    function renderAbsences(sundayDate)
+    {
         const tbody = document.getElementById('absencesBody');
         const table = document.getElementById('absencesTable');
         const noAbsencesDiv = document.getElementById('noAbsences');
@@ -137,10 +147,12 @@ page_width: 210mm
         // Collect all relevant absences
         const absences = [];
 
-        Object.entries(window['employees']).forEach(([empKey, employee]) => {
+        Object.entries(window['employees']).forEach(([empKey, employee]) =>
+        {
             if (!employee.absences) return;
 
-            employee.absences.forEach(absence => {
+            employee.absences.forEach(absence =>
+            {
                 const startDate = parseGermanDate(absence.start);
                 const endDate = parseGermanDate(absence.end);
                 const announcementDate = absence.announcement ? parseGermanDate(absence.announcement) : null;
@@ -148,9 +160,10 @@ page_width: 210mm
                 // Check conditions:
                 // 1. Announcement date must be set and <= the Sunday date (already announced)
                 // 2. End date must be >= Monday after Sunday (not yet in the past)
-                if (announcementDate && 
-                    announcementDate <= sundayDate && 
-                    endDate >= mondayAfterSunday) {
+                if (announcementDate &&
+                    announcementDate <= sundayDate &&
+                    endDate >= mondayAfterSunday)
+                {
                     absences.push({
                         name: employee.name,
                         startDate: startDate,
@@ -162,14 +175,16 @@ page_width: 210mm
             });
         });
 
-        if (absences.length === 0) {
+        if (absences.length === 0)
+        {
             table.style.display = 'none';
             noAbsencesDiv.style.display = 'block';
             return;
         }
 
         // Sort by start date, then by name
-        absences.sort((a, b) => {
+        absences.sort((a, b) =>
+        {
             const dateCompare = a.startDate - b.startDate;
             if (dateCompare !== 0) return dateCompare;
             return a.name.localeCompare(b.name);
@@ -178,9 +193,10 @@ page_width: 210mm
         noAbsencesDiv.style.display = 'none';
         tbody.innerHTML = '';
 
-        absences.forEach(absence => {
+        absences.forEach(absence =>
+        {
             const tr = document.createElement('tr');
-            
+
             const tdName = document.createElement('td');
             tdName.textContent = absence.name;
             tr.appendChild(tdName);
