@@ -259,7 +259,21 @@ async function loadFile(fileName) {
         return JSON.parse(contents);
     } catch (error) {
         if (error.name === 'NotFoundError') {
-            throw new Error(`Datei nicht gefunden: ${fileName}`);
+            // If missing info.json, expose error. Otherwise create empty JSON file.
+            if (fileName.toLowerCase() === 'info.json') {
+                throw new Error(`Datei nicht gefunden: ${fileName}`);
+            }
+
+            try {
+                const fileHandle = await directoryHandle.getFileHandle(fileName, { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write('{}');
+                await writable.close();
+
+                return {};
+            } catch (createError) {
+                throw new Error(`Fehler beim Erstellen der Datei: ${createError.message}`);
+            }
         } else if (error instanceof SyntaxError) {
             throw new Error(`Ungültiges JSON-Format in Datei: ${fileName}`);
         }
