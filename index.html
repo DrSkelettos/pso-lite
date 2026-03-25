@@ -206,9 +206,9 @@ dir: ./
 
     function applyDashboardSettings() {
         const user = window['user'];
-        if (!user || !user.username) return;
+        if (!user || !user.key) return;
 
-        const employee = window['employees'][user.username];
+        const employee = window['employees'][user.key];
         if (!employee) return;
 
         const settings = employee.dashboardSettings || {};
