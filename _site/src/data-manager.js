@@ -31,7 +31,7 @@ function checkData() {
 }
 
 
-async function saveData(objectName, fileName) {
+async function saveData(objectName, fileName, callback = null) {
     await saveFile(fileName, window[objectName]);
 
     setOriginalData(objectName);

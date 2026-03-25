@@ -55,13 +55,40 @@ dir: ../../../
 </div>
 
 <script>
-    window.addEventListener('baseDataLoaded', async function () {
-        loadMultipleData(['employees', 'patients-station'], function (result) {
+    window.addEventListener('baseDataLoaded', async function()
+    {
+        loadMultipleData(['employees', 'patients-station'], function(result)
+        {
             renderAbsences();
         });
     });
 
-    function renderAbsences() {
+    async function toggleAbsencePlanned(employeeKey, startDate, endDate)
+    {
+        // Find the employee and absence
+        const employee = window['employees'][employeeKey];
+        if (!employee || !employee.absences) return;
+
+        const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
+
+        // Find the specific absence
+        const absenceToUpdate = absencesArray.find(absence =>
+            absence.start === startDate && absence.end === endDate
+        );
+
+        if (absenceToUpdate)
+        {
+            // Toggle the planned state
+            absenceToUpdate.planned = !absenceToUpdate.planned;
+
+            // Save the changes
+            await saveData('employees', 'mitarbeiter_innen');
+            renderAbsences();
+        }
+    }
+
+    function renderAbsences()
+    {
         const tbody = document.getElementById('absencesTableBody');
         const noAbsencesDiv = document.getElementById('noAbsences');
         tbody.innerHTML = '';
@@ -72,19 +99,23 @@ dir: ../../../
         const absences = [];
 
         // Collect all absences
-        Object.entries(window['employees'] || {}).forEach(([empKey, employee]) => {
+        Object.entries(window['employees'] || {}).forEach(([empKey, employee]) =>
+        {
             if (!employee.absences) return;
 
             const absencesArray = Array.isArray(employee.absences) ? employee.absences : [employee.absences];
-            
-            absencesArray.forEach(absence => {
+
+            absencesArray.forEach(absence =>
+            {
                 const startDate = parseGermanDate(absence.start);
                 const endDate = parseGermanDate(absence.end);
-                
+
                 // Only show future absences longer than 1 day
-                if (endDate >= today) {
+                if (endDate >= today)
+                {
                     const days = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-                    if (days > 1) {
+                    if (days > 1)
+                    {
                         absences.push({
                             employeeKey: empKey,
                             employeeName: employee.name,
@@ -101,14 +132,16 @@ dir: ../../../
         // Sort by start date
         absences.sort((a, b) => a.startDate - b.startDate);
 
-        if (absences.length === 0) {
+        if (absences.length === 0)
+        {
             noAbsencesDiv.style.display = 'block';
             return;
         }
 
-        absences.forEach(item => {
+        absences.forEach(item =>
+        {
             const tr = document.createElement('tr');
-            
+
             // Employee name
             const tdName = document.createElement('td');
             tdName.textContent = item.employeeName;
@@ -136,11 +169,26 @@ dir: ../../../
 
             // Status
             const tdStatus = document.createElement('td');
-            if (item.absence.planned) {
-                tdStatus.innerHTML = '<span class="badge bg-success">Geplant</span>';
-            } else {
-                tdStatus.innerHTML = '<span class="badge bg-warning text-dark">Ungeplant</span>';
+            const statusBadge = document.createElement('span');
+            statusBadge.className = 'badge';
+            statusBadge.style.cursor = 'pointer';
+
+            if (item.absence.planned)
+            {
+                statusBadge.className += ' bg-success';
+                statusBadge.textContent = 'Geplant';
+            } else
+            {
+                statusBadge.className += ' bg-warning text-dark';
+                statusBadge.textContent = 'Ungeplant';
             }
+
+            statusBadge.onclick = function()
+            {
+                toggleAbsencePlanned(item.employeeKey, item.absence.start, item.absence.end);
+            };
+
+            tdStatus.appendChild(statusBadge);
             tr.appendChild(tdStatus);
 
             // Action button
