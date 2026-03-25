@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>PSOrga - KoSi</title>
+    <title>PSOrga - Warteliste</title>
 
     
     <link href="../../../src/style.css" rel="stylesheet">
@@ -34,11 +34,11 @@
             }
         });
 
-        init('KoSi', '../../../');
+        init('Warteliste', '../../../');
 
         window.addEventListener('directoryHandleInitialized', async function () {
             await loadData('employees', 'mitarbeiter_innen');
-            await checkLogin('KoSi', '../../../');
+            await checkLogin('Warteliste', '../../../');
             window.dispatchEvent(new Event('baseDataLoaded'));
 
             showIfAuthorized('#navLinkWorkloadStation', 'workloadStation');
@@ -147,7 +147,7 @@
                 </div>
             </ul>
 
-            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('kosi-station', 'kostensicherung-station')">
+            <div id="data-changed" class="d-none ms-auto text-warning fw-bold cursor-pointer" onclick="saveData('', '')">
                 <div class="d-inline-block pb-1">Speichern notwendig!</div>
                 <i class="ms-2 bi bi-floppy-fill fs-4 text-warning"></i>
             </div>
@@ -192,52 +192,11 @@
     </nav>
     <div class="container-fluid pb-3">
         
-<script src="../../../src/station/kosi.js"></script>
+<div class="container my-5">
+    <h1>Warteliste</h1>
+    <p>Diese Seite ist reserviert für die Station-Warteliste (Inhalt noch leer).</p>
+</div>
 
-<style>
-    .table-bordered tr.border-bottom-3 {
-        border-bottom-width: 3px !important;
-    }
-
-    /* Unset background color for table cells to make borders visible */
-    .table>:not(caption)>*>* {
-        background-color: transparent !important;
-    }
-
-    /* Preserve background color for specific classes */
-    .table>:not(caption)>.table-light>*,
-    .table>:not(caption)>* .bg-secondary-striped {
-        background-color: var(--bs-table-bg) !important;
-    }
-</style>
-
-
-<table id="kosiTable" class="table table-sm table-bordered table-hover align-middle">
-    <thead>
-        <tr class="text-center table-light">
-            <th class="text-start">Patient:in</th>
-            <th width="100">Aufnahme</th>
-            <th width="50">AD</th>
-            <th width="100">Entlassung</th>
-            <th width="100">KOÜB</th>
-            <th width="100">Verlängerung</th>
-            <th width="50">ED</th>
-            <th width="50">FA</th>
-            <th width="50">Aktion</th>
-        </tr>
-    </thead>
-    <tbody>
-
-    </tbody>
-</table>
-
-<script>
-    window.addEventListener('baseDataLoaded', async function () {
-        loadMultipleData(['patients-station', 'kosi-station'], function (result) {
-            fillKosiTable();
-        });
-    });
-</script>
     </div>
 
 </body>

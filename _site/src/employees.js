@@ -71,6 +71,8 @@ function editEmployee(empKey) {
     document.getElementById('editEmployeeRightsEditTherapiesStation').checked = employee.rights?.editTherapiesStation || false;
     document.getElementById('editEmployeeRightsViewRoundsStation').checked = employee.rights?.viewRoundsStation || false;
     document.getElementById('editEmployeeRightsEditRoundsStation').checked = employee.rights?.editRoundsStation || false;
+    document.getElementById('editEmployeeRightsViewStationWaitlist').checked = employee.rights?.viewStationWaitlist || false;
+    document.getElementById('editEmployeeRightsEditStationWaitlist').checked = employee.rights?.editStationWaitlist || false;
     document.getElementById('editEmployeeRightsKosiStation').checked = employee.rights?.kosiStation || false;
     document.getElementById('editEmployeeRightsWorkloadStation').checked = employee.rights?.workloadStation || false;
     document.getElementById('editEmployeeRightsEditEvents').checked = employee.rights?.editEvents || false;
@@ -281,6 +283,8 @@ async function saveEmployeeEdit() {
     rights.editTherapiesStation = document.getElementById('editEmployeeRightsEditTherapiesStation').checked;
     rights.viewRoundsStation = document.getElementById('editEmployeeRightsViewRoundsStation').checked;
     rights.editRoundsStation = document.getElementById('editEmployeeRightsEditRoundsStation').checked;
+    rights.viewStationWaitlist = document.getElementById('editEmployeeRightsViewStationWaitlist').checked;
+    rights.editStationWaitlist = document.getElementById('editEmployeeRightsEditStationWaitlist').checked;
     rights.workloadStation = document.getElementById('editEmployeeRightsWorkloadStation').checked;
     rights.kosiStation = document.getElementById('editEmployeeRightsKosiStation').checked;
     rights.editEvents = document.getElementById('editEmployeeRightsEditEvents').checked;

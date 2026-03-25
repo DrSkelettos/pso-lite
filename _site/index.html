@@ -47,11 +47,12 @@
             showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
             showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
             showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
+            showIfAuthorized('#navLinkWaitlistStation', 'viewStationWaitlist');
             showIfAuthorized('#navLinkAnnouncementsStation', 'viewAnnouncementsStation');
             showIfAuthorized('#navLinkAbsencesStation', 'viewAnnouncementsStation');
             showIfAuthorized('#navLinkTherapyplanStation', 'viewAnnouncementsStation');
             // Show Station dropdown if user has any station-related rights
-            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation') || authorize('editTherapyplanStation')) {
+            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation') || authorize('editTherapyplanStation') || authorize('viewStationWaitlist')) {
                 document.getElementById('navLinkStation').classList.remove('hidden');
             }
             showIfAuthorized('#navLinkStationDivider1', 'viewAnnouncementsStation');
@@ -133,6 +134,7 @@
                             <li><a class="dropdown-item hidden" id="navLinkTherapiesStation" href="./sites/station/therapiezuordnung/index.html"><i class="bi bi-list-columns me-1"></i> Therapiezuordnung</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkPoststationaer" href="./sites/station/poststationaer/index.html"><i class="bi bi-person-x me-1"></i> Poststationär</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkRoundsStation" href="./sites/station/chefaerztinvisite/index.html"><i class="bi bi-eye me-1"></i> Chefärztinvisite</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkWaitlistStation" href="./sites/station/waitlist/index.html"><i class="bi bi-list-check me-1"></i> Warteliste</a></li>
                             <li class="dropdown-divider hidden" id="navLinkStationDivider1"></li>
                             <li><a class="dropdown-item hidden" id="navLinkAnnouncementsStation" href="./sites/station/ankuendigungen/index.html"><i class="bi bi-megaphone me-1"></i> Ankündigungen</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkAbsencesStation" href="./sites/station/abwesenheiten/index.html"><i class="bi bi-calendar-x me-1"></i> Abwesenheiten</a></li>
@@ -251,6 +253,19 @@
                 <div class="card-body">
                     <h5 class="card-title">Chefärztinvisite</h5>
                     <p class="card-text">Planung für die Chefärztinvisite</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Warteliste -->
+        <div id="dashboardLinkWaitlistStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" id="dashboardCardWarteliste" onclick="window.location.href='sites/station/waitlist/index.html';">
+                <div class="card-header">
+                    <i class="bi bi-list-check" style="font-size: 3rem;"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Warteliste</h5>
+                    <p class="card-text">Geplante Patient:innen für Station</p>
                 </div>
             </div>
         </div>
@@ -420,6 +435,10 @@
         }
         if (settings.showAbwesenheiten === false || !authorize('viewAnnouncementsStation')) {
             const element = document.getElementById('dashboardLinkAbsencesStation');
+            if (element) element.remove();
+        }
+        if (settings.showWarteliste === false || !authorize('viewStationWaitlist')) {
+            const element = document.getElementById('dashboardLinkWaitlistStation');
             if (element) element.remove();
         }
 

@@ -65,6 +65,10 @@
   background-image: url("./svg/list-columns.svg");
 }
 
+.bi-list-check::before {
+  background-image: url("./svg/list-check.svg");
+}
+
 .bi-pencil::before {
   background-image: url("./svg/pencil.svg");
 }

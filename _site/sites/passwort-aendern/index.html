@@ -47,11 +47,12 @@
             showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
             showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
             showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
+            showIfAuthorized('#navLinkWaitlistStation', 'viewStationWaitlist');
             showIfAuthorized('#navLinkAnnouncementsStation', 'viewAnnouncementsStation');
             showIfAuthorized('#navLinkAbsencesStation', 'viewAnnouncementsStation');
             showIfAuthorized('#navLinkTherapyplanStation', 'viewAnnouncementsStation');
             // Show Station dropdown if user has any station-related rights
-            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation') || authorize('editTherapyplanStation')) {
+            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation') || authorize('editTherapyplanStation') || authorize('viewStationWaitlist')) {
                 document.getElementById('navLinkStation').classList.remove('hidden');
             }
             showIfAuthorized('#navLinkStationDivider1', 'viewAnnouncementsStation');

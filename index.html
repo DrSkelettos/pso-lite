@@ -72,6 +72,19 @@ dir: ./
             </div>
         </div>
 
+        <!-- Warteliste -->
+        <div id="dashboardLinkWaitlistStation" style="flex: 1;">
+            <div class="card text-center cursor-pointer h-100" id="dashboardCardWarteliste" onclick="window.location.href='sites/station/waitlist/index.html';">
+                <div class="card-header">
+                    <i class="bi bi-list-check" style="font-size: 3rem;"></i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Warteliste</h5>
+                    <p class="card-text">Geplante Patient:innen für Station</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Ankündigungen -->
         <div id="dashboardLinkAnnouncementsStation" style="flex: 1;">
             <div class="card text-center cursor-pointer h-100" id="dashboardCardAnkündigungen" onclick="window.location.href='sites/station/ankuendigungen/index.html';">
@@ -237,6 +250,10 @@ dir: ./
         }
         if (settings.showAbwesenheiten === false || !authorize('viewAnnouncementsStation')) {
             const element = document.getElementById('dashboardLinkAbsencesStation');
+            if (element) element.remove();
+        }
+        if (settings.showWarteliste === false || !authorize('viewStationWaitlist')) {
+            const element = document.getElementById('dashboardLinkWaitlistStation');
             if (element) element.remove();
         }
 

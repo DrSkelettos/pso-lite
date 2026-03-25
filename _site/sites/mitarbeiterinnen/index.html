@@ -47,11 +47,12 @@
             showIfAuthorized('#navLinkTherapiesStation', 'viewTherapiesStation');
             showIfAuthorized('#navLinkPoststationaer', 'editTherapiesStation');
             showIfAuthorized('#navLinkRoundsStation', 'viewRoundsStation');
+            showIfAuthorized('#navLinkWaitlistStation', 'viewStationWaitlist');
             showIfAuthorized('#navLinkAnnouncementsStation', 'viewAnnouncementsStation');
             showIfAuthorized('#navLinkAbsencesStation', 'viewAnnouncementsStation');
             showIfAuthorized('#navLinkTherapyplanStation', 'viewAnnouncementsStation');
             // Show Station dropdown if user has any station-related rights
-            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation') || authorize('editTherapyplanStation')) {
+            if (authorize('viewPatientsStation') || authorize('viewAnnouncementsStation') || authorize('editTherapyplanStation') || authorize('viewStationWaitlist')) {
                 document.getElementById('navLinkStation').classList.remove('hidden');
             }
             showIfAuthorized('#navLinkStationDivider1', 'viewAnnouncementsStation');
@@ -133,6 +134,7 @@
                             <li><a class="dropdown-item hidden" id="navLinkTherapiesStation" href="../../sites/station/therapiezuordnung/index.html"><i class="bi bi-list-columns me-1"></i> Therapiezuordnung</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkPoststationaer" href="../../sites/station/poststationaer/index.html"><i class="bi bi-person-x me-1"></i> Poststationär</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkRoundsStation" href="../../sites/station/chefaerztinvisite/index.html"><i class="bi bi-eye me-1"></i> Chefärztinvisite</a></li>
+                            <li><a class="dropdown-item hidden" id="navLinkWaitlistStation" href="../../sites/station/waitlist/index.html"><i class="bi bi-list-check me-1"></i> Warteliste</a></li>
                             <li class="dropdown-divider hidden" id="navLinkStationDivider1"></li>
                             <li><a class="dropdown-item hidden" id="navLinkAnnouncementsStation" href="../../sites/station/ankuendigungen/index.html"><i class="bi bi-megaphone me-1"></i> Ankündigungen</a></li>
                             <li><a class="dropdown-item hidden" id="navLinkAbsencesStation" href="../../sites/station/abwesenheiten/index.html"><i class="bi bi-calendar-x me-1"></i> Abwesenheiten</a></li>
@@ -467,6 +469,14 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditRoundsStation">
                                 <label class="form-check-label" for="editEmployeeRightsEditRoundsStation">Station: CÄV bearbeiten</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsViewStationWaitlist">
+                                <label class="form-check-label" for="editEmployeeRightsViewStationWaitlist">Station: Warteliste anzeigen</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="editEmployeeRightsEditStationWaitlist">
+                                <label class="form-check-label" for="editEmployeeRightsEditStationWaitlist">Station: Warteliste bearbeiten</label>
                             </div>
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" id="editEmployeeRightsKosiStation">
