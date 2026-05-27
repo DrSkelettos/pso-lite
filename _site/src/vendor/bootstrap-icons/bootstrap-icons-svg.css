@@ -73,6 +73,10 @@
   background-image: url("./svg/pencil.svg");
 }
 
+.bi-pause-circle::before {
+  background-image: url("./svg/pause-circle.svg");
+}
+
 .bi-pencil-square::before {
   background-image: url("./svg/pencil-square.svg");
 }

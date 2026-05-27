@@ -6,6 +6,7 @@
 let roundsData = {};
 let currentRoundsDate = null;
 let draggedElement = null;
+let placeholderIdCounter = 0;
 
 /**
  * Initialize the rounds module
@@ -89,7 +90,17 @@ function initRoundsEventListeners() {
     document.getElementById('savePatientAdditionalContent').addEventListener('click', function () {
         savePatientAdditionalContent();
     });
-    
+
+    // Add placeholder button
+    document.getElementById('addPlaceholderBtn').addEventListener('click', function () {
+        showPlaceholderModal(null);
+    });
+
+    // Save placeholder button
+    document.getElementById('savePlaceholderBtn').addEventListener('click', function () {
+        savePlaceholderFromModal();
+    });
+
     // Add context menu event listener to the edit rounds table
     document.getElementById('editRoundsPatientsTable').addEventListener('contextmenu', function(e) {
         // Find the closest row element
@@ -248,8 +259,9 @@ function addPatientToAddRoundsTable(patient, index, table) {
  * @param {Object} patient - Patient object
  * @param {number} index - Index for ordering
  * @param {HTMLElement} table - Table to add patient to
+ * @param {boolean} hidden - Whether the patient is hidden from rounds
  */
-function addPatientToEditRoundsTable(patient, index, table) {
+function addPatientToEditRoundsTable(patient, index, table, hidden = false) {
     // Get the date - either from editRoundsDate or viewRoundsDate
     let germanDateStr;
     if (document.getElementById('editRoundsDate').value) {
@@ -274,6 +286,20 @@ function addPatientToEditRoundsTable(patient, index, table) {
     row.addEventListener('dragleave', handleDragLeave);
     row.addEventListener('drop', handleDrop);
     row.addEventListener('dragend', handleDragEnd);
+
+    // Add double-click to toggle hidden state
+    row.addEventListener('dblclick', function (e) {
+        if (e.target.tagName === 'BUTTON' || e.target.closest('button')) return;
+        togglePatientHidden(row, tbody);
+    });
+
+    // Apply hidden state if specified
+    if (hidden) {
+        row.setAttribute('data-hidden', 'true');
+        row.style.opacity = '0.5';
+        row.removeAttribute('draggable');
+        row.classList.remove('cursor-move');
+    }
 
     // Order cell (hidden)
     const orderCell = row.insertCell();
@@ -385,6 +411,155 @@ function makeTableSortable(table) {
 }
 
 /**
+ * Add a placeholder row to the edit rounds table
+ * @param {Object} placeholder - Placeholder object { title, duration }
+ * @param {HTMLElement} table - Table to add the placeholder to
+ * @returns {HTMLElement} - The created row
+ */
+function addPlaceholderToEditRoundsTable(placeholder, table) {
+    const tbody = table.tBodies[0];
+    const row = tbody.insertRow();
+    const id = 'ph-' + (++placeholderIdCounter);
+
+    row.setAttribute('data-placeholder-id', id);
+    row.setAttribute('data-placeholder-title', placeholder.title || '');
+    row.setAttribute('data-placeholder-duration', placeholder.duration || 30);
+    row.setAttribute('draggable', 'true');
+    row.classList.add('cursor-move');
+
+    row.addEventListener('dragstart', handleDragStart);
+    row.addEventListener('dragover', handleDragOver);
+    row.addEventListener('dragenter', handleDragEnter);
+    row.addEventListener('dragleave', handleDragLeave);
+    row.addEventListener('drop', handleDrop);
+    row.addEventListener('dragend', handleDragEnd);
+
+    // Order cell (hidden, to match patient row structure)
+    const orderCell = row.insertCell();
+    orderCell.classList.add('d-none');
+
+    // Time cell
+    row.insertCell();
+
+    // Content cell spanning remaining columns
+    const contentCell = row.insertCell();
+    contentCell.colSpan = 8;
+    contentCell.classList.add('align-middle');
+
+    updatePlaceholderRowContent(row);
+    return row;
+}
+
+/**
+ * Update the visual content of a placeholder row
+ * @param {HTMLElement} row - Placeholder row element
+ */
+function updatePlaceholderRowContent(row) {
+    const title = row.getAttribute('data-placeholder-title') || '';
+    const duration = parseInt(row.getAttribute('data-placeholder-duration')) || 30;
+    const contentCell = row.cells[2];
+
+    contentCell.innerHTML =
+        `<span class="badge bg-warning text-dark me-2"><i class="bi bi-pause-circle me-1"></i>Platzhalter</span>` +
+        `<span class="fw-medium">${title ? escapeHtml(title) : '<em class="text-muted">Kein Titel</em>'}</span>` +
+        `<span class="text-muted ms-2">(${duration} Min.)</span>` +
+        `<div class="float-end">` +
+        `  <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="showPlaceholderModal(this.closest('tr'))"><i class="bi bi-pencil"></i></button>` +
+        `  <button type="button" class="btn btn-sm btn-outline-danger" onclick="removePlaceholder(this.closest('tr'))"><i class="bi bi-trash"></i></button>` +
+        `</div>`;
+}
+
+/**
+ * Remove a placeholder row from the table
+ * @param {HTMLElement} row - Placeholder row element
+ */
+function removePlaceholder(row) {
+    const tbody = row.parentNode;
+    row.remove();
+    updateRowOrder(tbody);
+}
+
+/**
+ * Show the placeholder add/edit modal
+ * @param {HTMLElement|null} editRow - Existing placeholder row to edit, or null to add new
+ */
+function showPlaceholderModal(editRow = null) {
+    const modal = document.getElementById('placeholderModal');
+    if (editRow) {
+        modal.querySelector('#placeholderTitle').value = editRow.getAttribute('data-placeholder-title') || '';
+        modal.querySelector('#placeholderDuration').value = editRow.getAttribute('data-placeholder-duration') || 30;
+        modal.setAttribute('data-edit-row-id', editRow.getAttribute('data-placeholder-id'));
+    } else {
+        modal.querySelector('#placeholderTitle').value = '';
+        modal.querySelector('#placeholderDuration').value = 30;
+        modal.removeAttribute('data-edit-row-id');
+    }
+    new bootstrap.Modal(modal).show();
+}
+
+/**
+ * Save placeholder data from modal (add or edit)
+ */
+function savePlaceholderFromModal() {
+    const modal = document.getElementById('placeholderModal');
+    const title = modal.querySelector('#placeholderTitle').value.trim();
+    const duration = parseInt(modal.querySelector('#placeholderDuration').value) || 30;
+    const editRowId = modal.getAttribute('data-edit-row-id');
+
+    if (editRowId) {
+        const row = document.querySelector(`[data-placeholder-id="${editRowId}"]`);
+        if (row) {
+            row.setAttribute('data-placeholder-title', title);
+            row.setAttribute('data-placeholder-duration', duration);
+            updatePlaceholderRowContent(row);
+            updateRowOrder(row.parentNode);
+        }
+    } else {
+        const table = document.getElementById('editRoundsPatientsTable');
+        addPlaceholderToEditRoundsTable({ title, duration }, table);
+        updateRowOrder(table.tBodies[0]);
+    }
+
+    bootstrap.Modal.getInstance(modal).hide();
+}
+
+/**
+ * Toggle a patient row's hidden state in the edit table
+ * @param {HTMLElement} row - Patient row element
+ * @param {HTMLElement} tbody - Table body element
+ */
+function togglePatientHidden(row, tbody) {
+    const isHidden = row.getAttribute('data-hidden') === 'true';
+
+    // Remove additional content rows before repositioning
+    Array.from(tbody.querySelectorAll('.additional-content-row')).forEach(r => r.remove());
+
+    if (isHidden) {
+        // Un-hide: restore draggable, move before first hidden row
+        row.removeAttribute('data-hidden');
+        row.style.opacity = '';
+        row.setAttribute('draggable', 'true');
+        row.classList.add('cursor-move');
+
+        const firstHiddenRow = Array.from(tbody.rows).find(
+            r => r.getAttribute('data-hidden') === 'true' && r !== row
+        );
+        if (firstHiddenRow) {
+            tbody.insertBefore(row, firstHiddenRow);
+        }
+    } else {
+        // Hide: remove draggable, move to end
+        row.setAttribute('data-hidden', 'true');
+        row.style.opacity = '0.5';
+        row.removeAttribute('draggable');
+        row.classList.remove('cursor-move');
+        tbody.appendChild(row);
+    }
+
+    updateRowOrder(tbody);
+}
+
+/**
  * Handle drag start event
  * @param {Event} e - Drag event
  */
@@ -454,6 +629,12 @@ function handleDragLeave(e) {
 function handleDrop(e) {
     e.stopPropagation();
 
+    // Don't allow dropping onto hidden patient rows
+    if (this.getAttribute('data-hidden') === 'true') {
+        handleDragEnd.call(draggedElement, e);
+        return false;
+    }
+
     // Remove existing additional content rows before reordering
     const tbody = this.parentNode;
     Array.from(tbody.querySelectorAll('.additional-content-row')).forEach(row => row.remove());
@@ -517,80 +698,70 @@ function updateRowOrder(tbody) {
     // Remove previously generated additional content rows
     Array.from(tbody.querySelectorAll('.additional-content-row')).forEach(row => row.remove());
 
-    const patientRows = Array.from(tbody.rows).filter(row => row.hasAttribute('data-patient-id'));
+    const startTimeInput = tbody.closest('table').id === 'addRoundsPatientsTable' ?
+        document.getElementById('roundsStartTime') :
+        document.getElementById('editRoundsStartTime');
+    const startTime = (startTimeInput && startTimeInput.value) ? startTimeInput.value : '08:30';
 
-    patientRows.forEach((row, idx) => {
-        // Update order index
-        row.cells[0].textContent = idx;
+    let timeSlot = startTime;
+    let visibleIndex = 0;
 
-        // Update time slot
-        const startTimeInput = tbody.closest('table').id === 'addRoundsPatientsTable' ?
-            document.getElementById('roundsStartTime') :
-            document.getElementById('editRoundsStartTime');
-        const startTime = startTimeInput.value || '08:30';
+    Array.from(tbody.rows).forEach((row) => {
+        // Skip additional content rows
+        if (row.classList.contains('additional-content-row')) return;
 
-        let timeSlot = startTime;
-        for (let i = 0; i < idx; i++) {
-            timeSlot = incrementTimeBy10Minutes(timeSlot);
+        // Hidden patient: no time shown
+        if (row.getAttribute('data-hidden') === 'true') {
+            row.cells[0].textContent = '';
+            row.cells[1].textContent = '';
+            return;
         }
-        row.cells[1].textContent = timeSlot;
 
-        // Update Termine cell with conflict highlighting
-        // Get patient ID
+        // Placeholder row: show start time, then advance by duration
+        if (row.hasAttribute('data-placeholder-id')) {
+            const duration = parseInt(row.getAttribute('data-placeholder-duration')) || 0;
+            row.cells[1].textContent = timeSlot;
+            timeSlot = incrementTimeByMinutes(timeSlot, duration);
+            return;
+        }
+
+        // Normal patient row
+        if (!row.hasAttribute('data-patient-id')) return;
+
+        row.cells[0].textContent = visibleIndex;
+        const currentTimeSlot = timeSlot;
+        row.cells[1].textContent = currentTimeSlot;
+        timeSlot = incrementTimeBy10Minutes(timeSlot);
+        visibleIndex++;
+
         const patientId = row.getAttribute('data-patient-id');
-
-        // Find the patient object
         const patient = window['patients-station'] ? window['patients-station'][patientId] : null;
         if (!patient) return;
-
-        // Add ID to patient object for consistency with other functions
         patient.id = patientId;
 
-        // Check for event conflicts with the new time slot
-        const eventConflicts = checkPatientEventConflicts(patient, germanDateStr, timeSlot);
-
-        // Get the Termine cell (fifth cell)
+        // Check for event conflicts with the patient's time slot
+        const eventConflicts = checkPatientEventConflicts(patient, germanDateStr, currentTimeSlot);
         const termineCell = row.cells[5];
-
-        // Clear existing content and classes
         termineCell.textContent = '';
-
-        // Get all events including custom events
         const allEvents = getPatientEvents(patient, germanDateStr);
-        
-        // Set the events text
         termineCell.textContent = allEvents;
 
-        // If there are conflicts, highlight the Termine cell and make conflicting events bold
-        if (eventConflicts.hasConflict) {
-
-            // Make conflicting events bold
-            if (eventConflicts.conflictingEvents.length > 0) {
-                // Replace the text with HTML that has bold conflicting events
-                termineCell.textContent = '';
-
-                const eventsArray = allEvents.split(', ');
-                eventsArray.forEach((event, i) => {
-                    // Check if this event is in the conflicting events list
-                    const isConflicting = eventConflicts.conflictingEvents.includes(event);
-
-                    // Create a span for the event
-                    const eventSpan = document.createElement('span');
-                    if (isConflicting) {
-                        eventSpan.style.fontWeight = 'bold';
-                        eventSpan.classList.add('text-danger');
-                    }
-                    eventSpan.textContent = event;
-
-                    // Add the span to the cell
-                    termineCell.appendChild(eventSpan);
-
-                    // Add comma if not the last event
-                    if (i < eventsArray.length - 1) {
-                        termineCell.appendChild(document.createTextNode(', '));
-                    }
-                });
-            }
+        if (eventConflicts.hasConflict && eventConflicts.conflictingEvents.length > 0) {
+            termineCell.textContent = '';
+            const eventsArray = allEvents.split(', ');
+            eventsArray.forEach((event, i) => {
+                const isConflicting = eventConflicts.conflictingEvents.includes(event);
+                const eventSpan = document.createElement('span');
+                if (isConflicting) {
+                    eventSpan.style.fontWeight = 'bold';
+                    eventSpan.classList.add('text-danger');
+                }
+                eventSpan.textContent = event;
+                termineCell.appendChild(eventSpan);
+                if (i < eventsArray.length - 1) {
+                    termineCell.appendChild(document.createTextNode(', '));
+                }
+            });
         }
 
         // WE cell (weekend) - empty as requested
@@ -662,7 +833,8 @@ function createNewRounds() {
         date: germanDateStr,
         title: 'Chefärztinvisite', // Default title
         startTime: '08:30', // Default start time
-        patients: patientOrder
+        patients: patientOrder,
+        hiddenPatients: []
     };
 
     // Initialize window['rounds-station'] if it doesn't exist
@@ -736,107 +908,129 @@ function populateRoundsTable(rounds, hideInternal = false) {
 
     // Add rows for patients in the saved order, skipping those no longer active
     let timeSlot = rounds.startTime;
+    const hiddenPatientsSet = new Set(rounds.hiddenPatients || []);
 
-    rounds.patients.forEach(patientId => {
-        if (activePatientsMap[patientId]) {
-            const patient = activePatientsMap[patientId];
-
-            const row = tbody.insertRow();
-
-            // Time slot
-            const timeCell = row.insertCell();
-            timeCell.textContent = timeSlot;
-
-            // Name cell
-            const nameCell = row.insertCell();
-            nameCell.textContent = patient.name;
-
-            // Employee cell
-            const empCell = row.insertCell();
-            empCell.classList.add('text-center');
-            const activeEmployee = getActiveEmployee(patient, rounds.date);
-            empCell.textContent = activeEmployee;
-
-            // Group cell
-            const groupCell = row.insertCell();
-            groupCell.classList.add('text-center');
-            groupCell.textContent = patient.group || '';
-
-            // Termine cell with events
-            if (!hideInternal) {
-                const termineCell = row.insertCell();
-                termineCell.classList.add('text-center');
-                termineCell.textContent = getPatientEvents(patient, rounds.date);
+    rounds.patients.forEach(item => {
+        // Handle placeholder
+        if (item && typeof item === 'object' && item.type === 'placeholder') {
+            if (item.title) {
+                // Show a full-width placeholder row with the title
+                const colspan = hideInternal ? 4 : 9;
+                const row = tbody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = colspan;
+                cell.textContent = item.title;
+                cell.classList.add('text-center', 'fw-medium', 'fst-italic', 'bg-light');
             }
+            // Always advance the time by the placeholder duration
+            timeSlot = incrementTimeByMinutes(timeSlot, item.duration || 0);
+            return;
+        }
 
-            // Therapy week cell
-            if (!hideInternal) {
-                const weekCell = row.insertCell();
-                weekCell.classList.add('text-center');
-                const weekNumber = parseInt(calculatePatientWeek(patient.admission, parseGermanDate(rounds.date)));
-                weekCell.textContent = weekNumber.toString();
-                
-                // Bold if week > 5 and no discharge date and no E-Modus
-                if (weekNumber > 5 && !patient.discharge && !patient.discharge_mode) {
-                    weekCell.style.fontWeight = 'bold';
-                }
+        // Handle regular patient
+        const patientId = item;
+        if (!patientId || hiddenPatientsSet.has(patientId)) return;
+        if (!activePatientsMap[patientId]) return;
+
+        const patient = activePatientsMap[patientId];
+
+        const row = tbody.insertRow();
+
+        // Time slot
+        const timeCell = row.insertCell();
+        timeCell.textContent = timeSlot;
+
+        // Name cell
+        const nameCell = row.insertCell();
+        nameCell.textContent = patient.name;
+
+        // Employee cell
+        const empCell = row.insertCell();
+        empCell.classList.add('text-center');
+        const activeEmployee = getActiveEmployee(patient, rounds.date);
+        empCell.textContent = activeEmployee;
+
+        // Group cell
+        const groupCell = row.insertCell();
+        groupCell.classList.add('text-center');
+        groupCell.textContent = patient.group || '';
+
+        // Termine cell with events
+        if (!hideInternal) {
+            const termineCell = row.insertCell();
+            termineCell.classList.add('text-center');
+            termineCell.textContent = getPatientEvents(patient, rounds.date);
+        }
+
+        // Therapy week cell
+        if (!hideInternal) {
+            const weekCell = row.insertCell();
+            weekCell.classList.add('text-center');
+            const weekNumber = parseInt(calculatePatientWeek(patient.admission, parseGermanDate(rounds.date)));
+            weekCell.textContent = weekNumber.toString();
+            
+            // Bold if week > 5 and no discharge date and no E-Modus
+            if (weekNumber > 5 && !patient.discharge && !patient.discharge_mode) {
+                weekCell.style.fontWeight = 'bold';
             }
+        }
 
-            // Discharge date cell
-            if (!hideInternal) {
-                const dischargeCell = row.insertCell();
-                dischargeCell.classList.add('text-center');
+        // Discharge date cell
+        if (!hideInternal) {
+            const dischargeCell = row.insertCell();
+            dischargeCell.classList.add('text-center');
+            
+            // Check if week > 5 and no discharge date and no E-Modus - add "?"
+            const weekNumber = parseInt(calculatePatientWeek(patient.admission, parseGermanDate(rounds.date)));
+            if (weekNumber > 5 && !patient.discharge && !patient.discharge_mode) {
+                dischargeCell.textContent = '?';
+            } else {
+                dischargeCell.textContent = patient.discharge || '';
                 
-                // Check if week > 5 and no discharge date and no E-Modus - add "?"
-                const weekNumber = parseInt(calculatePatientWeek(patient.admission, parseGermanDate(rounds.date)));
-                if (weekNumber > 5 && !patient.discharge && !patient.discharge_mode) {
-                    dischargeCell.textContent = '?';
-                } else {
-                    dischargeCell.textContent = patient.discharge || '';
+                // Bold if discharge date is in current or next week
+                if (patient.discharge) {
+                    const dischargeDate = parseGermanDate(patient.discharge);
+                    const roundsDate = parseGermanDate(rounds.date);
+                    const daysDiff = Math.floor((dischargeDate - roundsDate) / (24 * 60 * 60 * 1000));
                     
-                    // Bold if discharge date is in current or next week
-                    if (patient.discharge) {
-                        const dischargeDate = parseGermanDate(patient.discharge);
-                        const roundsDate = parseGermanDate(rounds.date);
-                        const daysDiff = Math.floor((dischargeDate - roundsDate) / (24 * 60 * 60 * 1000));
-                        
-                        // Bold if discharge is within 0-13 days (current week + next week)
-                        if (daysDiff >= 0 && daysDiff <= 13) {
-                            dischargeCell.style.fontWeight = 'bold';
-                        }
+                    // Bold if discharge is within 0-13 days (current week + next week)
+                    if (daysDiff >= 0 && daysDiff <= 13) {
+                        dischargeCell.style.fontWeight = 'bold';
                     }
                 }
             }
-
-            // Discharge mode cell
-            if (!hideInternal) {
-                const dischargeModeCell = row.insertCell();
-                dischargeModeCell.classList.add('text-center');
-                dischargeModeCell.textContent = patient.discharge_mode || '';
-            }
-
-            // WE cell (weekend) - empty as requested
-            if (!hideInternal) {
-                const weCell = row.insertCell();
-                weCell.classList.add('text-center');
-                weCell.textContent = '';
-            }
-
-            // Add additional content row if there is any content
-            if (!hideInternal) {
-                createAdditionalContentRow(patient, tbody, 9);
-            }
-
-            // Remove from map to track which patients we've included
-            delete activePatientsMap[patientId];
-
-            // Increment time slot by 10 minutes
-            timeSlot = incrementTimeBy10Minutes(timeSlot);
         }
+
+        // Discharge mode cell
+        if (!hideInternal) {
+            const dischargeModeCell = row.insertCell();
+            dischargeModeCell.classList.add('text-center');
+            dischargeModeCell.textContent = patient.discharge_mode || '';
+        }
+
+        // WE cell (weekend) - empty as requested
+        if (!hideInternal) {
+            const weCell = row.insertCell();
+            weCell.classList.add('text-center');
+            weCell.textContent = '';
+        }
+
+        // Add additional content row if there is any content
+        if (!hideInternal) {
+            createAdditionalContentRow(patient, tbody, 9);
+        }
+
+        // Remove from map to track which patients we've included
+        delete activePatientsMap[patientId];
+
+        // Increment time slot by 10 minutes
+        timeSlot = incrementTimeBy10Minutes(timeSlot);
     });
 
-    // Add any new active patients that weren't in the original list
+    // Add any new active patients that weren't in the original list (skip hidden)
     for (const patientId in activePatientsMap) {
+        if (hiddenPatientsSet.has(patientId)) continue;
+
         const patient = activePatientsMap[patientId];
 
         const row = tbody.insertRow();
@@ -1014,24 +1208,44 @@ function refreshEditRoundsTable() {
     }
 
     const tbody = editTable.tBodies[0];
-    const rows = Array.from(tbody.rows).filter(row => row.hasAttribute('data-patient-id'));
-    
-    // Get the current patient order
-    const patientOrder = rows.map(row => row.getAttribute('data-patient-id'));
-    
+    const rows = Array.from(tbody.rows).filter(row => !row.classList.contains('additional-content-row'));
+
+    // Capture items in order (patients, placeholders, hidden patients)
+    const items = rows.map(row => {
+        if (row.hasAttribute('data-placeholder-id')) {
+            return {
+                type: 'placeholder',
+                title: row.getAttribute('data-placeholder-title') || '',
+                duration: parseInt(row.getAttribute('data-placeholder-duration')) || 30
+            };
+        }
+        return {
+            type: 'patient',
+            id: row.getAttribute('data-patient-id'),
+            hidden: row.getAttribute('data-hidden') === 'true'
+        };
+    });
+
     // Clear the table
     while (tbody.rows.length > 0) {
         tbody.deleteRow(0);
     }
-    
-    // Re-add all patients in the same order
-    patientOrder.forEach((patientId, index) => {
-        const patient = window['patients-station'] ? window['patients-station'][patientId] : null;
-        if (patient) {
-            patient.id = patientId;
-            addPatientToEditRoundsTable(patient, index, editTable);
+
+    // Re-add all items in the same order
+    let index = 0;
+    items.forEach((item) => {
+        if (item.type === 'placeholder') {
+            addPlaceholderToEditRoundsTable(item, editTable);
+        } else {
+            const patient = window['patients-station'] ? window['patients-station'][item.id] : null;
+            if (patient) {
+                patient.id = item.id;
+                addPatientToEditRoundsTable(patient, index++, editTable, item.hidden);
+            }
         }
     });
+
+    updateRowOrder(tbody);
 }
 
 /**
@@ -1120,6 +1334,33 @@ function incrementTimeBy10Minutes(timeStr) {
 }
 
 /**
+ * Increment a time string by N minutes
+ * @param {string} timeStr - Time string in format HH:MM
+ * @param {number} minutes - Number of minutes to add
+ * @returns {string} - New time string
+ */
+function incrementTimeByMinutes(timeStr, minutes) {
+    const [hours, mins] = timeStr.split(':').map(Number);
+    const totalMinutes = hours * 60 + mins + parseInt(minutes);
+    const newHours = Math.floor(totalMinutes / 60) % 24;
+    const newMins = totalMinutes % 60;
+    return `${String(newHours).padStart(2, '0')}:${String(newMins).padStart(2, '0')}`;
+}
+
+/**
+ * Escape HTML special characters
+ * @param {string} str - String to escape
+ * @returns {string} - Escaped string
+ */
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+/**
  * Show the edit rounds form
  */
 function showEditRoundsForm() {
@@ -1169,19 +1410,33 @@ function showEditRoundsForm() {
         activePatientsMap[patient.id] = patient;
     });
 
-    // Add rows for patients in the saved order first
+    // Add rows for patients in the saved order first, handling placeholders
     let index = 0;
-    rounds.patients.forEach(patientId => {
+    rounds.patients.forEach(item => {
+        if (item && typeof item === 'object' && item.type === 'placeholder') {
+            addPlaceholderToEditRoundsTable(item, activePatientsTable);
+        } else if (typeof item === 'string' && activePatientsMap[item]) {
+            addPatientToEditRoundsTable(activePatientsMap[item], index++, activePatientsTable);
+            delete activePatientsMap[item];
+        }
+    });
+
+    // Add hidden patients at the end
+    const hiddenPatientIds = rounds.hiddenPatients || [];
+    hiddenPatientIds.forEach(patientId => {
         if (activePatientsMap[patientId]) {
-            addPatientToEditRoundsTable(activePatientsMap[patientId], index++, activePatientsTable);
+            addPatientToEditRoundsTable(activePatientsMap[patientId], index++, activePatientsTable, true);
             delete activePatientsMap[patientId];
         }
     });
 
-    // Add any new active patients
+    // Add any new active patients not yet in the list
     for (const patientId in activePatientsMap) {
         addPatientToEditRoundsTable(activePatientsMap[patientId], index++, activePatientsTable);
     }
+
+    // Recalculate times accounting for placeholders
+    updateRowOrder(activePatientsTable.tBodies[0]);
 
     // Make the table sortable
     makeTableSortable(activePatientsTable);
@@ -1216,10 +1471,25 @@ function updateRounds() {
     const roundsId = roundsIdInput.value;
     const germanDateStr = formatISOToGermanDate(dateInput.value);
 
-    // Get patient order from the table
+    // Get patient order and placeholders from the table; collect hidden patients separately
     const patientsTable = document.getElementById('editRoundsPatientsTable');
-    const patientRows = Array.from(patientsTable.tBodies[0].rows);
-    const patientOrder = patientRows.map(row => row.getAttribute('data-patient-id'));
+    const allRows = Array.from(patientsTable.tBodies[0].rows).filter(r => !r.classList.contains('additional-content-row'));
+    const patientOrder = [];
+    const hiddenPatients = [];
+
+    allRows.forEach(row => {
+        if (row.hasAttribute('data-placeholder-id')) {
+            patientOrder.push({
+                type: 'placeholder',
+                title: row.getAttribute('data-placeholder-title') || '',
+                duration: parseInt(row.getAttribute('data-placeholder-duration')) || 30
+            });
+        } else if (row.getAttribute('data-hidden') === 'true') {
+            hiddenPatients.push(row.getAttribute('data-patient-id'));
+        } else if (row.hasAttribute('data-patient-id')) {
+            patientOrder.push(row.getAttribute('data-patient-id'));
+        }
+    });
 
     // Update rounds object
     if (window['rounds-station'] && window['rounds-station'][roundsId]) {
@@ -1227,7 +1497,8 @@ function updateRounds() {
             date: germanDateStr,
             title: titleInput.value,
             startTime: startTimeInput.value,
-            patients: patientOrder
+            patients: patientOrder,
+            hiddenPatients: hiddenPatients
         };
 
         // Update our local copy of the data
@@ -1522,11 +1793,14 @@ function copyLatestRounds() {
         activePatientsMap[patient.id] = patient;
     });
 
-    // Filter out inactive patients from the latest rounds
-    const filteredPatients = latestRounds.patients.filter(patientId => activePatientsMap[patientId]);
+    // Filter out inactive patients from the latest rounds, keeping placeholders
+    const filteredPatients = latestRounds.patients.filter(item => {
+        if (item && typeof item === 'object' && item.type === 'placeholder') return true;
+        return typeof item === 'string' && activePatientsMap[item];
+    });
 
     // Add any new patients that weren't in the original list
-    const includedPatientIds = new Set(filteredPatients);
+    const includedPatientIds = new Set(filteredPatients.filter(item => typeof item === 'string'));
     activePatients.forEach(patient => {
         if (!includedPatientIds.has(patient.id)) {
             filteredPatients.push(patient.id);
@@ -1538,7 +1812,8 @@ function copyLatestRounds() {
         date: targetGermanDate,
         title: latestRounds.title,
         startTime: latestRounds.startTime,
-        patients: filteredPatients
+        patients: filteredPatients,
+        hiddenPatients: []
     };
 
     // Initialize window['rounds-station'] if it doesn't exist
@@ -1578,13 +1853,18 @@ function copyLatestRounds() {
         activePatientsTable.tBodies[0].deleteRow(0);
     }
 
-    // Add rows for patients in the copied order
+    // Add rows for patients in the copied order, handling placeholders
     let index = 0;
-    filteredPatients.forEach(patientId => {
-        if (activePatientsMap[patientId]) {
-            addPatientToEditRoundsTable(activePatientsMap[patientId], index++, activePatientsTable);
+    filteredPatients.forEach(item => {
+        if (item && typeof item === 'object' && item.type === 'placeholder') {
+            addPlaceholderToEditRoundsTable(item, activePatientsTable);
+        } else if (typeof item === 'string' && activePatientsMap[item]) {
+            addPatientToEditRoundsTable(activePatientsMap[item], index++, activePatientsTable);
         }
     });
+
+    // Recalculate times accounting for placeholders
+    updateRowOrder(activePatientsTable.tBodies[0]);
 
     // Make the table sortable
     makeTableSortable(activePatientsTable);
