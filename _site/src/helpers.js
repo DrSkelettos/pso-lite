@@ -1,3 +1,8 @@
+function openMailto(recipient, subject, body) {
+    const mailto = `mailto:${encodeURIComponent(recipient)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.open(mailto);
+}
+
 function formatGermanToISODate(germanDate) {
     const [day, month, year] = germanDate.split('.');
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;

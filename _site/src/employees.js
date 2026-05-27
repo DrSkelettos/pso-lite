@@ -34,6 +34,8 @@ function addEmployee() {
 
     const key = document.getElementById('employeeKey').value.trim();
     const name = document.getElementById('employeeName').value.trim();
+    const fullName = document.getElementById('employeeFullName').value.trim();
+    const email = document.getElementById('employeeEmail').value.trim();
     const patients = parseInt(document.getElementById('employeePatients').value);
 
     // Check if employee already exists
@@ -45,6 +47,8 @@ function addEmployee() {
     // Add new employee
     window['employees'][key] = {
         name: name,
+        ...(fullName ? { fullName } : {}),
+        ...(email ? { email } : {}),
         patients: patients
     };
 
@@ -64,6 +68,8 @@ function editEmployee(empKey) {
     // Set current key and name
     document.getElementById('editEmployeeKey').value = empKey;
     document.getElementById('editEmployeeName').value = employee.name;
+    document.getElementById('editEmployeeFullName').value = employee.fullName || '';
+    document.getElementById('editEmployeeEmail').value = employee.email || '';
     document.getElementById('editEmployeeUsername').value = employee.username || '';
     document.getElementById('editEmployeeRightsViewPatientsStation').checked = employee.rights?.viewPatientsStation || false;
     document.getElementById('editEmployeeRightsEditPatientsStation').checked = employee.rights?.editPatientsStation || false;
@@ -271,6 +277,8 @@ async function saveEmployeeEdit() {
     const oldEmployee = window['employees'][oldKey];
     const newKey = document.getElementById('editEmployeeKey').value.trim();
     const name = document.getElementById('editEmployeeName').value.trim();
+    const fullName = document.getElementById('editEmployeeFullName').value.trim();
+    const email = document.getElementById('editEmployeeEmail').value.trim();
     const username = document.getElementById('editEmployeeUsername').value.trim();
     const password = document.getElementById('editEmployeePassword').value.trim();
     const passwordCheckbox = document.getElementById('editEmployeePasswordCheckbox').checked;
@@ -415,6 +423,8 @@ async function saveEmployeeEdit() {
     // Create updated employee data
     const updatedEmployee = {
         name: name,
+        fullName: fullName || undefined,
+        email: email || undefined,
         username: username,
         patients: patients,
         absences: absences.length > 0 ? absences : undefined,

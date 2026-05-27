@@ -1,4 +1,30 @@
 /**
+ * Returns therapist info for a patient: main (permanent) and current (substitute) employee keys.
+ */
+function getTherapistInfo(patient) {
+    if (!patient.employees || patient.employees.length === 0) return { main: null, current: null };
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Main therapist: permanent assignment (no end date)
+    const mainEntry = patient.employees.find(emp => !emp.end);
+
+    // Current substitute: has end date and is active today
+    const currentEntry = patient.employees.find(emp => {
+        if (!emp.end) return false;
+        const start = parseGermanDate(emp.start);
+        const end = parseGermanDate(emp.end);
+        return start <= today && end >= today;
+    });
+
+    return {
+        main: mainEntry?.employee || null,
+        current: currentEntry?.employee || null
+    };
+}
+
+/**
  * Fills the KOSI table with patients who have been admitted today or in the past
  */
 function fillKosiTable() {
@@ -31,7 +57,43 @@ function fillKosiTable() {
             const nameCell = row.insertCell();
             nameCell.className = 'text-start';
             nameCell.textContent = patient.name;
-            
+
+            // Therapeut:in
+            const therapistCell = row.insertCell();
+            const therapistInfo = getTherapistInfo(patient);
+            if (therapistInfo.main || therapistInfo.current) {
+                const mainKey = therapistInfo.main;
+                const currentKey = therapistInfo.current;
+                // Active therapist to contact: substitute if present, else main
+                const contactKey = currentKey || mainKey;
+                const contactEmployee = window['employees']?.[contactKey] || {};
+
+                let displayText = mainKey || '';
+                if (currentKey && currentKey !== mainKey) {
+                    displayText += ` (${currentKey})`;
+                }
+
+                if (displayText) {
+                    const therapistLink = document.createElement('a');
+                    therapistLink.href = '#';
+                    therapistLink.textContent = displayText;
+                    therapistLink.style.cursor = 'pointer';
+                    therapistLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const recipient = contactEmployee.email || '';
+                        const patientName = patient.name;
+                        const kouebDate = kosiData.koueb || '';
+                        const therapistName = contactEmployee.name || contactKey || '';
+                        const currentUser = window['user'];
+                        const currentUserFullName = currentUser?.fullName || currentUser?.name || '';
+                        const subject = `Kostenübernahme ${patientName}`;
+                        const body = `Hallo ${therapistName},\n\nbei ${patientName} läuft die Kostenübernahme am ${kouebDate} aus. Bitte einen Verlängerungsantrag +4 Wochen schreiben und in meine Signierung schicken.\n\nViele Grüße\n${currentUserFullName}`;
+                        openMailto(recipient, subject, body);
+                    });
+                    therapistCell.appendChild(therapistLink);
+                }
+            }
+
             // Admission date (as text)
             const admissionCell = row.insertCell();
             admissionCell.textContent = patient.admission;
@@ -87,7 +149,7 @@ function fillKosiTable() {
                 
                 // Refresh the Verlängerung cell (remove checkboxes)
                 const row = this.closest('tr');
-                const verlaengerungCell = row.cells[5]; // 6th cell (0-indexed)
+                const verlaengerungCell = row.cells[6]; // 7th cell (0-indexed), after Therapeut:in
                 verlaengerungCell.innerHTML = '';
                 
                 return false;
