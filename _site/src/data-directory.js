@@ -13,6 +13,7 @@ const dataFileMap = {
     'events': 'termine',
     'kosi-station': 'kostensicherung-station',
     'announcements-station': 'ankuendigungen-station',
+    'waitlist-station' : 'warteliste-station'
 };
 
 /**
